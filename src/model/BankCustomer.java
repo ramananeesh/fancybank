@@ -1,4 +1,4 @@
-package raman_aneesh_myfancybank;
+package model;
 
 import java.util.ArrayList;
 
