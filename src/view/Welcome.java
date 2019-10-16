@@ -6,6 +6,9 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+
+import controller.Bank;
+
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
@@ -70,7 +73,7 @@ public class Welcome extends JFrame{
 		btnCustomer.setFont(new Font("Tahoma", Font.PLAIN, 55));
 		btnCustomer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				loginFrame=new Login();
+				loginFrame=new Login(new Bank());
 				loginFrame.setVisible(true);
 			}
 		});
