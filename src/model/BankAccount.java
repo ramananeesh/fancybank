@@ -1,13 +1,13 @@
 package model;
 
-public class Account {
+public class BankAccount {
 
 	private String type; 
 	private double balance; 
 	private double rate; 
 	private double fee;
 	
-	public Account(String type, double balance, double rate, double fee) {
+	public BankAccount(String type, double balance, double rate, double fee) {
 		super();
 		this.type = type;
 		this.balance = balance;

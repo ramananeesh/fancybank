@@ -3,14 +3,16 @@ package model;
 public class Transaction {
 
 	private String type;
-	private String amount; 
-	private String accountName;
-	
-	public Transaction(String type, String amount, String accountName) {
+	private String amount;
+	private String fromAccount;
+	private String toAccount;
+
+	public Transaction(String type, String amount, String accountName, String toAccount) {
 		super();
 		this.type = type;
 		this.amount = amount;
-		this.accountName = accountName;
+		this.fromAccount = accountName;
+		this.toAccount = toAccount;
 	}
 
 	public String getType() {
@@ -29,17 +31,26 @@ public class Transaction {
 		this.amount = amount;
 	}
 
-	public String getAccountName() {
-		return accountName;
+	public String getFromAccount() {
+		return fromAccount;
 	}
 
-	public void setAccountName(String accountName) {
-		this.accountName = accountName;
+	public void setFromAccount(String fromAccount) {
+		this.fromAccount = fromAccount;
+	}
+
+	public String getToAccount() {
+		return toAccount;
+	}
+
+	public void setToAccount(String toAccount) {
+		this.toAccount = toAccount;
 	}
 
 	@Override
 	public String toString() {
-		return "Transaction [type=" + type + ", amount=" + amount + ", accountName=" + accountName + "]";
-	} 
-	
+		return "Transaction [type=" + type + ", amount=" + amount + ", fromAccount=" + fromAccount + ", fromAccount="
+				+ fromAccount + "]";
+	}
+
 }
