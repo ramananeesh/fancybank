@@ -7,11 +7,11 @@ public class Transaction {
 	private String fromAccount;
 	private String toAccount;
 
-	public Transaction(String type, String amount, String accountName, String toAccount) {
+	public Transaction(String type, String amount, String fromAccount, String toAccount) {
 		super();
 		this.type = type;
 		this.amount = amount;
-		this.fromAccount = accountName;
+		this.fromAccount = fromAccount;
 		this.toAccount = toAccount;
 	}
 

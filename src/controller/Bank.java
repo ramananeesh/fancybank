@@ -1,4 +1,5 @@
 package controller;
+
 import java.util.ArrayList;
 
 import model.*;
@@ -6,6 +7,58 @@ import model.*;
 public class Bank {
 
 	private ArrayList<BankManager> managers;
-	private ArrayList<BankCustomer> customers; 
+	private ArrayList<BankCustomer> customers;
 	private ArrayList<Transaction> transactions;
+
+	public Bank() {
+		managers = new ArrayList<BankManager>();
+		customers = new ArrayList<BankCustomer>();
+		transactions = new ArrayList<Transaction>();
+	}
+
+	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
+		BankManager newManager = new BankManager(name, id, email, securityCode, password);
+		managers.add(newManager);
+		return newManager;
+	}
+
+	public Transaction addTransaction(String type, String amount, String fromAccount, String toAccount) {
+		Transaction newTransaction = new Transaction(type, amount, fromAccount, toAccount);
+		transactions.add(newTransaction);
+		return newTransaction;
+	}
+
+	public BankCustomer addCustomer(String name, Address address, String phoneNumber, String ssn, String email,
+			String password) {
+
+		int customerId = BankCustomer.generateCustomerId(customers);
+		BankCustomer newCustomer = new BankCustomer(name, customerId, address, phoneNumber, ssn, email, password);
+		this.customers.add(newCustomer);
+		return newCustomer;
+	}
+
+	public ArrayList<BankManager> getManagers() {
+		return managers;
+	}
+
+	public void setManagers(ArrayList<BankManager> managers) {
+		this.managers = managers;
+	}
+
+	public ArrayList<BankCustomer> getCustomers() {
+		return customers;
+	}
+
+	public void setCustomers(ArrayList<BankCustomer> customers) {
+		this.customers = customers;
+	}
+
+	public ArrayList<Transaction> getTransactions() {
+		return transactions;
+	}
+
+	public void setTransactions(ArrayList<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
 }
