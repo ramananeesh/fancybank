@@ -83,6 +83,10 @@ public class BankAccount {
 	public void setFee(double fee) {
 		this.fee = fee;
 	}
+	
+	public String[] getDetails() {
+		return new String[] {this.accountName,this.type};
+	}
 
 	@Override
 	public String toString() {

@@ -5,7 +5,7 @@ public class Transaction {
 	private String fromCustomer;
 	private String toCustomer;
 	private String type;
-	private double amount;
+	private Double amount;
 	private String fromAccount;
 	private String toAccount;
 
@@ -20,15 +20,22 @@ public class Transaction {
 		this.toAccount = toAccount;
 	}
 
-	public String shortCustomerDisplay() {
-		return this.toCustomer + " " + this.fromAccount + " " + this.toAccount + " " + this.type + " "
-				+ this.amount;
-	}
-
+//	public String shortCustomerDisplay() {
+//		return this.fromAccount + " " + this.toAccount + " " + this.type + " "
+//				+ this.amount;
+//	}
+//
+	
 	public String detailedCustomerDisplay() {
 		return "Transaction Detail: " + this.type + " of $" + this.amount + " between " + this.fromCustomer
-				+ "'s " + this.fromAccount + " account to" + this.toCustomer + "'s " + this.toAccount + " account\n";
+				+ "'s " + this.fromAccount + " account to " + this.toCustomer + "'s " + this.toAccount + " account\n";
 	}
+	
+	public String[] shortCustomerDisplay() {
+		return new String[] {this.fromAccount, this.toAccount ,this.type ,this.amount.toString()};
+	}
+
+	
 
 	public String getType() {
 		return type;

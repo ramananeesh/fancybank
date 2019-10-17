@@ -23,6 +23,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 import controller.Bank;
 import javafx.collections.SetChangeListener;
@@ -34,14 +36,17 @@ public class CustomerView extends JFrame implements Observer {
 	private BankCustomer customer;
 	private Bank bank;
 
-	private JList<String> accountsList;
-	private JList<String> transactionsList;
+	private JTable accountsTable;
+	private JTable transactionsTable;
 	private JLabel lblCustomerView;
-	private DefaultListModel<String> accountsModel;
-	private DefaultListModel<String> transactionsModel;
+
+
+	private DefaultTableModel accountsModel;
+	private DefaultTableModel transactionsModel;
+
 	private JLabel accountNameLbl;
 	private JLabel accountBalanceLbl;
-	private JLabel infoDetailslbl;
+	private JTextArea infoDetailsTextArea;
 
 	/**
 	 * Create the application.
@@ -59,11 +64,11 @@ public class CustomerView extends JFrame implements Observer {
 	 */
 	private void initialize() {
 
-		this.setBounds(100, 100, 1600, 800);
+		this.setBounds(100, 100, 1800, 800);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
-		lblCustomerView = new JLabel("Customer View ");
+		lblCustomerView = new JLabel("Welcome "+customer.getName());
 		lblCustomerView.setFont(new Font("Tahoma", Font.PLAIN, 45));
 		lblCustomerView.setHorizontalAlignment(SwingConstants.CENTER);
 		getContentPane().add(lblCustomerView, BorderLayout.NORTH);
@@ -77,19 +82,26 @@ public class CustomerView extends JFrame implements Observer {
 		accountsPanel.setPreferredSize(new Dimension(400, 300));
 		westPanel.add(accountsPanel, BorderLayout.NORTH);
 
-		accountsModel = new DefaultListModel<>();
-		accountsModel = addAccountsToList(this.customer, accountsModel);
-		accountsList = new JList<String>(accountsModel);
-		accountsList.setValueIsAdjusting(true);
-		accountsList.addListSelectionListener(new AccountListListener());
+		String accountsData[][] = new String[][] { };
+		String accountsHeader[] = new String[] { "Account Name", "Account Type" };
+		accountsModel = new DefaultTableModel(accountsData, accountsHeader);
+		accountsTable = new JTable(accountsModel);
 		accountsPanel.setLayout(new BorderLayout(0, 0));
+		accountsTable.getSelectionModel().addListSelectionListener(new AccountListListener());
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		accountsTable.setDefaultRenderer(String.class, centerRenderer);
+		accountsTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 30));
 
-		accountsList.setVisibleRowCount(5);
-		accountsList.setPreferredSize(new Dimension(380, 280));
-		accountsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		accountsList.setBorder(new EmptyBorder(5, 5, 5, 5));
-		accountsList.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		accountsPanel.add(accountsList);
+		accountsTable.setPreferredSize(new Dimension(380, 280));
+		accountsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		accountsTable.setBorder(new EmptyBorder(5, 5, 5, 5));
+		accountsTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		accountsTable.setRowHeight(35);
+		JScrollPane js = new JScrollPane(accountsTable);
+		js.setVisible(true);
+
+		accountsPanel.add(js);
 
 		JPanel centerPanel = new JPanel();
 		getContentPane().add(centerPanel, BorderLayout.CENTER);
@@ -117,7 +129,7 @@ public class CustomerView extends JFrame implements Observer {
 		JButton btnAddAccount = new JButton("Add Account");
 		btnAddAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+
 				JTextField nameField = new JTextField();
 
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
@@ -126,7 +138,7 @@ public class CustomerView extends JFrame implements Observer {
 				ArrayList<String> accountType = new ArrayList<String>();
 				accountType.add("Savings");
 				accountType.add("Checking");
-			
+
 				for (int i = 0; i < accountType.size(); i++) {
 					combo.addItem(accountType.get(i));
 				}
@@ -137,7 +149,7 @@ public class CustomerView extends JFrame implements Observer {
 						JOptionPane.OK_CANCEL_OPTION);
 
 				if (reply == JOptionPane.OK_OPTION) {
-					String type; 
+					String type;
 					type = combo.getItemAt(combo.getSelectedIndex());
 
 					bank.addAccount(customer, nameField.getText(), type);
@@ -228,41 +240,54 @@ public class CustomerView extends JFrame implements Observer {
 		lblTransactions.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		transactionsPanel.add(lblTransactions, BorderLayout.NORTH);
 
-		transactionsModel = new DefaultListModel<>();
-		// change to transactions here
-		transactionsModel = addTransactionsToList(customer, transactionsModel);
-		transactionsList = new JList<String>(transactionsModel);
-		transactionsList.addListSelectionListener(new TransactionListListener());
-		transactionsList.setVisible(true);
+		String transactionsData[][] = new String[][] {  };
+		String transactionsHeader[] = new String[] { "From", "To", "Type", "Amount($)" };
+		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
+		transactionsTable = new JTable(transactionsModel);
+		transactionsTable.getSelectionModel().addListSelectionListener(new TransactionListListener());
+		transactionsTable.setVisible(true);
 
-		transactionsList.setVisibleRowCount(8);
-		transactionsList.setPreferredSize(new Dimension(380, 380));
-		transactionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		transactionsList.setBorder(new EmptyBorder(5, 5, 5, 5));
-		transactionsList.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		transactionsPanel.add(transactionsList);
-		// transactionsPanel.setPreferredSize(new Dimension(400, 400));
-
+		transactionsTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 30));
+		transactionsTable.setPreferredSize(new Dimension(380, 380));
+		transactionsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		transactionsTable.setBorder(new EmptyBorder(5, 5, 5, 5));
+		transactionsTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		transactionsTable.setRowHeight(35);
+		transactionsTable.setRowMargin(2);
+		transactionsTable.setDefaultRenderer(String.class, centerRenderer);
+		JScrollPane js1 = new JScrollPane(transactionsTable);
+		js1.setVisible(true);
+		transactionsPanel.add(js1);
+		
 		btnsPanel.setBorder(new LineBorder(Color.black, 3));
 		
+
 		JPanel infoPanel = new JPanel();
 		centerPanel.add(infoPanel, BorderLayout.NORTH);
 		infoPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JLabel lblInformationDetails = new JLabel("Information / Details");
 		lblInformationDetails.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		lblInformationDetails.setHorizontalAlignment(SwingConstants.CENTER);
 		infoPanel.add(lblInformationDetails, BorderLayout.NORTH);
+
+		infoPanel.setPreferredSize(new Dimension(600, 300));
+		infoDetailsTextArea = new JTextArea("NA");
+		infoDetailsTextArea.setWrapStyleWord(true);
+		infoDetailsTextArea.setLineWrap(true);
+		infoDetailsTextArea.setEnabled(false);
+		infoDetailsTextArea.setForeground(Color.BLUE);
+		infoDetailsTextArea.setFont(new Font("Tahoma", Font.PLAIN, 28));
 		
-		infoDetailslbl = new JLabel("NA");
-		infoDetailslbl.setForeground(Color.BLUE);
-		infoDetailslbl.setFont(new Font("Tahoma", Font.PLAIN, 28));
-		infoDetailslbl.setHorizontalAlignment(SwingConstants.CENTER);
-		infoPanel.add(infoDetailslbl, BorderLayout.SOUTH);
+		JScrollPane infoScrollPane = new JScrollPane(infoDetailsTextArea);
+		infoScrollPane.setVisible(true);
+		infoPanel.add(infoScrollPane, BorderLayout.CENTER);
 		balancePanel.setBorder(new LineBorder(Color.black, 3));
+		infoPanel.setBorder(new LineBorder(Color.black, 3));
+		loansPanel.setBorder(new LineBorder(Color.black, 3));
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
-	
+
 	public class TransactionActionListener implements ActionListener {
 
 		String title;
@@ -301,9 +326,17 @@ public class CustomerView extends JFrame implements Observer {
 				if (this.type.equals("Deposit")) {
 					bank.depositForCustomer(customer, combo.getItemAt(accountIndex),
 							Double.parseDouble(amountField.getText()));
+					Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Deposit",
+							Double.parseDouble(amountField.getText()), "Self",
+							accounts.get(accountIndex).getAccountName());
+					bank.addTransactionForCustomer(customer, transaction);
 				} else if (this.type.equals("Withdraw")) {
 					bank.withdrawForCustomer(customer, combo.getItemAt(accountIndex),
 							Double.parseDouble(amountField.getText()));
+					Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Withdrawal",
+							Double.parseDouble(amountField.getText()), accounts.get(accountIndex).getAccountName(),
+							"Self");
+					bank.addTransactionForCustomer(customer, transaction);
 				}
 			}
 		}
@@ -351,7 +384,8 @@ public class CustomerView extends JFrame implements Observer {
 							String account1 = accounts.get(index1).getAccountName();
 							String account2 = accounts.get(index2).getAccountName();
 							bank.transferBetweenAccountsForCustomer(customer, account1, account2, amount);
-							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Internal Transfer", amount, account1, account2);
+							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(),
+									"Internal Transfer", amount, account1, account2);
 							bank.addTransactionForCustomer(customer, transaction);
 							break;
 						} else {
@@ -374,12 +408,13 @@ public class CustomerView extends JFrame implements Observer {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 			// TODO Auto-generated method stub
-			if(accountsList.getSelectedIndex()==-1) {
+
+			if (accountsTable.getSelectedRow() == -1) {
 				return;
 			}
-			
+
 			ArrayList<BankAccount> accounts = customer.getAccounts();
-			BankAccount account = accounts.get(accountsList.getSelectedIndex());
+			BankAccount account = accounts.get(accountsTable.getSelectedRow());
 
 			accountNameLbl.setText(account.getAccountName());
 			Double balance = account.getBalance();
@@ -387,38 +422,42 @@ public class CustomerView extends JFrame implements Observer {
 		}
 
 	}
-	
-	public class TransactionListListener implements ListSelectionListener{
+
+	public class TransactionListListener implements ListSelectionListener {
 
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 			// TODO Auto-generated method stub
-			if(transactionsList.getSelectedIndex()==-1) {
+
+
+			if (transactionsTable.getSelectedRow() == -1) {
 				return;
 			}
-			
 			ArrayList<Transaction> transactions = customer.getTransactions();
-			Transaction transaction = transactions.get(transactionsList.getSelectedIndex());
-			
-			infoDetailslbl.setText(transaction.detailedCustomerDisplay());
+			Transaction transaction = transactions.get(transactionsTable.getSelectedRow());
+
+			String info = transaction.detailedCustomerDisplay();
+			infoDetailsTextArea.setText(info);
 		}
-		
+
 	}
 
-	public DefaultListModel<String> addAccountsToList(BankCustomer customer, DefaultListModel<String> model) {
+	public DefaultTableModel addAccountsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<BankAccount> accounts = customer.getAccounts();
+
 		for (BankAccount acc : accounts) {
-			model.addElement(acc.getAccountName() + "\t" + acc.getType());
+			model.addRow(acc.getDetails());
 		}
+
 		return model;
 	}
-	
-	public DefaultListModel<String> addTransactionsToList(BankCustomer customer, DefaultListModel<String> model){
+
+	public DefaultTableModel addTransactionsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<Transaction> transactions = customer.getTransactions();
 		for (Transaction t : transactions) {
-			model.addElement(t.shortCustomerDisplay());
+			model.addRow(t.shortCustomerDisplay());
 		}
 		return model;
 	}
@@ -426,13 +465,21 @@ public class CustomerView extends JFrame implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub
+		
+		String accountsData[][] = new String[][] { };
+		String accountsHeader[] = new String[] { "Account Name", "Account Type" };
+		accountsModel = new DefaultTableModel(accountsData, accountsHeader);
+		accountsModel = addAccountsToTable(this.customer,
+				accountsModel);
+		accountsTable.setModel(accountsModel);
 
-		accountsModel = addAccountsToList(this.customer, new DefaultListModel<String>());
-		accountsList.setModel(accountsModel);
-		
-		transactionsModel = addTransactionsToList(customer, new DefaultListModel<String>());
-		transactionsList.setModel(transactionsModel);
-		
+		String transactionsData[][] = new String[][] {  };
+		String transactionsHeader[] = new String[] { "From", "To", "Type", "Amount($)" };
+		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
+		transactionsModel = addTransactionsToTable(customer,
+				transactionsModel);
+		transactionsTable.setModel(transactionsModel);
+
 	}
 
 }

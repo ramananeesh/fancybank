@@ -26,8 +26,9 @@ public class Bank extends Observable {
 		return newManager;
 	}
 
-	public Transaction addTransaction(String type, String amount, String fromAccount, String toAccount) {
-		Transaction newTransaction = new Transaction(type, amount, fromAccount, toAccount);
+	public Transaction addTransaction(String fromCustomer, String toCustomer, String type, double amount,
+			String fromAccount, String toAccount) {
+		Transaction newTransaction = new Transaction(fromCustomer, toCustomer, type, amount, fromAccount, toAccount);
 		transactions.add(newTransaction);
 		return newTransaction;
 	}
@@ -46,16 +47,17 @@ public class Bank extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	public int getCustomerIndex(String name) {
-		int i=0;
-		for(BankCustomer cust : this.customers) {
-			if(cust.getName().equals(name))
+		int i = 0;
+		for (BankCustomer cust : this.customers) {
+			if (cust.getName().equals(name))
 				return i;
 			i++;
 		}
 		return -1;
 	}
+
 	public BankCustomer getCustomerByEmail(String email) {
 
 		for (BankCustomer c : this.customers) {
@@ -69,15 +71,22 @@ public class Bank extends Observable {
 	public void depositForCustomer(BankCustomer customer, String accountName, double amount) {
 		this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
 	}
-	
+
 	public void withdrawForCustomer(BankCustomer customer, String accountName, double amount) {
 		this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
 	}
-	
-	public void transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName, String toAccountName, double amount) {
+
+	public void transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName, String toAccountName,
+			double amount) {
 		this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName, amount);
 	}
-	
+
+	public void addTransactionForCustomer(BankCustomer customer, Transaction transaction) {
+		this.getCustomerByEmail(customer.getEmail()).addTransaction(transaction);
+		setChanged();
+		notifyObservers();
+	}
+
 	public BankCustomer login(String email, String password) {
 		BankCustomer customer = getCustomerByEmail(email);
 		if (customer == null)
