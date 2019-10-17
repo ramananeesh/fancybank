@@ -19,6 +19,8 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import controller.Bank;
 import javafx.collections.SetChangeListener;
@@ -33,6 +35,8 @@ public class CustomerView extends JFrame implements Observer {
 	private JList<String> accountsList;
 	private JLabel lblCustomerView;
 	private DefaultListModel<String> model;
+	private JLabel accountNameLbl;
+	private JLabel accountBalanceLbl;
 	
 	
 	/**
@@ -76,6 +80,7 @@ public class CustomerView extends JFrame implements Observer {
 		model = new DefaultListModel<>();
 		model = addAccountsToList(this.customer,model);
 		accountsList = new JList<String>(model);
+		accountsList.addListSelectionListener(new AccountListListener());
 		accountsList.setVisible(true);
 		
 		accountsList.setVisibleRowCount(5);
@@ -173,15 +178,15 @@ public class CustomerView extends JFrame implements Observer {
 		balanceDisplayPanel.setPreferredSize(new Dimension(500,100));
 		balancePanel.add(balanceDisplayPanel);
 		balanceDisplayPanel.setLayout(new GridLayout(0, 2, 0, 0));
-		JLabel accountNameLbl = new JLabel("Account name: ");
+		accountNameLbl = new JLabel("Account name: ");
+		accountNameLbl.setHorizontalAlignment(SwingConstants.RIGHT);
 		accountNameLbl.setPreferredSize(new Dimension(230, 50));
 		accountNameLbl.setBorder(border);
 		balanceDisplayPanel.add(accountNameLbl);
 		
-		JLabel accountBalanceLbl = new JLabel("$ 0.0");
+		accountBalanceLbl = new JLabel("$ 0.0");
 		accountBalanceLbl.setPreferredSize(new Dimension(230, 50));
 		accountBalanceLbl.setBorder(border);
-		accountBalanceLbl.setHorizontalAlignment(SwingConstants.TRAILING);
 		balanceDisplayPanel.add(accountBalanceLbl);
 		
 		JPanel loansPanel = new JPanel();
@@ -201,6 +206,22 @@ public class CustomerView extends JFrame implements Observer {
 		JPanel loansDisplayPanel = new JPanel();
 		loansPanel.add(loansDisplayPanel, BorderLayout.CENTER);
 		
+		
+	}
+	
+	public class AccountListListener implements ListSelectionListener{
+
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			// TODO Auto-generated method stub
+			
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			BankAccount account = accounts.get(accountsList.getSelectedIndex());
+			
+			accountNameLbl.setText(account.getAccountName());
+			Double balance = account.getBalance();
+			accountBalanceLbl.setText(balance.toString());
+		}
 		
 	}
 	
