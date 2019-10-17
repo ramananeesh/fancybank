@@ -137,6 +137,10 @@ public class BankCustomer extends Customer {
 	public void setAccounts(ArrayList<BankAccount> accounts) {
 		this.accounts = accounts;
 	}
+	
+	public String[] getDetails() {
+		return new String[] {this.getCustomerId(),this.getName()};
+	}
 
 	public static int generateCustomerId(ArrayList<BankCustomer> existingCustomers) {
 		rand = new Random();
@@ -200,6 +204,17 @@ public class BankCustomer extends Customer {
 				max=acc.getBalance();
 		}
 		return max;
+	}
+	
+	public String getCustomerDetails() {
+		String ret="";
+		ret+="Customer ID: "+this.getCustomerId()+"\n";
+		ret+="Customer Name: "+this.getName()+"\n";
+		ret+="Accounts: \n";
+		for(BankAccount acc: this.accounts) {
+			ret+=acc.toString(0.0);
+		}
+		return ret;
 	}
 
 }

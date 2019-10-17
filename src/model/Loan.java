@@ -83,6 +83,12 @@ public class Loan {
 				Boolean.toString(this.isActive) };
 	}
 
+	
+	public String[] getShortLoanDisplayForManager() {
+		return new String[] { this.loanId, this.customerName, Double.toString(this.loanAmount), Boolean.toString(this.isApproved),
+				Boolean.toString(this.isActive) };
+	}
+
 	public String getDetailedLoanDisplayForCustomer() {
 		String ret = "";
 

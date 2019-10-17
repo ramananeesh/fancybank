@@ -26,7 +26,7 @@ public class Transaction {
 //	}
 //
 	
-	public String detailedCustomerDisplay() {
+	public String detailedDisplay() {
 		return "Transaction Detail: " + this.type + " of $" + this.amount + " between " + this.fromCustomer
 				+ "'s " + this.fromAccount + " account to " + this.toCustomer + "'s " + this.toAccount + " account\n";
 	}
@@ -35,7 +35,9 @@ public class Transaction {
 		return new String[] {this.fromAccount, this.toAccount ,this.type ,this.amount.toString()};
 	}
 
-	
+	public String[] shortManagerDisplay() {
+		return new String[] {this.fromCustomer, this.fromAccount, this.toAccount ,this.type ,this.amount.toString()};
+	}
 
 	public String getType() {
 		return type;

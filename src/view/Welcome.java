@@ -20,7 +20,8 @@ import java.awt.Font;
 
 public class Welcome extends JFrame{
 
-	private Login loginFrame;
+	private JFrame loginFrame;
+	private Bank bank;
 
 	/**
 	 * Launch the application.
@@ -29,7 +30,8 @@ public class Welcome extends JFrame{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Welcome window = new Welcome();
+					Bank bank = new Bank();
+					Welcome window = new Welcome(bank);
 					window.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -41,8 +43,10 @@ public class Welcome extends JFrame{
 	/**
 	 * Create the application.
 	 */
-	public Welcome() {
+	public Welcome(Bank bank) {
+		
 		super();
+		this.bank = bank;
 		initialize();
 	}
 
@@ -68,12 +72,23 @@ public class Welcome extends JFrame{
 		JButton btnManager = new JButton("Manager ");
 		btnManager.setFont(new Font("Tahoma", Font.PLAIN, 55));
 		panel.add(btnManager);
+		btnManager.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				loginFrame = new ManagerLogin(bank);
+				setVisible(false);
+				loginFrame.setVisible(true);
+			}
+		});
 		
 		JButton btnCustomer = new JButton("Customer");
 		btnCustomer.setFont(new Font("Tahoma", Font.PLAIN, 55));
 		btnCustomer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				loginFrame=new Login(new Bank());
+				loginFrame=new Login(bank);
+				setVisible(false);
 				loginFrame.setVisible(true);
 			}
 		});

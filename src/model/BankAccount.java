@@ -96,4 +96,8 @@ public class BankAccount {
 	public String toString(int args) {
 		return type+"\t"+ balance +"\t"+rate+ "\t"+fee+"\t";
 	}
+	
+	public String toString(double args) {
+		return "\t\tAccount Type: "+type+"\n\t\tBalance: "+balance+"\n";
+	}
 }

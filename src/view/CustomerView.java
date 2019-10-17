@@ -329,6 +329,13 @@ public class CustomerView extends JFrame implements Observer {
 		moreOptionsPanel.add(btnCurrencyConverter);
 
 		JButton btnLogout = new JButton("Logout");
+		btnLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
+				Welcome welcome = new Welcome(bank);
+				welcome.setVisible(true);
+			}
+		});
 		btnLogout.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		moreOptionsPanel.add(btnLogout);
 
@@ -552,7 +559,7 @@ public class CustomerView extends JFrame implements Observer {
 			ArrayList<Transaction> transactions = customer.getTransactions();
 			Transaction transaction = transactions.get(transactionsTable.getSelectedRow());
 
-			String info = transaction.detailedCustomerDisplay();
+			String info = transaction.detailedDisplay();
 			infoDetailsTextArea.setText(info);
 		}
 
