@@ -51,7 +51,7 @@ public class CustomerView extends JFrame implements Observer {
 	 */
 	private void initialize() {
 		
-		this.setBounds(100, 100, 1000, 674);
+		this.setBounds(100, 100, 1600, 800);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
@@ -65,11 +65,12 @@ public class CustomerView extends JFrame implements Observer {
 		westPanel.setLayout(new BorderLayout(0, 0));
 		
 		JLabel lblAccounts = new JLabel("Accounts");
-		lblAccounts.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		lblAccounts.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAccounts.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		westPanel.add(lblAccounts, BorderLayout.NORTH);
 		
 		JPanel accountsPanel = new JPanel();
-//		accountsPanel.setSize(500, 500);
+		accountsPanel.setPreferredSize(new Dimension(300,300));
 		westPanel.add(accountsPanel, BorderLayout.CENTER);
 		
 		model = new DefaultListModel<>();
@@ -108,11 +109,13 @@ public class CustomerView extends JFrame implements Observer {
 			public void actionPerformed(ActionEvent arg0) {
 				JRadioButton savings = new JRadioButton();
 				JRadioButton checking = new JRadioButton();
+				JTextField nameField = new JTextField();
 				
 				savings.setSelected(true);
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
 				
 				Object[] fields = {
+						"Account name", nameField,
 					"Savings ", savings,
 					"Checking ", checking,
 				};
@@ -125,7 +128,7 @@ public class CustomerView extends JFrame implements Observer {
 						accountType = "Savings";
 					else
 						accountType = "Checking";
-					bank.addAccount(customer, accountType);
+					bank.addAccount(customer, nameField.getText(), accountType);
 				}
 			}
 		});
@@ -138,6 +141,7 @@ public class CustomerView extends JFrame implements Observer {
 		centerPanel.add(messageLabel, BorderLayout.SOUTH);
 		
 		JPanel eastPanel = new JPanel();
+		eastPanel.setPreferredSize(new Dimension(500,800));
 		getContentPane().add(eastPanel, BorderLayout.EAST);
 		GridBagLayout gbl_eastPanel = new GridBagLayout();
 		gbl_eastPanel.columnWidths = new int[]{376, 0};
@@ -147,30 +151,35 @@ public class CustomerView extends JFrame implements Observer {
 		eastPanel.setLayout(gbl_eastPanel);
 		
 		JPanel balancePanel = new JPanel();
+		balancePanel.setPreferredSize(new Dimension(500,150));
 		GridBagConstraints gbc_balancePanel = new GridBagConstraints();
 		gbc_balancePanel.fill = GridBagConstraints.BOTH;
 		gbc_balancePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_balancePanel.gridx = 0;
 		gbc_balancePanel.gridy = 0;
-		eastPanel.add(balancePanel, gbc_balancePanel);
 		balancePanel.setLayout(new BorderLayout(0, 0));
+		eastPanel.add(balancePanel, gbc_balancePanel);
+		
 		
 		JLabel lblNewLabel = new JLabel("Balance");
 		lblNewLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		balancePanel.add(lblNewLabel, BorderLayout.NORTH);
 		
+		Border border = BorderFactory.createEmptyBorder(5,5,5,5);
+		
 		JPanel balanceDisplayPanel = new JPanel();
+		balanceDisplayPanel.setPreferredSize(new Dimension(500,100));
 		balancePanel.add(balanceDisplayPanel);
 		balanceDisplayPanel.setLayout(new GridLayout(0, 2, 0, 0));
-		
-		Border border = BorderFactory.createEmptyBorder(5,5,5,5);
 		JLabel accountNameLbl = new JLabel("Account name: ");
+		accountNameLbl.setPreferredSize(new Dimension(230, 50));
 		accountNameLbl.setBorder(border);
 		balanceDisplayPanel.add(accountNameLbl);
 		
 		JLabel accountBalanceLbl = new JLabel("$ 0.0");
+		accountBalanceLbl.setPreferredSize(new Dimension(230, 50));
 		accountBalanceLbl.setBorder(border);
 		accountBalanceLbl.setHorizontalAlignment(SwingConstants.TRAILING);
 		balanceDisplayPanel.add(accountBalanceLbl);
@@ -199,7 +208,7 @@ public class CustomerView extends JFrame implements Observer {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<BankAccount> accounts = customer.getAccounts();
 		for (BankAccount acc : accounts) {
-			model.addElement(acc.getType());
+			model.addElement(acc.getAccountName()+"\t"+acc.getType());
 		}
 		return model;
 	}

@@ -41,8 +41,8 @@ public class Bank extends Observable {
 		return newCustomer;
 	}
 
-	public void addAccount(BankCustomer customer, String accountType) {
-		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountType));
+	public void addAccount(BankCustomer customer, String accountName, String accountType) {
+		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType));
 		setChanged();
 		notifyObservers();
 	}

@@ -2,21 +2,24 @@ package model;
 
 public class BankAccount {
 
+	private String accountName;
 	private String type; 
 	private double balance; 
 	private double rate; 
 	private double fee;
 	
-	public BankAccount(String type) {
+	public BankAccount(String name, String type) {
 		super();
+		this.accountName = name;
 		this.type = type;
 		this.balance = 0;
 		this.rate = 0;
 		this.fee = 0;
 	}
 	
-	public BankAccount(String type, double balance, double rate, double fee) {
+	public BankAccount(String name,String type, double balance, double rate, double fee) {
 		super();
+		this.accountName = name;
 		this.type = type;
 		this.balance = balance;
 		this.rate = rate;
@@ -31,6 +34,14 @@ public class BankAccount {
 		return true;
 	}
 	
+	public String getAccountName() {
+		return accountName;
+	}
+
+	public void setAccountName(String accountName) {
+		this.accountName = accountName;
+	}
+
 	public boolean withdraw(double amount) {
 		if(amount<=0 || amount>this.balance) {
 			return false;
