@@ -185,7 +185,7 @@ public class CustomerView extends JFrame implements Observer {
 		balancePanel.setLayout(new BorderLayout(0, 0));
 		eastPanel.add(balancePanel, gbc_balancePanel);
 
-		JLabel lblNewLabel = new JLabel("Balance");
+		JLabel lblNewLabel = new JLabel("Balance Info");
 		lblNewLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 34));
@@ -196,14 +196,15 @@ public class CustomerView extends JFrame implements Observer {
 		JPanel balanceDisplayPanel = new JPanel();
 		balanceDisplayPanel.setPreferredSize(new Dimension(500, 100));
 		balancePanel.add(balanceDisplayPanel);
-		balanceDisplayPanel.setLayout(new GridLayout(0, 2, 0, 0));
+		balanceDisplayPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		accountNameLbl = new JLabel("Account name: ");
-		accountNameLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		accountNameLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		accountNameLbl.setPreferredSize(new Dimension(230, 50));
 		accountNameLbl.setBorder(border);
 		balanceDisplayPanel.add(accountNameLbl);
 
 		accountBalanceLbl = new JLabel("$ 0.0");
+		accountBalanceLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		accountBalanceLbl.setPreferredSize(new Dimension(230, 50));
 		accountBalanceLbl.setBorder(border);
 		balanceDisplayPanel.add(accountBalanceLbl);
@@ -238,7 +239,7 @@ public class CustomerView extends JFrame implements Observer {
 		loansTable.setPreferredSize(new Dimension(580, 140));
 		loansTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		loansTable.setBorder(new EmptyBorder(5,5,5,5));
-		loansTable.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		loansTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
 		loansTable.setRowHeight(20);
 		loansDisplayPanel.setPreferredSize(new Dimension(600,350));
 		loansDisplayPanel.add(loansScrollPane);
@@ -494,8 +495,6 @@ public class CustomerView extends JFrame implements Observer {
 					int index1 = combo1.getSelectedIndex();
 					int index2 = combo2.getSelectedIndex();
 					String amountString = amountField.getText();
-//					if(!amountString.contains("."))
-//						amountString.concat(".0");
 					double amount = Double.parseDouble(amountString);
 					if (index1 != index2) {
 						if (amount > 0) {
@@ -534,9 +533,9 @@ public class CustomerView extends JFrame implements Observer {
 			ArrayList<BankAccount> accounts = customer.getAccounts();
 			BankAccount account = accounts.get(accountsTable.getSelectedRow());
 
-			accountNameLbl.setText(account.getAccountName());
+			accountNameLbl.setText("Account Name: "+account.getAccountName());
 			Double balance = account.getBalance();
-			accountBalanceLbl.setText(balance.toString());
+			accountBalanceLbl.setText("Account Balance: $"+balance.toString());
 		}
 
 	}
@@ -713,7 +712,7 @@ public class CustomerView extends JFrame implements Observer {
 		transactionsTable.setModel(transactionsModel);
 
 		String loansData[][] = new String[][] {};
-		String loansHeader[] = new String[] { "Loan ID", "Amount", "Approved", "Active" };
+		String loansHeader[] = new String[] { "ID", "Amount", "Approved", "Active" };
 		loansModel = new DefaultTableModel(loansData, loansHeader);
 		loansModel = addLoansToTable(customer, loansModel);
 		loansTable.setModel(loansModel);
