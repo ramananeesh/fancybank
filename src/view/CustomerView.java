@@ -40,13 +40,14 @@ public class CustomerView extends JFrame implements Observer {
 	private JTable transactionsTable;
 	private JLabel lblCustomerView;
 
-
 	private DefaultTableModel accountsModel;
 	private DefaultTableModel transactionsModel;
+	private DefaultTableModel loansModel;
 
 	private JLabel accountNameLbl;
 	private JLabel accountBalanceLbl;
 	private JTextArea infoDetailsTextArea;
+	private JTable loansTable;
 
 	/**
 	 * Create the application.
@@ -64,11 +65,11 @@ public class CustomerView extends JFrame implements Observer {
 	 */
 	private void initialize() {
 
-		this.setBounds(100, 100, 1800, 800);
+		this.setBounds(100, 100, 1900, 1000);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
-		lblCustomerView = new JLabel("Welcome "+customer.getName());
+		lblCustomerView = new JLabel("Welcome " + customer.getName());
 		lblCustomerView.setFont(new Font("Tahoma", Font.PLAIN, 45));
 		lblCustomerView.setHorizontalAlignment(SwingConstants.CENTER);
 		getContentPane().add(lblCustomerView, BorderLayout.NORTH);
@@ -82,14 +83,14 @@ public class CustomerView extends JFrame implements Observer {
 		accountsPanel.setPreferredSize(new Dimension(400, 300));
 		westPanel.add(accountsPanel, BorderLayout.NORTH);
 
-		String accountsData[][] = new String[][] { };
+		String accountsData[][] = new String[][] {};
 		String accountsHeader[] = new String[] { "Account Name", "Account Type" };
 		accountsModel = new DefaultTableModel(accountsData, accountsHeader);
 		accountsTable = new JTable(accountsModel);
 		accountsPanel.setLayout(new BorderLayout(0, 0));
 		accountsTable.getSelectionModel().addListSelectionListener(new AccountListListener());
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 		accountsTable.setDefaultRenderer(String.class, centerRenderer);
 		accountsTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 30));
 
@@ -165,7 +166,7 @@ public class CustomerView extends JFrame implements Observer {
 		centerPanel.add(messageLabel, BorderLayout.SOUTH);
 
 		JPanel eastPanel = new JPanel();
-		eastPanel.setPreferredSize(new Dimension(500, 800));
+		eastPanel.setPreferredSize(new Dimension(600, 1000));
 		getContentPane().add(eastPanel, BorderLayout.EAST);
 		GridBagLayout gbl_eastPanel = new GridBagLayout();
 		gbl_eastPanel.columnWidths = new int[] { 376, 0 };
@@ -175,7 +176,7 @@ public class CustomerView extends JFrame implements Observer {
 		eastPanel.setLayout(gbl_eastPanel);
 
 		JPanel balancePanel = new JPanel();
-		balancePanel.setPreferredSize(new Dimension(500, 150));
+		balancePanel.setPreferredSize(new Dimension(500, 120));
 		GridBagConstraints gbc_balancePanel = new GridBagConstraints();
 		gbc_balancePanel.fill = GridBagConstraints.BOTH;
 		gbc_balancePanel.insets = new Insets(0, 0, 5, 0);
@@ -224,8 +225,22 @@ public class CustomerView extends JFrame implements Observer {
 
 		JPanel loansDisplayPanel = new JPanel();
 		loansPanel.add(loansDisplayPanel, BorderLayout.CENTER);
-		
-		JScrollPane loansScrollPane = new JScrollPane();
+
+		String loansData[][] = new String[][] {};
+		String loansHeader[] = new String[] { "ID", "Amount", "Approved", "Active" };
+		loansModel = new DefaultTableModel(loansData, loansHeader);
+		loansTable = new JTable(loansModel);
+		loansTable.getSelectionModel().addListSelectionListener(new LoanListListener());
+		loansTable.setDefaultRenderer(String.class, centerRenderer);
+		loansTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 18));
+		JScrollPane loansScrollPane = new JScrollPane(loansTable);
+		loansScrollPane.setPreferredSize(new Dimension(580, 200));
+		loansTable.setPreferredSize(new Dimension(580, 140));
+		loansTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		loansTable.setBorder(new EmptyBorder(5,5,5,5));
+		loansTable.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		loansTable.setRowHeight(20);
+		loansDisplayPanel.setPreferredSize(new Dimension(600,350));
 		loansDisplayPanel.add(loansScrollPane);
 
 		accountsPanel.setBorder(new LineBorder(Color.black, 3));
@@ -244,7 +259,7 @@ public class CustomerView extends JFrame implements Observer {
 		lblTransactions.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		transactionsPanel.add(lblTransactions, BorderLayout.NORTH);
 
-		String transactionsData[][] = new String[][] {  };
+		String transactionsData[][] = new String[][] {};
 		String transactionsHeader[] = new String[] { "From", "To", "Type", "Amount($)" };
 		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
 		transactionsTable = new JTable(transactionsModel);
@@ -262,13 +277,18 @@ public class CustomerView extends JFrame implements Observer {
 		JScrollPane js1 = new JScrollPane(transactionsTable);
 		js1.setVisible(true);
 		transactionsPanel.add(js1);
-		
+
 		btnsPanel.setBorder(new LineBorder(Color.black, 3));
-		
+
 		JButton btnRequestLoan = new JButton("Request Loan");
 		btnRequestLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnRequestLoan);
 		
+		JButton btnCloseLoan = new JButton("Close Loan");
+		btnCloseLoan.addActionListener(new LoanCloseListener());
+		btnCloseLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnCloseLoan);
+		btnRequestLoan.addActionListener(new RequestLoanActionListener());
 
 		JPanel infoPanel = new JPanel();
 		centerPanel.add(infoPanel, BorderLayout.NORTH);
@@ -286,37 +306,39 @@ public class CustomerView extends JFrame implements Observer {
 		infoDetailsTextArea.setEnabled(false);
 		infoDetailsTextArea.setForeground(Color.BLUE);
 		infoDetailsTextArea.setFont(new Font("Tahoma", Font.PLAIN, 28));
-		
+
 		JScrollPane infoScrollPane = new JScrollPane(infoDetailsTextArea);
 		infoScrollPane.setVisible(true);
 		infoPanel.add(infoScrollPane, BorderLayout.CENTER);
 		balancePanel.setBorder(new LineBorder(Color.black, 3));
 		infoPanel.setBorder(new LineBorder(Color.black, 3));
 		loansPanel.setBorder(new LineBorder(Color.black, 3));
-		
+
 		JPanel moreOptionsPanel = new JPanel();
 		moreOptionsPanel.setBorder(new LineBorder(Color.black, 3));
+		moreOptionsPanel.setPreferredSize(new Dimension(500,200));
 		GridBagConstraints gbc_moreOptionsPanel = new GridBagConstraints();
 		gbc_moreOptionsPanel.fill = GridBagConstraints.BOTH;
 		gbc_moreOptionsPanel.gridx = 0;
 		gbc_moreOptionsPanel.gridy = 2;
 		eastPanel.add(moreOptionsPanel, gbc_moreOptionsPanel);
-		
+
 		JButton btnCurrencyConverter = new JButton("Currency Converter");
 		btnCurrencyConverter.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		moreOptionsPanel.add(btnCurrencyConverter);
-		
+
 		JButton btnLogout = new JButton("Logout");
 		btnLogout.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		moreOptionsPanel.add(btnLogout);
-		
+
 		JButton btnExit = new JButton("Exit");
 		btnExit.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		moreOptionsPanel.add(btnExit);
+		
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
 
-	public class RequestLoanActionListener implements ActionListener{
+	public class RequestLoanActionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -326,64 +348,64 @@ public class CustomerView extends JFrame implements Observer {
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
-			else if(!customer.customerHasBalanceInAnyAccount()) {
+
+			else if (!customer.customerHasBalanceInAnyAccount()) {
 				JOptionPane.showMessageDialog(null, "At least one account needs to have some balance amount", "Error",
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
+
 			JTextField loanAmountField = new JTextField();
 			JTextField tenureField = new JTextField();
 			JTextField collateralField = new JTextField();
 			JTextField collateralAmountField = new JTextField();
-			
-			Object[] fields = {
-				"Loan Amount: ", loanAmountField,
-				"Tenure in Months: ", tenureField, 
-				"Collateral Name: ", collateralField, 
-				"Collateral Value($): ", collateralAmountField,
-			};
-			
-			while(true) {
+
+			Object[] fields = { "Loan Amount: ", loanAmountField, "Tenure in Months: ", tenureField,
+					"Collateral Name: ", collateralField, "Collateral Value($): ", collateralAmountField, };
+
+			while (true) {
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
-				
-				int reply = JOptionPane.showConfirmDialog(null, fields, "Loan Application Window", JOptionPane.OK_CANCEL_OPTION);
-				
-				if(reply==JOptionPane.OK_OPTION) {
+
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Loan Application Window",
+						JOptionPane.OK_CANCEL_OPTION);
+
+				if (reply == JOptionPane.OK_OPTION) {
 					try {
 						UIManager.put("OptionPane.minimumSize", new Dimension(300, 100));
 						double loanAmount = Double.parseDouble(loanAmountField.getText());
-						if(loanAmount<=0) {
-							JOptionPane.showMessageDialog(null, "Loan amount cannot be less than or equal to 0", "Error",
-									JOptionPane.ERROR_MESSAGE);
+						if (loanAmount <= 0) {
+							JOptionPane.showMessageDialog(null, "Loan amount cannot be less than or equal to 0",
+									"Error", JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
 						int tenure = Integer.parseInt(tenureField.getText());
 						String collateral = collateralField.getText();
 						double collateralAmount = Double.parseDouble(collateralAmountField.getText());
-						if(collateralAmount<=0) {
-							JOptionPane.showMessageDialog(null, "Collateral Amount Cannot be Less than or Equal to 0", "Error",
-									JOptionPane.ERROR_MESSAGE);
+						if (collateralAmount <= 0) {
+							JOptionPane.showMessageDialog(null, "Collateral Amount Cannot be Less than or Equal to 0",
+									"Error", JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
-						
-						bank.addLoan(customer, loanAmount, bank.getLoanInterestRate(), tenure, collateral, collateralAmount);
+
+						bank.addLoan(customer, loanAmount, bank.getLoanInterestRate(), tenure, collateral,
+								collateralAmount);
 						break;
-						
+
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null,
+								"Error in processing values. Please enter values in correct format", "Error",
+								JOptionPane.ERROR_MESSAGE);
 					}
-					catch(Exception e1) {
-						System.out.println("Error in processing values. Please enter values in correct format");
-						
-					}
+				} else {
+					break;
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	public class TransactionActionListener implements ActionListener {
 
 		String title;
@@ -525,7 +547,6 @@ public class CustomerView extends JFrame implements Observer {
 		public void valueChanged(ListSelectionEvent arg0) {
 			// TODO Auto-generated method stub
 
-
 			if (transactionsTable.getSelectedRow() == -1) {
 				return;
 			}
@@ -536,6 +557,114 @@ public class CustomerView extends JFrame implements Observer {
 			infoDetailsTextArea.setText(info);
 		}
 
+	}
+	
+	public class LoanListListener implements ListSelectionListener {
+
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			// TODO Auto-generated method stub
+
+			if (loansTable.getSelectedRow() == -1) {
+				return;
+			}
+			ArrayList<Loan> loans = customer.getLoans();
+			Loan loan = loans.get(loansTable.getSelectedRow());
+
+			String info = loan.getDetailedLoanDisplayForCustomer();
+			infoDetailsTextArea.setText(info);
+		}
+
+	}
+	
+	public class LoanCloseListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			
+			ArrayList<Loan> loans = customer.getLoans();
+			
+			JLabel loanAmountLbl = new JLabel("N/A");
+			JLabel accountBalanceLbl = new JLabel ("N/A");
+			JComboBox loanCombo = new JComboBox();
+			for(Loan l: loans) {
+				loanCombo.addItem(l.getLoanId());
+			}
+			
+			JComboBox accountCombo = new JComboBox();
+			
+			for(BankAccount acc: accounts) {
+				accountCombo.addItem(acc.getAccountName());
+			}
+			
+			accountCombo.addActionListener (new ActionListener () {
+			    public void actionPerformed(ActionEvent e) {
+			        accountBalanceLbl.setText(Double.toString(accounts.get(accountCombo.getSelectedIndex()).getBalance()));
+			    }
+			});
+			
+			loanCombo.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					loanAmountLbl.setText(Double.toString(loans.get(loanCombo.getSelectedIndex()).getPayoffAmount()));
+				}
+				
+			});
+			
+			Object[] fields = {
+				"Loans: ", 	loanCombo,
+				"Accounts: ", accountCombo,
+				"Loan Ammount: ", loanAmountLbl,
+				"Account Balance: ", accountBalanceLbl,
+			};
+			
+			double minLoanAmount = customer.getMinimumLoanAmount();
+			double maxAccBalance = customer.getMaximumAccountBalance();
+			
+			if(minLoanAmount>maxAccBalance) {
+				JOptionPane.showMessageDialog(null, "The Minimum Settle off Amount for Any loan Exceeds the Maximum account balance from all accounts", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			while(true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Close-off Loan",
+						JOptionPane.OK_CANCEL_OPTION);
+				
+				if(reply==JOptionPane.OK_OPTION) {
+					
+					int accIndex = accountCombo.getSelectedIndex();
+					int loanIndex = loanCombo.getSelectedIndex();
+					
+					if(accIndex==-1 || loanIndex==-1) {
+						JOptionPane.showMessageDialog(null, "Select a loan id and an account to settle the loan", "Error", JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+					else {
+						BankAccount acc = accounts.get(accIndex);
+						Loan loan = loans.get(loanIndex);
+						
+						if(acc.getBalance()<=loan.getPayoffAmount()) {
+							JOptionPane.showMessageDialog(null, "Account balance should be greater than Loan Payoff amount", "Error", JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						else {
+							bank.settleLoanForCustomer(customer, acc.getAccountName(), loan.getLoanId(), loan.getPayoffAmount());
+							break;
+						}
+					}
+				}
+				else {
+					break;
+				}
+			}
+			
+			
+		}
+		
 	}
 
 	public DefaultTableModel addAccountsToTable(BankCustomer customer, DefaultTableModel model) {
@@ -558,23 +687,36 @@ public class CustomerView extends JFrame implements Observer {
 		return model;
 	}
 
+	public DefaultTableModel addLoansToTable(BankCustomer customer, DefaultTableModel model) {
+		customer = this.bank.getCustomerByEmail(customer.getEmail());
+		ArrayList<Loan> loans = customer.getLoans();
+		for (Loan l : loans) {
+			model.addRow(l.getShortLoanDisplayForCustomer());
+		}
+		return model;
+	}
+
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub
-		
-		String accountsData[][] = new String[][] { };
+
+		String accountsData[][] = new String[][] {};
 		String accountsHeader[] = new String[] { "Account Name", "Account Type" };
 		accountsModel = new DefaultTableModel(accountsData, accountsHeader);
-		accountsModel = addAccountsToTable(this.customer,
-				accountsModel);
+		accountsModel = addAccountsToTable(this.customer, accountsModel);
 		accountsTable.setModel(accountsModel);
 
-		String transactionsData[][] = new String[][] {  };
+		String transactionsData[][] = new String[][] {};
 		String transactionsHeader[] = new String[] { "From", "To", "Type", "Amount($)" };
 		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
-		transactionsModel = addTransactionsToTable(customer,
-				transactionsModel);
+		transactionsModel = addTransactionsToTable(customer, transactionsModel);
 		transactionsTable.setModel(transactionsModel);
+
+		String loansData[][] = new String[][] {};
+		String loansHeader[] = new String[] { "Loan ID", "Amount", "Approved", "Active" };
+		loansModel = new DefaultTableModel(loansData, loansHeader);
+		loansModel = addLoansToTable(customer, loansModel);
+		loansTable.setModel(loansModel);
 
 	}
 

@@ -13,13 +13,14 @@ public class Bank extends Observable {
 	private ArrayList<BankCustomer> customers;
 	private ArrayList<Transaction> transactions;
 	
-	private int loanInterestRate; 
+	private double loanInterestRate; 
 
 	public Bank() {
 		super();
 		managers = new ArrayList<BankManager>();
 		customers = new ArrayList<BankCustomer>();
 		transactions = new ArrayList<Transaction>();
+		this.loanInterestRate = 0.1;
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
@@ -94,6 +95,15 @@ public class Bank extends Observable {
 		setChanged();
 		notifyObservers();
 	}
+	
+	public void settleLoanForCustomer(BankCustomer customer, String accountName, String loanId, double loanAmount) {
+		this.getCustomerByEmail(customer.getEmail()).closeLoan(loanId);
+		this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, loanAmount);
+		Transaction t = this.addTransaction(customer.getName(), "Bank", "Loan Settlement", loanAmount, accountName, "My Fancy Bank");
+		this.addTransactionForCustomer(customer, t);
+		setChanged();
+		notifyObservers();
+	}
 
 	public BankCustomer login(String email, String password) {
 		BankCustomer customer = getCustomerByEmail(email);
@@ -130,7 +140,7 @@ public class Bank extends Observable {
 		this.transactions = transactions;
 	}
 
-	public int getLoanInterestRate() {
+	public double getLoanInterestRate() {
 		return loanInterestRate;
 	}
 

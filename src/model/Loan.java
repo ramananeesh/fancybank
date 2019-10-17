@@ -87,10 +87,10 @@ public class Loan {
 		String ret = "";
 
 		ret += "Loan ID: " + this.loanId + "\n";
-		ret += "Loan Amount: $" + this.loanAmount + "\tInterest Rate: " + this.interestRate + "\n";
+		ret += "Loan Amount: $" + this.loanAmount + "\nInterest Rate: " + this.interestRate + "\n";
 		ret += "Tenure: " + this.tenure + " months\t Start Date: " + this.loanStartDate + "\n";
-		ret += "Collateral: " + this.collateral + "\t Collateral Amount: " + this.collateralAmount + "\n";
-		ret += "Loan Approved Status: " + this.loanApprovedStatus + "\t Loan Active: " + this.isActive + "\n";
+		ret += "Collateral: " + this.collateral + "\nCollateral Amount: " + this.collateralAmount + "\n";
+		ret += "Loan Approved Status: " + this.loanApprovedStatus + "\nLoan Active: " + this.isActive + "\n";
 		return ret;
 	}
 

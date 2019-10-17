@@ -183,5 +183,23 @@ public class BankCustomer extends Customer {
 		
 		return false;
 	}
+	
+	public double getMinimumLoanAmount() {
+		double min = loans.get(0).getPayoffAmount();
+		for(Loan l: loans) {
+			if(l.getPayoffAmount()<min)
+				min=l.getPayoffAmount();
+		}
+		return min;
+	}
+	
+	public double getMaximumAccountBalance() {
+		double max = accounts.get(0).getBalance();
+		for(BankAccount acc: accounts) {
+			if(acc.getBalance()>max)
+				max=acc.getBalance();
+		}
+		return max;
+	}
 
 }
