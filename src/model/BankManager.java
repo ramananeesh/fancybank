@@ -1,11 +1,15 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class BankManager extends Person {
 
 	private String id;
 	private String email;
 	private String securityCode;
 	private String password;
+	
 
 	public BankManager(String name, String id, String email, String securityCode, String password) {
 		super(name);
@@ -51,6 +55,24 @@ public class BankManager extends Person {
 	public String toString() {
 		return "BankManager [id=" + id + ", email=" + email + ", securityCode=" + securityCode + ", password="
 				+ password + "]";
+	}
+
+	public static int generateId(ArrayList<BankManager> existingManagers) {
+		Random rand = new Random();
+		int c = 0;
+		while (true) {
+
+			c = rand.nextInt(10000) + 1;
+			for (int i = 0; i < existingManagers.size(); i++) {
+				if (Integer.parseInt(existingManagers.get(i).getId()) == c) {
+					break;
+				}
+			}
+
+			break;
+		}
+
+		return c;
 	}
 
 }

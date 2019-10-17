@@ -76,6 +76,16 @@ public class Bank extends Observable {
 
 		return null;
 	}
+	
+	public BankManager getManagerByEmail(String email) {
+
+		for (BankManager m : this.managers) {
+			if (m.getEmail().equals(email))
+				return m;
+		}
+
+		return null;
+	}
 
 	public void depositForCustomer(BankCustomer customer, String accountName, double amount) {
 		this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
@@ -116,6 +126,16 @@ public class Bank extends Observable {
 		return null;
 	}
 
+	public BankManager loginManager(String email, String password) {
+		BankManager manager = getManagerByEmail(email);
+		if (manager == null)
+			return null;
+
+		if (manager.getPassword().equals(password))
+			return manager;
+
+		return null;
+	}
 	public ArrayList<BankManager> getManagers() {
 		return managers;
 	}
