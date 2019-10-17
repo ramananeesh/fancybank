@@ -70,7 +70,7 @@ public class CustomerView extends JFrame implements Observer {
 		JPanel westPanel = new JPanel();
 		getContentPane().add(westPanel, BorderLayout.WEST);
 		westPanel.setLayout(new BorderLayout(0, 0));
-		westPanel.setPreferredSize(new Dimension(400,800));
+		westPanel.setPreferredSize(new Dimension(400, 800));
 
 		JPanel accountsPanel = new JPanel();
 		accountsPanel.setPreferredSize(new Dimension(400, 300));
@@ -116,25 +116,30 @@ public class CustomerView extends JFrame implements Observer {
 		JButton btnAddAccount = new JButton("Add Account");
 		btnAddAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JRadioButton savings = new JRadioButton();
-				JRadioButton checking = new JRadioButton();
+				
 				JTextField nameField = new JTextField();
 
-				savings.setSelected(true);
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
+				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
+				JComboBox<String> combo = new JComboBox<String>();
+				ArrayList<String> accountType = new ArrayList<String>();
+				accountType.add("Savings");
+				accountType.add("Checking");
+			
+				for (int i = 0; i < accountType.size(); i++) {
+					combo.addItem(accountType.get(i));
+				}
 
-				Object[] fields = { "Account name", nameField, "Savings ", savings, "Checking ", checking, };
+				Object[] fields = { "Account name", nameField, "Account Type: ", combo };
 
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Choose Account Type",
 						JOptionPane.OK_CANCEL_OPTION);
 
 				if (reply == JOptionPane.OK_OPTION) {
-					String accountType;
-					if (savings.isSelected())
-						accountType = "Savings";
-					else
-						accountType = "Checking";
-					bank.addAccount(customer, nameField.getText(), accountType);
+					String type; 
+					type = combo.getItemAt(combo.getSelectedIndex());
+
+					bank.addAccount(customer, nameField.getText(), type);
 				}
 			}
 		});
@@ -221,22 +226,22 @@ public class CustomerView extends JFrame implements Observer {
 		lblTransactions.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTransactions.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		transactionsPanel.add(lblTransactions, BorderLayout.NORTH);
-		
+
 		accountsModel = new DefaultListModel<>();
-		//change to transactions here 
+		// change to transactions here
 		accountsModel = addAccountsToList(this.customer, accountsModel);
 		transactionsList = new JList<String>(accountsModel);
 		transactionsList.addListSelectionListener(new AccountListListener());
 		transactionsList.setVisible(true);
-		
+
 		transactionsList.setVisibleRowCount(8);
 		transactionsList.setPreferredSize(new Dimension(380, 380));
 		transactionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		transactionsList.setBorder(new EmptyBorder(5, 5, 5, 5));
 		transactionsList.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		transactionsPanel.add(transactionsList);
-		//transactionsPanel.setPreferredSize(new Dimension(400, 400));
-		
+		// transactionsPanel.setPreferredSize(new Dimension(400, 400));
+
 		btnsPanel.setBorder(new LineBorder(Color.black, 3));
 		balancePanel.setBorder(new LineBorder(Color.black, 3));
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
@@ -321,7 +326,10 @@ public class CustomerView extends JFrame implements Observer {
 				if (reply == JOptionPane.OK_OPTION) {
 					int index1 = combo1.getSelectedIndex();
 					int index2 = combo2.getSelectedIndex();
-					Double amount = Double.parseDouble(amountField.toString());
+					String amountString = amountField.getText();
+//					if(!amountString.contains("."))
+//						amountString.concat(".0");
+					double amount = Double.parseDouble(amountString);
 					if (index1 != index2) {
 						if (amount > 0) {
 							bank.transferBetweenAccountsForCustomer(customer, accounts.get(index1).getAccountName(),
