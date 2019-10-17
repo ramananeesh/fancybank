@@ -2,13 +2,13 @@ package model;
 
 public class Customer extends Person {
 
-	private int customerId;
+	private String customerId;
 	private Address address;
 	private String phoneNumber;
 	private String ssn;
 	private String email;
 
-	public Customer(String name, int customerId, Address address, String phoneNumber, String ssn, String email) {
+	public Customer(String name, String customerId, Address address, String phoneNumber, String ssn, String email) {
 		super(name);
 		this.customerId = customerId;
 		this.address = address;
@@ -25,11 +25,11 @@ public class Customer extends Person {
 		this.email = email;
 	}
 
-	public int getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 

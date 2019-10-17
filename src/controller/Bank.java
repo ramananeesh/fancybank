@@ -12,6 +12,8 @@ public class Bank extends Observable {
 	private ArrayList<BankManager> managers;
 	private ArrayList<BankCustomer> customers;
 	private ArrayList<Transaction> transactions;
+	
+	private int loanInterestRate; 
 
 	public Bank() {
 		super();
@@ -37,13 +39,19 @@ public class Bank extends Observable {
 			String password) {
 
 		int customerId = BankCustomer.generateCustomerId(customers);
-		BankCustomer newCustomer = new BankCustomer(name, customerId, address, phoneNumber, ssn, email, password);
+		BankCustomer newCustomer = new BankCustomer(name, Integer.toString(customerId), address, phoneNumber, ssn, email, password);
 		this.customers.add(newCustomer);
 		return newCustomer;
 	}
 
 	public void addAccount(BankCustomer customer, String accountName, String accountType) {
 		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType));
+		setChanged();
+		notifyObservers();
+	}
+	
+	public void addLoan(BankCustomer customer, double loanAmount, double interestRate, int tenure, String collateral, double collateralAmount) {
+		this.getCustomerByEmail(customer.getEmail()).addLoan(new Loan(customer.getName(), customer.getCustomerId(), Integer.toString(BankCustomer.generateLoanId(customer.getLoans())),loanAmount, interestRate, tenure, collateral, collateralAmount));
 		setChanged();
 		notifyObservers();
 	}
@@ -120,6 +128,14 @@ public class Bank extends Observable {
 
 	public void setTransactions(ArrayList<Transaction> transactions) {
 		this.transactions = transactions;
+	}
+
+	public int getLoanInterestRate() {
+		return loanInterestRate;
+	}
+
+	public void setLoanInterestRate(int loanInterestRate) {
+		this.loanInterestRate = loanInterestRate;
 	}
 
 }

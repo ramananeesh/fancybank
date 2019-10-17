@@ -4,48 +4,52 @@ import java.util.Date;
 
 public class Loan {
 
-	private String loanId; 
-	private String customerId; 
+	private String loanId;
+	private String customerId;
 	private String customerName;
 	private double loanAmount;
-	private double interestRate; 
-	private int tenure; //in months
-	private boolean isActive; 
-	private boolean isApproved; 
+	private double interestRate;
+	private int tenure; // in months
+	private boolean isActive;
+	private boolean isApproved;
 	private Date loanStartDate;
-	private String collateral; 
+	private String collateral;
 	private double collateralAmount;
-	private String loanApprovedStatus; 
-	
-	public Loan(String customerName, String customerId, double loanAmount, double interestRate, int tenure, String collateral, double collateralAmount) {
+	private String loanApprovedStatus;
+
+	public Loan(String customerName, String customerId, String loanId, double loanAmount, double interestRate,
+			int tenure, String collateral, double collateralAmount) {
 		super();
-		this.customerName = customerName; 
+		this.customerName = customerName;
 		this.customerId = customerId;
-		this.loanAmount = loanAmount; 
-		this.interestRate = interestRate; 
-		this.tenure = tenure; 
+		this.loanId = loanId;
+		this.loanAmount = loanAmount;
+		this.interestRate = interestRate;
+		this.tenure = tenure;
 		this.collateral = collateral;
-		this.collateralAmount = collateralAmount; 
-		
+		this.collateralAmount = collateralAmount;
+
 		this.isActive = false;
-		this.isApproved = false; 
+		this.isApproved = false;
 		this.loanApprovedStatus = "Pending";
 		this.loanStartDate = new Date();
 	}
-	public Loan(String loanId, String customerName, String customerId,  double loanAmount, float interestRate, int tenure, boolean isActive,
-			boolean isApproved, Date loanStartDate, String collateral, double collateralAmount) {
+
+	public Loan(String loanId, String customerName, String customerId, double loanAmount, float interestRate,
+			int tenure, boolean isActive, boolean isApproved, Date loanStartDate, String collateral,
+			double collateralAmount) {
 		super();
 		this.loanId = loanId;
 		this.customerId = customerId;
-		this.customerName = customerName; 
+		this.customerName = customerName;
 		this.loanAmount = loanAmount;
-		
+
 		this.interestRate = interestRate;
 		this.tenure = tenure;
 		this.isActive = isActive;
 		this.isApproved = isApproved;
 		this.loanStartDate = loanStartDate;
-		this.collateral = collateral; 
+		this.collateral = collateral;
 		this.collateralAmount = collateralAmount;
 		this.loanApprovedStatus = "Pending";
 	}
@@ -73,45 +77,46 @@ public class Loan {
 	public void setCustomerName(String customerName) {
 		this.customerName = customerName;
 	}
-	
+
 	public String[] getShortLoanDisplayForCustomer() {
-		return new String[] {this.loanId, Double.toString(this.loanAmount), Boolean.toString(this.isApproved), Boolean.toString(this.isActive)};
+		return new String[] { this.loanId, Double.toString(this.loanAmount), Boolean.toString(this.isApproved),
+				Boolean.toString(this.isActive) };
 	}
-	
+
 	public String getDetailedLoanDisplayForCustomer() {
-		String ret="";
-		
-		ret+="Loan ID: "+this.loanId+"\n";
-		ret+="Loan Amount: $"+this.loanAmount+"\tInterest Rate: "+this.interestRate+"\n";
-		ret+="Tenure: "+this.tenure+" months\t Start Date: "+this.loanStartDate+"\n";
-		ret+="Collateral: "+this.collateral+"\t Collateral Amount: "+this.collateralAmount+"\n";
-		ret+="Loan Approved Status: "+ this.loanApprovedStatus+"\t Loan Active: "+this.isActive+"\n";
+		String ret = "";
+
+		ret += "Loan ID: " + this.loanId + "\n";
+		ret += "Loan Amount: $" + this.loanAmount + "\tInterest Rate: " + this.interestRate + "\n";
+		ret += "Tenure: " + this.tenure + " months\t Start Date: " + this.loanStartDate + "\n";
+		ret += "Collateral: " + this.collateral + "\t Collateral Amount: " + this.collateralAmount + "\n";
+		ret += "Loan Approved Status: " + this.loanApprovedStatus + "\t Loan Active: " + this.isActive + "\n";
 		return ret;
 	}
 
 	public void approve() {
-		this.isApproved=true;
-		this.loanApprovedStatus="Approved";
+		this.isApproved = true;
+		this.loanApprovedStatus = "Approved";
 		this.isActive = true;
 	}
-	
+
 	public double getInterestAmount() {
-		return this.loanAmount*this.interestRate*this.tenure/(100.0);
+		return this.loanAmount * this.interestRate * this.tenure / (100.0);
 	}
-	
+
 	public double getPayoffAmount() {
 		return loanAmount + getInterestAmount();
 	}
-	
+
 	public void close() {
 		this.isActive = false;
 	}
-	
+
 	public void reject() {
-		this.isApproved=false;
-		this.loanApprovedStatus="Rejected";
+		this.isApproved = false;
+		this.loanApprovedStatus = "Rejected";
 	}
-	
+
 	public String getLoanId() {
 		return loanId;
 	}
@@ -181,6 +186,6 @@ public class Loan {
 		return "Loan [loanId=" + loanId + ", customerId=" + customerId + ", loanAmount=" + loanAmount
 				+ ", interestRate=" + interestRate + ", tenure=" + tenure + ", isActive=" + isActive + ", isApproved="
 				+ isApproved + ", loanStartDate=" + loanStartDate + "]";
-	} 
-	
+	}
+
 }

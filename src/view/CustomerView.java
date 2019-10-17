@@ -265,6 +265,10 @@ public class CustomerView extends JFrame implements Observer {
 		
 		btnsPanel.setBorder(new LineBorder(Color.black, 3));
 		
+		JButton btnRequestLoan = new JButton("Request Loan");
+		btnRequestLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnRequestLoan);
+		
 
 		JPanel infoPanel = new JPanel();
 		centerPanel.add(infoPanel, BorderLayout.NORTH);
@@ -312,6 +316,74 @@ public class CustomerView extends JFrame implements Observer {
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
 
+	public class RequestLoanActionListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			if (customer.getAccounts().size() == 0) {
+				JOptionPane.showMessageDialog(null, "No Accounts exist for Customer", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			else if(!customer.customerHasBalanceInAnyAccount()) {
+				JOptionPane.showMessageDialog(null, "At least one account needs to have some balance amount", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			JTextField loanAmountField = new JTextField();
+			JTextField tenureField = new JTextField();
+			JTextField collateralField = new JTextField();
+			JTextField collateralAmountField = new JTextField();
+			
+			Object[] fields = {
+				"Loan Amount: ", loanAmountField,
+				"Tenure in Months: ", tenureField, 
+				"Collateral Name: ", collateralField, 
+				"Collateral Value($): ", collateralAmountField,
+			};
+			
+			while(true) {
+				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
+				
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Loan Application Window", JOptionPane.OK_CANCEL_OPTION);
+				
+				if(reply==JOptionPane.OK_OPTION) {
+					try {
+						UIManager.put("OptionPane.minimumSize", new Dimension(300, 100));
+						double loanAmount = Double.parseDouble(loanAmountField.getText());
+						if(loanAmount<=0) {
+							JOptionPane.showMessageDialog(null, "Loan amount cannot be less than or equal to 0", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						int tenure = Integer.parseInt(tenureField.getText());
+						String collateral = collateralField.getText();
+						double collateralAmount = Double.parseDouble(collateralAmountField.getText());
+						if(collateralAmount<=0) {
+							JOptionPane.showMessageDialog(null, "Collateral Amount Cannot be Less than or Equal to 0", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						
+						bank.addLoan(customer, loanAmount, bank.getLoanInterestRate(), tenure, collateral, collateralAmount);
+						break;
+						
+					}
+					catch(Exception e1) {
+						System.out.println("Error in processing values. Please enter values in correct format");
+						
+					}
+				}
+				
+			}
+			
+		}
+		
+	}
+	
 	public class TransactionActionListener implements ActionListener {
 
 		String title;
