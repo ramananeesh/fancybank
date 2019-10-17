@@ -169,9 +169,9 @@ public class CustomerView extends JFrame implements Observer {
 		getContentPane().add(eastPanel, BorderLayout.EAST);
 		GridBagLayout gbl_eastPanel = new GridBagLayout();
 		gbl_eastPanel.columnWidths = new int[] { 376, 0 };
-		gbl_eastPanel.rowHeights = new int[] { 265, 265, 0 };
-		gbl_eastPanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
-		gbl_eastPanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+		gbl_eastPanel.rowHeights = new int[] { 265, 265, 0, 0 };
+		gbl_eastPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gbl_eastPanel.rowWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		eastPanel.setLayout(gbl_eastPanel);
 
 		JPanel balancePanel = new JPanel();
@@ -209,6 +209,7 @@ public class CustomerView extends JFrame implements Observer {
 
 		JPanel loansPanel = new JPanel();
 		GridBagConstraints gbc_loansPanel = new GridBagConstraints();
+		gbc_loansPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_loansPanel.fill = GridBagConstraints.BOTH;
 		gbc_loansPanel.gridx = 0;
 		gbc_loansPanel.gridy = 1;
@@ -223,6 +224,9 @@ public class CustomerView extends JFrame implements Observer {
 
 		JPanel loansDisplayPanel = new JPanel();
 		loansPanel.add(loansDisplayPanel, BorderLayout.CENTER);
+		
+		JScrollPane loansScrollPane = new JScrollPane();
+		loansDisplayPanel.add(loansScrollPane);
 
 		accountsPanel.setBorder(new LineBorder(Color.black, 3));
 
@@ -285,6 +289,26 @@ public class CustomerView extends JFrame implements Observer {
 		balancePanel.setBorder(new LineBorder(Color.black, 3));
 		infoPanel.setBorder(new LineBorder(Color.black, 3));
 		loansPanel.setBorder(new LineBorder(Color.black, 3));
+		
+		JPanel moreOptionsPanel = new JPanel();
+		moreOptionsPanel.setBorder(new LineBorder(Color.black, 3));
+		GridBagConstraints gbc_moreOptionsPanel = new GridBagConstraints();
+		gbc_moreOptionsPanel.fill = GridBagConstraints.BOTH;
+		gbc_moreOptionsPanel.gridx = 0;
+		gbc_moreOptionsPanel.gridy = 2;
+		eastPanel.add(moreOptionsPanel, gbc_moreOptionsPanel);
+		
+		JButton btnCurrencyConverter = new JButton("Currency Converter");
+		btnCurrencyConverter.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		moreOptionsPanel.add(btnCurrencyConverter);
+		
+		JButton btnLogout = new JButton("Logout");
+		btnLogout.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		moreOptionsPanel.add(btnLogout);
+		
+		JButton btnExit = new JButton("Exit");
+		btnExit.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		moreOptionsPanel.add(btnExit);
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
 

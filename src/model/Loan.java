@@ -6,26 +6,112 @@ public class Loan {
 
 	private String loanId; 
 	private String customerId; 
-	private String loanAmount;
-	private float interestRate; 
+	private String customerName;
+	private double loanAmount;
+	private double interestRate; 
 	private int tenure; //in months
 	private boolean isActive; 
 	private boolean isApproved; 
 	private Date loanStartDate;
+	private String collateral; 
+	private double collateralAmount;
+	private String loanApprovedStatus; 
 	
-	public Loan(String loanId, String customerId, String loanAmount, float interestRate, int tenure, boolean isActive,
-			boolean isApproved, Date loanStartDate) {
+	public Loan(String customerName, String customerId, double loanAmount, double interestRate, int tenure, String collateral, double collateralAmount) {
+		super();
+		this.customerName = customerName; 
+		this.customerId = customerId;
+		this.loanAmount = loanAmount; 
+		this.interestRate = interestRate; 
+		this.tenure = tenure; 
+		this.collateral = collateral;
+		this.collateralAmount = collateralAmount; 
+		
+		this.isActive = false;
+		this.isApproved = false; 
+		this.loanApprovedStatus = "Pending";
+		this.loanStartDate = new Date();
+	}
+	public Loan(String loanId, String customerName, String customerId,  double loanAmount, float interestRate, int tenure, boolean isActive,
+			boolean isApproved, Date loanStartDate, String collateral, double collateralAmount) {
 		super();
 		this.loanId = loanId;
 		this.customerId = customerId;
+		this.customerName = customerName; 
 		this.loanAmount = loanAmount;
+		
 		this.interestRate = interestRate;
 		this.tenure = tenure;
 		this.isActive = isActive;
 		this.isApproved = isApproved;
 		this.loanStartDate = loanStartDate;
+		this.collateral = collateral; 
+		this.collateralAmount = collateralAmount;
+		this.loanApprovedStatus = "Pending";
 	}
 
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public String getCollateral() {
+		return collateral;
+	}
+
+	public void setCollateral(String collateral) {
+		this.collateral = collateral;
+	}
+
+	public double getCollateralAmount() {
+		return collateralAmount;
+	}
+
+	public void setCollateralAmount(double collateralAmount) {
+		this.collateralAmount = collateralAmount;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+	
+	public String[] getShortLoanDisplayForCustomer() {
+		return new String[] {this.loanId, Double.toString(this.loanAmount), Boolean.toString(this.isApproved), Boolean.toString(this.isActive)};
+	}
+	
+	public String getDetailedLoanDisplayForCustomer() {
+		String ret="";
+		
+		ret+="Loan ID: "+this.loanId+"\n";
+		ret+="Loan Amount: $"+this.loanAmount+"\tInterest Rate: "+this.interestRate+"\n";
+		ret+="Tenure: "+this.tenure+" months\t Start Date: "+this.loanStartDate+"\n";
+		ret+="Collateral: "+this.collateral+"\t Collateral Amount: "+this.collateralAmount+"\n";
+		ret+="Loan Approved Status: "+ this.loanApprovedStatus+"\t Loan Active: "+this.isActive+"\n";
+		return ret;
+	}
+
+	public void approve() {
+		this.isApproved=true;
+		this.loanApprovedStatus="Approved";
+		this.isActive = true;
+	}
+	
+	public double getInterestAmount() {
+		return this.loanAmount*this.interestRate*this.tenure/(100.0);
+	}
+	
+	public double getPayoffAmount() {
+		return loanAmount + getInterestAmount();
+	}
+	
+	public void close() {
+		this.isActive = false;
+	}
+	
+	public void reject() {
+		this.isApproved=false;
+		this.loanApprovedStatus="Rejected";
+	}
+	
 	public String getLoanId() {
 		return loanId;
 	}
@@ -42,19 +128,19 @@ public class Loan {
 		this.customerId = customerId;
 	}
 
-	public String getLoanAmount() {
+	public double getLoanAmount() {
 		return loanAmount;
 	}
 
-	public void setLoanAmount(String loanAmount) {
+	public void setLoanAmount(double loanAmount) {
 		this.loanAmount = loanAmount;
 	}
 
-	public float getInterestRate() {
+	public double getInterestRate() {
 		return interestRate;
 	}
 
-	public void setInterestRate(float interestRate) {
+	public void setInterestRate(double interestRate) {
 		this.interestRate = interestRate;
 	}
 
