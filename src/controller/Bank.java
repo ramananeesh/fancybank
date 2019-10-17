@@ -66,6 +66,12 @@ public class Bank extends Observable {
 		return null;
 	}
 
+	public void depositForCustomer(BankCustomer customer, String accountName, double amount) {
+		this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
+//		setChanged();
+//		notifyObservers();
+	}
+	
 	public BankCustomer login(String email, String password) {
 		BankCustomer customer = getCustomerByEmail(email);
 		if (customer == null)

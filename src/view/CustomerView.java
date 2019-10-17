@@ -102,6 +102,30 @@ public class CustomerView extends JFrame implements Observer {
 		btnsPanel.add(btnWithdraw);
 		
 		JButton btnDeposit = new JButton("Deposit");
+		btnDeposit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
+				
+				JComboBox<String> combo = new JComboBox<String>();
+				ArrayList<BankAccount> accounts = customer.getAccounts();
+				for(int i=0;i<accounts.size();i++) {
+					combo.addItem(accounts.get(i).getAccountName());
+				}
+				JTextField amountField = new JTextField();
+				
+				Object[] fields = {
+					"Account Name: ", combo,
+					"Amount in USD: $", amountField,
+				};
+				
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Deposit into Account", JOptionPane.OK_CANCEL_OPTION);
+				
+				if(reply==JOptionPane.OK_OPTION) {
+					int accountIndex = combo.getSelectedIndex();
+					bank.depositForCustomer(customer, combo.getItemAt(accountIndex), Double.parseDouble(amountField.getText()));
+				}
+			}
+		});
 		btnDeposit.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnDeposit);
 		
