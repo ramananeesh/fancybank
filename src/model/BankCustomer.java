@@ -58,6 +58,20 @@ public class BankCustomer extends Customer {
 		this.accounts.set(accountIndex, account);
 	}
 
+	public void transferBetweenAccounts(String fromAccountName, String toAccountName, double amount) {
+		int fromIndex = getAccountIndexByName(fromAccountName);
+		int toIndex = getAccountIndexByName(toAccountName);
+		
+		BankAccount fromAccount = this.accounts.get(fromIndex);
+		BankAccount toAccount = this.accounts.get(toIndex);
+		
+		fromAccount.withdraw(amount);
+		toAccount.deposit(amount);
+		
+		this.accounts.set(fromIndex, fromAccount);
+		this.accounts.set(toIndex, toAccount);
+	}
+	
 	public int getAccountIndexByName(String accountName) {
 		for (int i = 0; i < this.accounts.size(); i++) {
 			if (this.accounts.get(i).getAccountName().equals(accountName))

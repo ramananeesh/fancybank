@@ -74,6 +74,10 @@ public class Bank extends Observable {
 		this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
 	}
 	
+	public void transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName, String toAccountName, double amount) {
+		this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName, amount);
+	}
+	
 	public BankCustomer login(String email, String password) {
 		BankCustomer customer = getCustomerByEmail(email);
 		if (customer == null)
