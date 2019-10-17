@@ -108,6 +108,7 @@ public class CustomerView extends JFrame implements Observer {
 		btnsPanel.add(btnDeposit);
 		
 		JButton btnTransfer = new JButton("Transfer");
+		btnTransfer.addActionListener(new TransferBtnListener());
 		btnTransfer.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnTransfer);
 		
@@ -253,6 +254,55 @@ public class CustomerView extends JFrame implements Observer {
 					bank.withdrawForCustomer(customer, combo.getItemAt(accountIndex), Double.parseDouble(amountField.getText()));
 				}
 			}
+		}
+		
+	}
+	
+	public class TransferBtnListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			if(customer.getAccounts().size()==0) {
+				JOptionPane.showMessageDialog(null, "No Accounts exist for Customer", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			while(true) {
+				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
+				UIManager.put("ComboBox.font",  new Font("Tahoma", Font.PLAIN, 30));
+				
+				JComboBox<String> combo1 = new JComboBox<String>();
+				JComboBox<String> combo2 = new JComboBox<String>();
+				ArrayList<BankAccount> accounts = customer.getAccounts();
+				for(int i=0;i<accounts.size();i++) {
+					combo1.addItem(accounts.get(i).getAccountName());
+					combo2.addItem(accounts.get(i).getAccountName());
+				}
+				
+				JTextField amountField = new JTextField();
+				
+				Object[] fields = {
+					"From Account Name: ", combo1,
+					"To Account Name: ", combo2,
+					"Amount in USD: $", amountField,
+				};
+				
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Transfer between Accounts", JOptionPane.OK_CANCEL_OPTION);
+				if(reply==JOptionPane.OK_OPTION) {
+					int index1 = combo1.getSelectedIndex();
+					int index2 = combo2.getSelectedIndex();
+					
+					if(index1!=index2) {
+						System.out.println("From: "+accounts.get(index1));
+						System.out.println("To: "+accounts.get(index2));
+						break;
+					}
+					JOptionPane.showMessageDialog(null, "From and to accounts cannot be the same!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}
+			
+			
 		}
 		
 	}
