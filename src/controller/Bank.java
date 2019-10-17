@@ -68,8 +68,10 @@ public class Bank extends Observable {
 
 	public void depositForCustomer(BankCustomer customer, String accountName, double amount) {
 		this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
-//		setChanged();
-//		notifyObservers();
+	}
+	
+	public void withdrawForCustomer(BankCustomer customer, String accountName, double amount) {
+		this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
 	}
 	
 	public BankCustomer login(String email, String password) {

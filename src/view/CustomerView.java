@@ -99,33 +99,11 @@ public class CustomerView extends JFrame implements Observer {
 		
 		JButton btnWithdraw = new JButton("Withdraw");
 		btnWithdraw.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnWithdraw.addActionListener(new TransactionActionListener("Withdraw From Account", "Withdraw"));
 		btnsPanel.add(btnWithdraw);
 		
 		JButton btnDeposit = new JButton("Deposit");
-		btnDeposit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
-				
-				JComboBox<String> combo = new JComboBox<String>();
-				ArrayList<BankAccount> accounts = customer.getAccounts();
-				for(int i=0;i<accounts.size();i++) {
-					combo.addItem(accounts.get(i).getAccountName());
-				}
-				JTextField amountField = new JTextField();
-				
-				Object[] fields = {
-					"Account Name: ", combo,
-					"Amount in USD: $", amountField,
-				};
-				
-				int reply = JOptionPane.showConfirmDialog(null, fields, "Deposit into Account", JOptionPane.OK_CANCEL_OPTION);
-				
-				if(reply==JOptionPane.OK_OPTION) {
-					int accountIndex = combo.getSelectedIndex();
-					bank.depositForCustomer(customer, combo.getItemAt(accountIndex), Double.parseDouble(amountField.getText()));
-				}
-			}
-		});
+		btnDeposit.addActionListener(new TransactionActionListener("Deposit into Account", "Deposit"));
 		btnDeposit.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnDeposit);
 		
@@ -230,6 +208,52 @@ public class CustomerView extends JFrame implements Observer {
 		JPanel loansDisplayPanel = new JPanel();
 		loansPanel.add(loansDisplayPanel, BorderLayout.CENTER);
 		
+		
+	}
+	
+	public class TransactionActionListener implements ActionListener{
+
+		String title; 
+		String type; 
+		public TransactionActionListener(String title, String type) {
+			// TODO Auto-generated constructor stub
+			this.title = title;
+			this.type = type;
+		}
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			if(customer.getAccounts().size()==0) {
+				JOptionPane.showMessageDialog(null, "No Accounts exist for Customer", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
+			UIManager.put("ComboBox.font",  new Font("Tahoma", Font.PLAIN, 30));
+			
+			JComboBox<String> combo = new JComboBox<String>();
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			for(int i=0;i<accounts.size();i++) {
+				combo.addItem(accounts.get(i).getAccountName());
+			}
+			JTextField amountField = new JTextField();
+			
+			Object[] fields = {
+				"Account Name: ", combo,
+				"Amount in USD: $", amountField,
+			};
+			
+			int reply = JOptionPane.showConfirmDialog(null, fields, title, JOptionPane.OK_CANCEL_OPTION);
+			
+			if(reply==JOptionPane.OK_OPTION) {
+				int accountIndex = combo.getSelectedIndex();
+				if(this.type.equals("Deposit")) {
+					bank.depositForCustomer(customer, combo.getItemAt(accountIndex), Double.parseDouble(amountField.getText()));
+				}
+				else if(this.type.equals("Withdraw")) {
+					bank.withdrawForCustomer(customer, combo.getItemAt(accountIndex), Double.parseDouble(amountField.getText()));
+				}
+			}
+		}
 		
 	}
 	

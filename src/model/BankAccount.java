@@ -41,7 +41,7 @@ public class BankAccount {
 	public void setAccountName(String accountName) {
 		this.accountName = accountName;
 	}
-
+	
 	public boolean withdraw(double amount) {
 		if(amount<=0 || amount>this.balance) {
 			return false;

@@ -44,21 +44,29 @@ public class BankCustomer extends Customer {
 
 	public void depositIntoAccount(String accountName, double amount) {
 		int accountIndex = getAccountIndexByName(accountName);
-		
+
 		BankAccount account = this.accounts.get(accountIndex);
 		account.deposit(amount);
 		this.accounts.set(accountIndex, account);
 	}
-	
+
+	public void withdrawFromAccount(String accountName, double amount) {
+		int accountIndex = getAccountIndexByName(accountName);
+
+		BankAccount account = this.accounts.get(accountIndex);
+		account.withdraw(amount);
+		this.accounts.set(accountIndex, account);
+	}
+
 	public int getAccountIndexByName(String accountName) {
-		for(int i=0;i<this.accounts.size();i++) {
-			if(this.accounts.get(i).getAccountName().equals(accountName))
+		for (int i = 0; i < this.accounts.size(); i++) {
+			if (this.accounts.get(i).getAccountName().equals(accountName))
 				return i;
 		}
-		
+
 		return -1;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
@@ -92,6 +100,5 @@ public class BankCustomer extends Customer {
 
 		return c;
 	}
-	
 
 }
