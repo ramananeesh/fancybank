@@ -41,6 +41,7 @@ public class CustomerView extends JFrame implements Observer {
 	private DefaultListModel<String> transactionsModel;
 	private JLabel accountNameLbl;
 	private JLabel accountBalanceLbl;
+	private JLabel infoDetailslbl;
 
 	/**
 	 * Create the application.
@@ -70,7 +71,7 @@ public class CustomerView extends JFrame implements Observer {
 		JPanel westPanel = new JPanel();
 		getContentPane().add(westPanel, BorderLayout.WEST);
 		westPanel.setLayout(new BorderLayout(0, 0));
-		westPanel.setPreferredSize(new Dimension(400, 800));
+		westPanel.setPreferredSize(new Dimension(700, 800));
 
 		JPanel accountsPanel = new JPanel();
 		accountsPanel.setPreferredSize(new Dimension(400, 300));
@@ -227,11 +228,11 @@ public class CustomerView extends JFrame implements Observer {
 		lblTransactions.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		transactionsPanel.add(lblTransactions, BorderLayout.NORTH);
 
-		accountsModel = new DefaultListModel<>();
+		transactionsModel = new DefaultListModel<>();
 		// change to transactions here
-		accountsModel = addAccountsToList(this.customer, accountsModel);
-		transactionsList = new JList<String>(accountsModel);
-		transactionsList.addListSelectionListener(new AccountListListener());
+		transactionsModel = addTransactionsToList(customer, transactionsModel);
+		transactionsList = new JList<String>(transactionsModel);
+		transactionsList.addListSelectionListener(new TransactionListListener());
 		transactionsList.setVisible(true);
 
 		transactionsList.setVisibleRowCount(8);
@@ -243,10 +244,25 @@ public class CustomerView extends JFrame implements Observer {
 		// transactionsPanel.setPreferredSize(new Dimension(400, 400));
 
 		btnsPanel.setBorder(new LineBorder(Color.black, 3));
+		
+		JPanel infoPanel = new JPanel();
+		centerPanel.add(infoPanel, BorderLayout.NORTH);
+		infoPanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblInformationDetails = new JLabel("Information / Details");
+		lblInformationDetails.setFont(new Font("Tahoma", Font.PLAIN, 34));
+		lblInformationDetails.setHorizontalAlignment(SwingConstants.CENTER);
+		infoPanel.add(lblInformationDetails, BorderLayout.NORTH);
+		
+		infoDetailslbl = new JLabel("NA");
+		infoDetailslbl.setForeground(Color.BLUE);
+		infoDetailslbl.setFont(new Font("Tahoma", Font.PLAIN, 28));
+		infoDetailslbl.setHorizontalAlignment(SwingConstants.CENTER);
+		infoPanel.add(infoDetailslbl, BorderLayout.SOUTH);
 		balancePanel.setBorder(new LineBorder(Color.black, 3));
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
-
+	
 	public class TransactionActionListener implements ActionListener {
 
 		String title;
@@ -332,8 +348,11 @@ public class CustomerView extends JFrame implements Observer {
 					double amount = Double.parseDouble(amountString);
 					if (index1 != index2) {
 						if (amount > 0) {
-							bank.transferBetweenAccountsForCustomer(customer, accounts.get(index1).getAccountName(),
-									accounts.get(index2).getAccountName(), amount);
+							String account1 = accounts.get(index1).getAccountName();
+							String account2 = accounts.get(index2).getAccountName();
+							bank.transferBetweenAccountsForCustomer(customer, account1, account2, amount);
+							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Internal Transfer", amount, account1, account2);
+							bank.addTransactionForCustomer(customer, transaction);
 							break;
 						} else {
 							JOptionPane.showMessageDialog(null, "Amount cannot be less than or equal to 0", "Error",
@@ -355,7 +374,10 @@ public class CustomerView extends JFrame implements Observer {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 			// TODO Auto-generated method stub
-
+			if(accountsList.getSelectedIndex()==-1) {
+				return;
+			}
+			
 			ArrayList<BankAccount> accounts = customer.getAccounts();
 			BankAccount account = accounts.get(accountsList.getSelectedIndex());
 
@@ -364,6 +386,23 @@ public class CustomerView extends JFrame implements Observer {
 			accountBalanceLbl.setText(balance.toString());
 		}
 
+	}
+	
+	public class TransactionListListener implements ListSelectionListener{
+
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			// TODO Auto-generated method stub
+			if(transactionsList.getSelectedIndex()==-1) {
+				return;
+			}
+			
+			ArrayList<Transaction> transactions = customer.getTransactions();
+			Transaction transaction = transactions.get(transactionsList.getSelectedIndex());
+			
+			infoDetailslbl.setText(transaction.detailedCustomerDisplay());
+		}
+		
 	}
 
 	public DefaultListModel<String> addAccountsToList(BankCustomer customer, DefaultListModel<String> model) {
@@ -374,6 +413,15 @@ public class CustomerView extends JFrame implements Observer {
 		}
 		return model;
 	}
+	
+	public DefaultListModel<String> addTransactionsToList(BankCustomer customer, DefaultListModel<String> model){
+		customer = this.bank.getCustomerByEmail(customer.getEmail());
+		ArrayList<Transaction> transactions = customer.getTransactions();
+		for (Transaction t : transactions) {
+			model.addElement(t.shortCustomerDisplay());
+		}
+		return model;
+	}
 
 	@Override
 	public void update(Observable o, Object arg) {
@@ -381,6 +429,10 @@ public class CustomerView extends JFrame implements Observer {
 
 		accountsModel = addAccountsToList(this.customer, new DefaultListModel<String>());
 		accountsList.setModel(accountsModel);
+		
+		transactionsModel = addTransactionsToList(customer, new DefaultListModel<String>());
+		transactionsList.setModel(transactionsModel);
+		
 	}
 
 }

@@ -42,6 +42,14 @@ public class BankCustomer extends Customer {
 		return removedAccount;
 	}
 
+	public ArrayList<Transaction> getTransactions() {
+		return transactions;
+	}
+
+	public void setTransactions(ArrayList<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
 	public void depositIntoAccount(String accountName, double amount) {
 		int accountIndex = getAccountIndexByName(accountName);
 
