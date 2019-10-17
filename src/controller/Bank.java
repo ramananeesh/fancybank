@@ -3,9 +3,11 @@ package controller;
 import java.util.ArrayList;
 import java.util.Observable;
 
+import javax.swing.DefaultListModel;
+
 import model.*;
 
-public class Bank extends Observable{
+public class Bank extends Observable {
 
 	private ArrayList<BankManager> managers;
 	private ArrayList<BankCustomer> customers;
@@ -38,27 +40,43 @@ public class Bank extends Observable{
 		this.customers.add(newCustomer);
 		return newCustomer;
 	}
+
+	public void addAccount(BankCustomer customer, String accountType) {
+		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountType));
+		setChanged();
+		notifyObservers();
+	}
 	
+	public int getCustomerIndex(String name) {
+		int i=0;
+		for(BankCustomer cust : this.customers) {
+			if(cust.getName().equals(name))
+				return i;
+			i++;
+		}
+		return -1;
+	}
 	public BankCustomer getCustomerByEmail(String email) {
-	
-		for(BankCustomer c: this.customers) {
-			if(c.getEmail().equals(email))
+
+		for (BankCustomer c : this.customers) {
+			if (c.getEmail().equals(email))
 				return c;
 		}
-		
+
 		return null;
 	}
 
 	public BankCustomer login(String email, String password) {
 		BankCustomer customer = getCustomerByEmail(email);
-		if(customer==null)
+		if (customer == null)
 			return null;
-		
-		if(customer.getPassword().equals(password))
+
+		if (customer.getPassword().equals(password))
 			return customer;
-		
+
 		return null;
 	}
+
 	public ArrayList<BankManager> getManagers() {
 		return managers;
 	}

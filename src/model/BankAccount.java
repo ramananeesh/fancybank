@@ -7,6 +7,14 @@ public class BankAccount {
 	private double rate; 
 	private double fee;
 	
+	public BankAccount(String type) {
+		super();
+		this.type = type;
+		this.balance = 0;
+		this.rate = 0;
+		this.fee = 0;
+	}
+	
 	public BankAccount(String type, double balance, double rate, double fee) {
 		super();
 		this.type = type;
@@ -70,4 +78,7 @@ public class BankAccount {
 		return "Account [type=" + type + ", balance=" + balance + ", rate=" + rate + ", fee=" + fee + "]";
 	} 
 	
+	public String toString(int args) {
+		return type+"\t"+ balance +"\t"+rate+ "\t"+fee+"\t";
+	}
 }

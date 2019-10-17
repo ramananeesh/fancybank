@@ -2,38 +2,47 @@ package view;
 
 import java.awt.EventQueue;
 import java.util.*;
-
-import javax.swing.JFrame;
 import java.awt.BorderLayout;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import java.awt.Dimension;
+
 import javax.swing.border.Border;
 
 import model.*;
 
 import java.awt.Font;
-import javax.swing.JPanel;
+
+import javax.swing.*;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
-import javax.swing.JComboBox;
-import javax.swing.JList;
 import java.awt.FlowLayout;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import java.awt.Insets;
 import javax.swing.border.EmptyBorder;
-import javax.swing.ListSelectionModel;
+
+import controller.Bank;
+import javafx.collections.SetChangeListener;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class CustomerView extends JFrame implements Observer {
 	private BankCustomer customer;
-
+	private Bank bank;
+	
+	private JList<String> accountsList;
+	private JLabel lblCustomerView;
+	private DefaultListModel<String> model;
+	
+	
 	/**
 	 * Create the application.
 	 */
-	public CustomerView(BankCustomer customer) {
-		this.customer = customer;
+	public CustomerView(Bank bank,BankCustomer customer) {
+		
+		this.bank = bank;
+		this.customer = this.bank.getCustomerByEmail(customer.getEmail());
+		this.bank.addObserver(this);
 		initialize();
 	}
 
@@ -46,7 +55,7 @@ public class CustomerView extends JFrame implements Observer {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblCustomerView = new JLabel("Customer View ");
+		lblCustomerView = new JLabel("Customer View ");
 		lblCustomerView.setFont(new Font("Tahoma", Font.PLAIN, 45));
 		lblCustomerView.setHorizontalAlignment(SwingConstants.CENTER);
 		getContentPane().add(lblCustomerView, BorderLayout.NORTH);
@@ -63,7 +72,11 @@ public class CustomerView extends JFrame implements Observer {
 //		accountsPanel.setSize(500, 500);
 		westPanel.add(accountsPanel, BorderLayout.CENTER);
 		
-		JList<BankAccount> accountsList = new JList();
+		model = new DefaultListModel<>();
+		model = addAccountsToList(this.customer,model);
+		accountsList = new JList<String>(model);
+		accountsList.setVisible(true);
+		
 		accountsList.setVisibleRowCount(5);
 		accountsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		accountsList.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -89,6 +102,35 @@ public class CustomerView extends JFrame implements Observer {
 		JButton btnTransfer = new JButton("Transfer");
 		btnTransfer.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnTransfer);
+		
+		JButton btnAddAccount = new JButton("Add Account");
+		btnAddAccount.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JRadioButton savings = new JRadioButton();
+				JRadioButton checking = new JRadioButton();
+				
+				savings.setSelected(true);
+				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
+				
+				Object[] fields = {
+					"Savings ", savings,
+					"Checking ", checking,
+				};
+				
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Choose Account Type", JOptionPane.OK_CANCEL_OPTION);
+				
+				if(reply==JOptionPane.OK_OPTION) {
+					String accountType; 
+					if(savings.isSelected())
+						accountType = "Savings";
+					else
+						accountType = "Checking";
+					bank.addAccount(customer, accountType);
+				}
+			}
+		});
+		btnAddAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnAddAccount);
 		
 		JLabel messageLabel = new JLabel("Message");
 		messageLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
@@ -152,11 +194,22 @@ public class CustomerView extends JFrame implements Observer {
 		
 		
 	}
+	
+	public DefaultListModel<String> addAccountsToList(BankCustomer customer, DefaultListModel<String> model) {
+		customer = this.bank.getCustomerByEmail(customer.getEmail());
+		ArrayList<BankAccount> accounts = customer.getAccounts();
+		for (BankAccount acc : accounts) {
+			model.addElement(acc.getType());
+		}
+		return model;
+	}
 
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub
 		
+		model = addAccountsToList(this.customer, new DefaultListModel<String>());
+		accountsList.setModel(model);
 	}
 
 }

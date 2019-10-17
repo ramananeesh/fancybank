@@ -31,28 +31,14 @@ public class Login extends JFrame {
 
 	private Bank bank;
 
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					Login window = new Login();
-//					window.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-
 	/**
 	 * Create the application.
 	 */
 	public Login(Bank bank) {
 		super();
 		this.bank = bank;
+		//test purpose
+		this.bank.addCustomer("Aneesh", new Address("","","","",""), "" , "", "test", "1234");
 		initialize();
 	}
 
@@ -99,6 +85,10 @@ public class Login extends JFrame {
 						UIManager.put("OptionPane.minimumSize", new Dimension(50, 200));
 						if (customer != null) {
 							JOptionPane.showMessageDialog(null, "Login Successful!");
+							CustomerView custView = new CustomerView(bank,customer);
+							setVisible(false);
+							custView.setVisible(true);
+							
 							break;
 						}
 						JOptionPane.showMessageDialog(null, "Email ID or Password incorrect!");
