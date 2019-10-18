@@ -28,6 +28,11 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JTextField;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 public class ManagerView extends JFrame implements Observer {
 
@@ -48,6 +53,20 @@ public class ManagerView extends JFrame implements Observer {
 		this.bank = bank;
 		this.manager = manager;
 		this.bank.addObserver(this);
+		
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setBackground(Color.LIGHT_GRAY);
+		setJMenuBar(menuBar);
+		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+		
+		JMenu mnOptions = new JMenu("Options");
+		menuBar.add(mnOptions);
+		
+		JMenuItem mntmLogOut = new JMenuItem("Log Out");
+		mnOptions.add(mntmLogOut);
+		
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mnOptions.add(mntmExit);
 		initialize();
 	}
 
@@ -156,6 +175,18 @@ public class ManagerView extends JFrame implements Observer {
 
 		JPanel btnsPanel = new JPanel();
 		panel.add(btnsPanel, BorderLayout.CENTER);
+		
+		JButton btnApproveLoan = new JButton("Approve Loan");
+		btnsPanel.add(btnApproveLoan);
+		
+		JButton btnSetInterestRate = new JButton("Set Interest Rate");
+		btnsPanel.add(btnSetInterestRate);
+		
+		JButton btnSetHighBalance = new JButton("Set High Balance Amount");
+		btnsPanel.add(btnSetHighBalance);
+		
+		JButton btnSettleInterests = new JButton("Settle Interests");
+		btnsPanel.add(btnSettleInterests);
 
 		JPanel southPanel = new JPanel();
 		getContentPane().add(southPanel, BorderLayout.SOUTH);
