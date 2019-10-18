@@ -178,7 +178,7 @@ public class Bank extends Observable {
 				return;
 			for (BankAccount acc : accounts) {
 				if (acc.getType().equals("Savings")) {
-					if (acc.getBalance() > highBalance) {
+					if (acc.getBalance() >= highBalance) {
 						double interestAmount = this.savingsInterestRate * acc.getBalance();
 						acc.setBalance(acc.getBalance()+interestAmount);
 						Transaction t = this.addTransaction("Bank", customer.getName(), "Interest Settlement",
