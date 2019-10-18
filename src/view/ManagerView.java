@@ -33,9 +33,11 @@ import java.awt.Dimension;
 import javax.swing.JTextField;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 public class ManagerView extends JFrame implements Observer {
 
@@ -48,6 +50,7 @@ public class ManagerView extends JFrame implements Observer {
 	private JTable transactionsTable;
 	private DefaultTableModel transactionsModel;
 	private JTextArea infoDetailsTextArea;
+	private JLabel amountEarnedLbl;
 
 	/**
 	 * Create the application.
@@ -142,7 +145,7 @@ public class ManagerView extends JFrame implements Observer {
 		loansDisplayPanel.add(loansLbl, BorderLayout.NORTH);
 
 		String loansData[][] = new String[][] {};
-		String loansHeader[] = new String[] { "ID", "Customer", "Amount", "Approved", "Active" };
+		String loansHeader[] = new String[] { "ID", "Customer", "Amount", "Status", "Active" };
 		loansModel = new DefaultTableModel(loansData, loansHeader) {
 			public boolean isCellEditable(int rowIndex, int mColIndex) {
 				return false;
@@ -194,6 +197,7 @@ public class ManagerView extends JFrame implements Observer {
 		
 		JButton btnApproveLoan = new JButton("Approve Loan");
 		btnsPanel.add(btnApproveLoan);
+		btnApproveLoan.addActionListener(new ApproveLoanListener());
 		
 		JButton btnSetInterestRate = new JButton("Set Interest Rate");
 		btnsPanel.add(btnSetInterestRate);
@@ -203,6 +207,10 @@ public class ManagerView extends JFrame implements Observer {
 		
 		JButton btnSettleInterests = new JButton("Settle Interests");
 		btnsPanel.add(btnSettleInterests);
+		
+		amountEarnedLbl = new JLabel("Amount Earned: $");
+		amountEarnedLbl.setHorizontalAlignment(SwingConstants.CENTER);
+		centerPanel.add(amountEarnedLbl, BorderLayout.SOUTH);
 
 		JPanel southPanel = new JPanel();
 		getContentPane().add(southPanel, BorderLayout.SOUTH);
@@ -237,6 +245,72 @@ public class ManagerView extends JFrame implements Observer {
 		eastPanel.add(transactionsScrollPane, BorderLayout.CENTER);
 
 	}
+	
+	public class ApproveLoanListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			JComboBox combo1 = new JComboBox();
+			JComboBox combo2 = new JComboBox();
+			JLabel loanAmountLabel = new JLabel("N/A");
+			JLabel collateralAmountLabel = new JLabel("N/A");
+			 
+			
+			for(BankCustomer cust: bank.getCustomers()) {
+				combo1.addItem(cust.getName());
+			}
+			
+			combo1.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					ArrayList<Loan> customerLoans = bank.getCustomers().get(combo1.getSelectedIndex()).getLoans();
+					
+					for(Loan l: customerLoans) {
+						combo2.addItem(l.getLoanId());
+					}
+				}
+			});
+			
+			combo2.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					Loan l = bank.getCustomers().get(combo1.getSelectedIndex()).getLoans().get(combo2.getSelectedIndex());
+					loanAmountLabel.setText("$"+l.getLoanAmount());
+					collateralAmountLabel.setText("$"+l.getCollateralAmount());
+				}
+			});
+			
+			Object[] fields = new Object[] {
+				"Customer: ", combo1,
+				"Loan ID: ", combo2, 
+				"Loan Amount: ", loanAmountLabel, 
+				"Collateral Amount: ", collateralAmountLabel,
+			};
+			
+			while(true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Approve Loan", JOptionPane.OK_CANCEL_OPTION);
+				
+				if(reply==JOptionPane.OK_OPTION) {
+					if(combo1.getSelectedIndex()==-1||combo2.getSelectedIndex()==-1) {
+						JOptionPane.showMessageDialog(null, "Select a customer and Loan ID to approve loan",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+					BankCustomer customer = bank.getCustomers().get(combo1.getSelectedIndex());
+					Loan l = customer.getLoans().get(combo2.getSelectedIndex());
+					bank.approveLoanForCustomer(customer, l.getLoanId());
+					break;
+				}
+				else {
+					break;
+				}
+			}
+		}
+	}
 
 	public DefaultTableModel addCustomersToTable(DefaultTableModel model) {
 
@@ -267,7 +341,7 @@ public class ManagerView extends JFrame implements Observer {
 			return model;
 		}
 		for (Loan l : loans) {
-			model.addRow(l.getShortLoanDisplayForCustomer());
+			model.addRow(l.getShortLoanDisplayForManager());
 		}
 		return model;
 	}
@@ -342,6 +416,35 @@ public class ManagerView extends JFrame implements Observer {
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
 
+		String customersData[][] = new String[][] {};
+		String customersHeader[] = new String[] { "ID", "Customer Name" };
+		customersModel = new DefaultTableModel(customersData, customersHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+		customersModel = addCustomersToTable(customersModel);
+		customersTable.setModel(customersModel);
+		
+		String transactionsData[][] = new String[][] {};
+		String transactionsHeader[] = new String[] { "Customer", "From", "To", "Type", "Amount" };
+		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+		transactionsModel = addTransactionsToTable(transactionsModel);
+		transactionsTable.setModel(transactionsModel);
+
+		String loansData[][] = new String[][] {};
+		String loansHeader[] = new String[] { "ID", "Customer", "Amount", "Status", "Active" };
+		loansModel = new DefaultTableModel(loansData, loansHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+		loansModel = addLoansToTable(loansModel);
+		loansTable.setModel(loansModel);
 	}
 
 }

@@ -95,7 +95,7 @@ public class CustomerView extends JFrame implements Observer {
 		accountsTable.setDefaultRenderer(String.class, centerRenderer);
 		accountsTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 30));
 
-		accountsTable.setPreferredSize(new Dimension(380, accountsTable.getSize().height));
+		accountsTable.setPreferredSize(new Dimension(380, 380));
 		accountsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		accountsTable.setBorder(new EmptyBorder(5, 5, 5, 5));
 		accountsTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
@@ -177,7 +177,7 @@ public class CustomerView extends JFrame implements Observer {
 		loansPanel.add(loansDisplayPanel, BorderLayout.CENTER);
 
 		String loansData[][] = new String[][] {};
-		String loansHeader[] = new String[] { "ID", "Amount", "Approved", "Active" };
+		String loansHeader[] = new String[] { "ID", "Amount", "Status", "Active" };
 		loansModel = new DefaultTableModel(loansData, loansHeader);
 		loansTable = new JTable(loansModel);
 		loansTable.getSelectionModel().addListSelectionListener(new LoanListListener());
@@ -395,9 +395,10 @@ public class CustomerView extends JFrame implements Observer {
 						int tenure = Integer.parseInt(tenureField.getText());
 						String collateral = collateralField.getText();
 						double collateralAmount = Double.parseDouble(collateralAmountField.getText());
-						if (collateralAmount <= 0) {
-							JOptionPane.showMessageDialog(null, "Collateral Amount Cannot be Less than or Equal to 0",
-									"Error", JOptionPane.ERROR_MESSAGE);
+						if (collateralAmount <= loanAmount) {
+							JOptionPane.showMessageDialog(null,
+									"Collateral Amount Cannot be Less than or Equal to Loan Amount", "Error",
+									JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
 
@@ -450,25 +451,63 @@ public class CustomerView extends JFrame implements Observer {
 			JTextField amountField = new JTextField();
 
 			Object[] fields = { "Account Name: ", combo, "Amount in USD: $", amountField, };
+			while (true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, title, JOptionPane.OK_CANCEL_OPTION);
 
-			int reply = JOptionPane.showConfirmDialog(null, fields, title, JOptionPane.OK_CANCEL_OPTION);
+				if (reply == JOptionPane.OK_OPTION) {
+					int accountIndex = combo.getSelectedIndex();
+					double amount;
+					try {
+						amount = Double.parseDouble(amountField.getText());
+						if (amount <= 0) {
+							JOptionPane.showMessageDialog(null, "Deposit should be a real value >=0", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Error processing deposit. Deposit should be a real value",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
 
-			if (reply == JOptionPane.OK_OPTION) {
-				int accountIndex = combo.getSelectedIndex();
-				if (this.type.equals("Deposit")) {
-					bank.depositForCustomer(customer, combo.getItemAt(accountIndex),
-							Double.parseDouble(amountField.getText()));
-					Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Deposit",
-							Double.parseDouble(amountField.getText()), "Self",
-							accounts.get(accountIndex).getAccountName());
-					bank.addTransactionForCustomer(customer, transaction);
-				} else if (this.type.equals("Withdraw")) {
-					bank.withdrawForCustomer(customer, combo.getItemAt(accountIndex),
-							Double.parseDouble(amountField.getText()));
-					Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Withdrawal",
-							Double.parseDouble(amountField.getText()), accounts.get(accountIndex).getAccountName(),
-							"Self");
-					bank.addTransactionForCustomer(customer, transaction);
+					if (this.type.equals("Deposit")) {
+						boolean flag = bank.depositForCustomer(customer, combo.getItemAt(accountIndex), amount);
+						double fees = accounts.get(combo.getSelectedIndex()).getFees("Deposit");
+						if (!flag) {
+							JOptionPane.showMessageDialog(null,
+									"Error processing deposit. Fee exceeds account balance including deposit", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Deposit",
+								Double.parseDouble(amountField.getText()), "Self",
+								accounts.get(accountIndex).getAccountName());
+						bank.addTransactionForCustomer(customer, transaction);
+
+						bank.addMoneyEarned(fees);
+						transaction = bank.addTransaction(customer.getName(), customer.getName(), "Transaction Fees",
+								fees, accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
+						bank.addTransactionForCustomer(customer, transaction);
+						break;
+					} else if (this.type.equals("Withdraw")) {
+						boolean flag = bank.withdrawForCustomer(customer, combo.getItemAt(accountIndex), amount);
+						double fees = accounts.get(combo.getSelectedIndex()).getFees("Withdrawal");
+						if (!flag) {
+							JOptionPane.showMessageDialog(null, "Error processing deposit. Fee exceeds account balance",
+									"Error", JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(),
+								"Withdrawal", Double.parseDouble(amountField.getText()),
+								accounts.get(accountIndex).getAccountName(), "Self");
+						bank.addTransactionForCustomer(customer, transaction);
+						
+						bank.addMoneyEarned(fees);
+						transaction = bank.addTransaction(customer.getName(), customer.getName(), "Transaction Fees",
+								fees, accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
+						bank.addTransactionForCustomer(customer, transaction);
+						break;
+					}
 				}
 			}
 		}
@@ -723,7 +762,7 @@ public class CustomerView extends JFrame implements Observer {
 		transactionsTable.setModel(transactionsModel);
 
 		String loansData[][] = new String[][] {};
-		String loansHeader[] = new String[] { "ID", "Amount", "Approved", "Active" };
+		String loansHeader[] = new String[] { "ID", "Amount", "Status", "Active" };
 		loansModel = new DefaultTableModel(loansData, loansHeader);
 		loansModel = addLoansToTable(customer, loansModel);
 		loansTable.setModel(loansModel);

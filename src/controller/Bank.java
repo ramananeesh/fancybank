@@ -13,7 +13,10 @@ public class Bank extends Observable {
 	private ArrayList<BankCustomer> customers;
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
-	
+	private double moneyEarned;
+	private double accountOperationFee; 
+	private double checkingTransactionFee;
+	private double withdrawalFee;
 	private double loanInterestRate; 
 
 	public Bank() {
@@ -23,6 +26,10 @@ public class Bank extends Observable {
 		transactions = new ArrayList<Transaction>();
 		loans = new ArrayList<Loan>();
 		this.loanInterestRate = 0.1;
+		this.moneyEarned = 0;
+		this.accountOperationFee = 5;
+		this.checkingTransactionFee = 2;
+		this.withdrawalFee = 2;
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
@@ -48,7 +55,7 @@ public class Bank extends Observable {
 	}
 
 	public void addAccount(BankCustomer customer, String accountName, String accountType) {
-		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType));
+		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType,loanInterestRate, withdrawalFee, checkingTransactionFee, accountOperationFee));
 		setChanged();
 		notifyObservers();
 	}
@@ -91,17 +98,19 @@ public class Bank extends Observable {
 		return null;
 	}
 
-	public void depositForCustomer(BankCustomer customer, String accountName, double amount) {
-		this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
+	public boolean depositForCustomer(BankCustomer customer, String accountName, double amount) {
+		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
+		return flag;
 	}
 
-	public void withdrawForCustomer(BankCustomer customer, String accountName, double amount) {
-		this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
+	public boolean withdrawForCustomer(BankCustomer customer, String accountName, double amount) {
+		boolean flag = this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
+		return flag;
 	}
 
-	public void transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName, String toAccountName,
+	public boolean transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName, String toAccountName,
 			double amount) {
-		this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName, amount);
+		return this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName, amount);
 	}
 
 	public void addTransactionForCustomer(BankCustomer customer, Transaction transaction) {
@@ -110,15 +119,65 @@ public class Bank extends Observable {
 		notifyObservers();
 	}
 	
-	public void settleLoanForCustomer(BankCustomer customer, String accountName, String loanId, double loanAmount) {
+	public boolean settleLoanForCustomer(BankCustomer customer, String accountName, String loanId, double loanAmount) {
+		
+		boolean flag = this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, loanAmount);
+		if(!flag)
+			return false;
 		this.getCustomerByEmail(customer.getEmail()).closeLoan(loanId);
-		this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, loanAmount);
 		Transaction t = this.addTransaction(customer.getName(), "Bank", "Loan Settlement", loanAmount, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, t);
 		setChanged();
 		notifyObservers();
+		return true;
 	}
 
+	public Loan getLoanById(String loanId) {
+		for(Loan l: loans) {
+			if(l.getLoanId().equals(loanId))
+				return l;
+		}
+		return null;
+	}
+	
+	public Loan getLoanById(BankCustomer customer, String loanId) {
+		for(Loan l: customer.getLoans()) {
+			if(l.getLoanId().equals(loanId))
+				return l;
+		}
+		return null;
+	}
+	
+	public int getLoanIndexById(String loanId) {
+		int i=0;
+		for(Loan l: loans) {
+			if(l.getLoanId().equals(loanId))
+				return i;
+			i++;
+		}
+		return -1;
+	}
+	
+	public void approveLoan(String loanId) {
+		for(Loan l: this.loans) {
+			if(l.getLoanId().equals(loanId)) {
+				l.approve();
+			}
+		}
+	}
+	
+	public void addMoneyEarned(double moneyEarned) {
+		this.moneyEarned+=moneyEarned;
+	}
+	
+	public void approveLoanForCustomer(BankCustomer customer, String loanId) {
+		this.getCustomerByEmail(customer.getEmail()).approveLoan(loanId);
+		this.approveLoan(loanId);
+		setChanged();
+		notifyObservers();
+	}
+	
+	
 	public BankCustomer login(String email, String password) {
 		BankCustomer customer = getCustomerByEmail(email);
 		if (customer == null)
@@ -182,6 +241,38 @@ public class Bank extends Observable {
 
 	public void setLoans(ArrayList<Loan> loans) {
 		this.loans = loans;
+	}
+
+	public double getMoneyEarned() {
+		return moneyEarned;
+	}
+
+	public void setMoneyEarned(double moneyEarned) {
+		this.moneyEarned = moneyEarned;
+	}
+
+	public double getAccountOperationFee() {
+		return accountOperationFee;
+	}
+
+	public void setAccountOperationFee(double accountOperationFee) {
+		this.accountOperationFee = accountOperationFee;
+	}
+
+	public double getCheckingTransactionFee() {
+		return checkingTransactionFee;
+	}
+
+	public void setCheckingTransactionFee(double checkingTransactionFee) {
+		this.checkingTransactionFee = checkingTransactionFee;
+	}
+
+	public double getWithdrawalFee() {
+		return withdrawalFee;
+	}
+
+	public void setWithdrawalFee(double withdrawalFee) {
+		this.withdrawalFee = withdrawalFee;
 	}
 
 }

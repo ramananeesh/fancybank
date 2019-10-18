@@ -6,15 +6,19 @@ public class BankAccount {
 	private String type; 
 	private double balance; 
 	private double rate; 
-	private double fee;
+	private double withdrawalFee;
+	private double accountOperationFee; 
+	private double transactionFee;
 	
-	public BankAccount(String name, String type) {
+	public BankAccount(String name, String type, double rate, double withdrawalFee, double transactionFee, double accountOperationFee) {
 		super();
 		this.accountName = name;
 		this.type = type;
+		this.rate = rate;
 		this.balance = 0;
-		this.rate = 0;
-		this.fee = 0;
+		this.withdrawalFee = withdrawalFee;
+		this.transactionFee=transactionFee;
+		this.accountOperationFee = accountOperationFee;
 	}
 	
 	public BankAccount(String name,String type, double balance, double rate, double fee) {
@@ -23,15 +27,35 @@ public class BankAccount {
 		this.type = type;
 		this.balance = balance;
 		this.rate = rate;
-		this.fee = fee;
+		this.withdrawalFee = fee;
 	}
 	
 	public boolean deposit(double deposit) {
 		if(deposit<=0)
 			return false;
-		this.balance+=deposit;
+		
+		if((balance+deposit-getFees("Deposit")< 0))
+			return false;
+		
+		this.balance+=(deposit-getFees("Deposit"));
 		
 		return true;
+	}
+	
+	public double getFees(String transactionType) {
+		double fees=0;
+		if(transactionType.equals("Deposit") && this.balance==0)
+			fees+=accountOperationFee;
+		
+		if(type.equals("Checking"))
+			fees+=transactionFee;
+		
+		if(transactionType.equals("Withdrawal")) {
+			if(type.equals("Savings"))
+				fees+=withdrawalFee;
+		}
+		
+		return fees;
 	}
 	
 	public String getAccountName() {
@@ -47,7 +71,10 @@ public class BankAccount {
 			return false;
 		}
 		
-		this.balance-=amount;
+		if(balance-(amount+getFees("Withdrawal"))<0)
+			return false;
+		
+		this.balance-=(amount+getFees("Withdrawal"));
 		
 		return true;
 	}
@@ -76,12 +103,12 @@ public class BankAccount {
 		this.rate = rate;
 	}
 
-	public double getFee() {
-		return fee;
+	public double getWithdrawalFee() {
+		return withdrawalFee;
 	}
 
-	public void setFee(double fee) {
-		this.fee = fee;
+	public void setWithdrawalFee(double fee) {
+		this.withdrawalFee = fee;
 	}
 	
 	public String[] getDetails() {
@@ -90,11 +117,11 @@ public class BankAccount {
 
 	@Override
 	public String toString() {
-		return "Account [type=" + type + ", balance=" + balance + ", rate=" + rate + ", fee=" + fee + "]";
+		return "Account [type=" + type + ", balance=" + balance + ", rate=" + rate + ", fee=" + withdrawalFee + "]";
 	} 
 	
 	public String toString(int args) {
-		return type+"\t"+ balance +"\t"+rate+ "\t"+fee+"\t";
+		return type+"\t"+ balance +"\t"+rate+ "\t"+withdrawalFee+"\t";
 	}
 	
 	public String toString(double args) {

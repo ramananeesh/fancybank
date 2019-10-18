@@ -64,34 +64,44 @@ public class BankCustomer extends Customer {
 		this.transactions = transactions;
 	}
 
-	public void depositIntoAccount(String accountName, double amount) {
+	public boolean depositIntoAccount(String accountName, double amount) {
 		int accountIndex = getAccountIndexByName(accountName);
 
 		BankAccount account = this.accounts.get(accountIndex);
-		account.deposit(amount);
+		boolean flag = account.deposit(amount);
 		this.accounts.set(accountIndex, account);
+		return flag;
 	}
 
-	public void withdrawFromAccount(String accountName, double amount) {
+	public boolean withdrawFromAccount(String accountName, double amount) {
 		int accountIndex = getAccountIndexByName(accountName);
 
 		BankAccount account = this.accounts.get(accountIndex);
-		account.withdraw(amount);
+		boolean flag = account.withdraw(amount);
 		this.accounts.set(accountIndex, account);
+		return flag;
 	}
 
-	public void transferBetweenAccounts(String fromAccountName, String toAccountName, double amount) {
+	public boolean transferBetweenAccounts(String fromAccountName, String toAccountName, double amount) {
 		int fromIndex = getAccountIndexByName(fromAccountName);
 		int toIndex = getAccountIndexByName(toAccountName);
 		
 		BankAccount fromAccount = this.accounts.get(fromIndex);
 		BankAccount toAccount = this.accounts.get(toIndex);
 		
-		fromAccount.withdraw(amount);
-		toAccount.deposit(amount);
-		
+		boolean flag1 = fromAccount.withdraw(amount);
+		if(!flag1)
+			return false;
+		boolean flag2 = toAccount.deposit(amount);
+		if(!flag2) {
+			fromAccount.setBalance(fromAccount.getBalance()+amount);
+			return false;
+		}
+	
 		this.accounts.set(fromIndex, fromAccount);
 		this.accounts.set(toIndex, toAccount);
+		
+		return flag1&&flag2;
 	}
 	
 	public void closeLoan(String loanId) {
@@ -140,6 +150,14 @@ public class BankCustomer extends Customer {
 	
 	public String[] getDetails() {
 		return new String[] {this.getCustomerId(),this.getName()};
+	}
+	
+	public void approveLoan(String loanId) {
+		for(Loan l: loans) {
+			if(l.getLoanId().equals(loanId)) {
+				l.approve();
+			}
+		}
 	}
 
 	public static int generateCustomerId(ArrayList<BankCustomer> existingCustomers) {

@@ -79,13 +79,13 @@ public class Loan {
 	}
 
 	public String[] getShortLoanDisplayForCustomer() {
-		return new String[] { this.loanId, Double.toString(this.loanAmount), Boolean.toString(this.isApproved),
+		return new String[] { this.loanId, Double.toString(this.loanAmount), this.loanApprovedStatus,
 				Boolean.toString(this.isActive) };
 	}
 
 	
 	public String[] getShortLoanDisplayForManager() {
-		return new String[] { this.loanId, this.customerName, Double.toString(this.loanAmount), Boolean.toString(this.isApproved),
+		return new String[] { this.loanId, this.customerName, Double.toString(this.loanAmount), this.loanApprovedStatus,
 				Boolean.toString(this.isActive) };
 	}
 
