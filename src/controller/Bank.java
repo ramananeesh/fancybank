@@ -124,8 +124,11 @@ public class Bank extends Observable {
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, loanAmount);
 		if(!flag)
 			return false;
+		double fees = this.getCustomerByEmail(customer.getEmail()).getAccounts().get(this.getCustomerByEmail(customer.getEmail()).getAccountIndexByName(accountName)).getFees("Withdrawal");
 		this.getCustomerByEmail(customer.getEmail()).closeLoan(loanId);
 		Transaction t = this.addTransaction(customer.getName(), "Bank", "Loan Settlement", loanAmount, accountName, "My Fancy Bank");
+		this.addTransactionForCustomer(customer, t);
+		t = this.addTransaction(customer.getName(), "Bank", "Transaction fees", fees, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, t);
 		setChanged();
 		notifyObservers();
