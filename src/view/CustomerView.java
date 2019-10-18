@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import javax.swing.border.Border;
 
 import model.*;
+import model.Currency;
 
 import java.awt.Font;
 
@@ -480,10 +481,17 @@ public class CustomerView extends JFrame implements Observer {
 			UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
 
 			JComboBox<String> combo = new JComboBox<String>();
+			JComboBox<String> currencyCombo = new JComboBox<String>();
 			ArrayList<BankAccount> accounts = customer.getAccounts();
+			ArrayList<Currency> currencies = bank.getCurrencies();
 			for (int i = 0; i < accounts.size(); i++) {
 				combo.addItem(accounts.get(i).getAccountName());
 			}
+			
+			for(Currency c: currencies) {
+				currencyCombo.addItem(c.getName()+" - "+c.getAbbreviation());
+			}
+			
 			JTextField amountField = new JTextField();
 
 			Object[] fields = { "Account Name: ", combo, "Amount in USD: $", amountField, };
@@ -492,14 +500,18 @@ public class CustomerView extends JFrame implements Observer {
 
 				if (reply == JOptionPane.OK_OPTION) {
 					int accountIndex = combo.getSelectedIndex();
-					double amount;
+					double inputAmount, amount;
 					try {
-						amount = Double.parseDouble(amountField.getText());
-						if (amount <= 0) {
+						inputAmount = Double.parseDouble(amountField.getText());
+						if (inputAmount <= 0) {
 							JOptionPane.showMessageDialog(null, "Deposit should be a real value >=0", "Error",
 									JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
+						
+						Currency currency = currencies.get(currencyCombo.getSelectedIndex());
+						
+						amount = currency.getAmountInUSD(inputAmount);
 					} catch (Exception e1) {
 						JOptionPane.showMessageDialog(null, "Error processing deposit. Deposit should be a real value",
 								"Error", JOptionPane.ERROR_MESSAGE);

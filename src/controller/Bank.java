@@ -37,9 +37,10 @@ public class Bank extends Observable {
 		this.savingsInterestRate = 0.02;
 		
 		this.currencies=new ArrayList<Currency>();
-		currencies.add(new Currency("Indian Rupees", "INR", 0.014));
-		currencies.add(new Currency("British Pounds", "GBP", 1.30));
-		currencies.add(new Currency("Euros", "EUR", 1.12));
+		currencies.add(new Currency("US Dollars", "USD", 1, 1));
+		currencies.add(new Currency("Indian Rupees", "INR", 0.014, 72.14));
+		currencies.add(new Currency("British Pounds", "GBP", 1.30, 0.77));
+		currencies.add(new Currency("Euros", "EUR", 1.12, 0.9));
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
