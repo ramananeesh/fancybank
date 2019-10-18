@@ -239,7 +239,7 @@ public class CustomerView extends JFrame implements Observer {
 		loansTable.setPreferredSize(new Dimension(580, 140));
 		loansTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		loansTable.setBorder(new EmptyBorder(5,5,5,5));
-		loansTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		loansTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
 		loansTable.setRowHeight(20);
 		loansDisplayPanel.setPreferredSize(new Dimension(600,350));
 		loansDisplayPanel.add(loansScrollPane);

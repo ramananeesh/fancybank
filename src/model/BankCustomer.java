@@ -214,6 +214,10 @@ public class BankCustomer extends Customer {
 		for(BankAccount acc: this.accounts) {
 			ret+=acc.toString(0.0);
 		}
+		ret+="Loans: \n";
+		for(Loan l: this.loans) {
+			ret+=l.getDetailedLoanDisplayForManager();
+		}
 		return ret;
 	}
 

@@ -99,7 +99,28 @@ public class Loan {
 		ret += "Loan Approved Status: " + this.loanApprovedStatus + "\nLoan Active: " + this.isActive + "\n";
 		return ret;
 	}
+	
+	public String getDetailedLoanDisplayForManager() {
+		String ret = "";
 
+		ret += "\t\tLoan ID: " + this.loanId + "\n";
+		ret += "\t\tLoan Amount: $" + this.loanAmount + "\n\t\tInterest Rate: " + this.interestRate + "\n";
+		ret += "\t\tTenure: " + this.tenure + " months\t Start Date: " + this.loanStartDate + "\n";
+		ret += "\t\tCollateral: " + this.collateral + "\n\t\tCollateral Amount: " + this.collateralAmount + "\n";
+		ret += "\t\tLoan Approved Status: " + this.loanApprovedStatus + "\n\t\tLoan Active: " + this.isActive + "\n";
+		return ret;
+	}
+
+	public String getDetailedLoanDisplayForManager(int args) {
+		String ret = "";
+
+		ret += "\t\tLoan ID: " + this.loanId + "\n\t\tCustomer Name: "+customerName+"\n";
+		ret += "\t\tLoan Amount: $" + this.loanAmount + "\n\t\tInterest Rate: " + this.interestRate + "\n";
+		ret += "\t\tTenure: " + this.tenure + " months\t Start Date: " + this.loanStartDate + "\n";
+		ret += "\t\tCollateral: " + this.collateral + "\n\t\tCollateral Amount: " + this.collateralAmount + "\n";
+		ret += "\t\tLoan Approved Status: " + this.loanApprovedStatus + "\n\t\tLoan Active: " + this.isActive + "\n";
+		return ret;
+	}
 	public void approve() {
 		this.isApproved = true;
 		this.loanApprovedStatus = "Approved";

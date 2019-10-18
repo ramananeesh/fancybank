@@ -12,6 +12,7 @@ public class Bank extends Observable {
 	private ArrayList<BankManager> managers;
 	private ArrayList<BankCustomer> customers;
 	private ArrayList<Transaction> transactions;
+	private ArrayList<Loan> loans;
 	
 	private double loanInterestRate; 
 
@@ -20,6 +21,7 @@ public class Bank extends Observable {
 		managers = new ArrayList<BankManager>();
 		customers = new ArrayList<BankCustomer>();
 		transactions = new ArrayList<Transaction>();
+		loans = new ArrayList<Loan>();
 		this.loanInterestRate = 0.1;
 	}
 
@@ -52,7 +54,9 @@ public class Bank extends Observable {
 	}
 	
 	public void addLoan(BankCustomer customer, double loanAmount, double interestRate, int tenure, String collateral, double collateralAmount) {
-		this.getCustomerByEmail(customer.getEmail()).addLoan(new Loan(customer.getName(), customer.getCustomerId(), Integer.toString(BankCustomer.generateLoanId(customer.getLoans())),loanAmount, interestRate, tenure, collateral, collateralAmount));
+		Loan loan = new Loan(customer.getName(), customer.getCustomerId(), Integer.toString(BankCustomer.generateLoanId(customer.getLoans())),loanAmount, interestRate, tenure, collateral, collateralAmount);
+		this.loans.add(loan);
+		this.getCustomerByEmail(customer.getEmail()).addLoan(loan);
 		setChanged();
 		notifyObservers();
 	}
@@ -166,6 +170,18 @@ public class Bank extends Observable {
 
 	public void setLoanInterestRate(int loanInterestRate) {
 		this.loanInterestRate = loanInterestRate;
+	}
+
+	public void setLoanInterestRate(double loanInterestRate) {
+		this.loanInterestRate = loanInterestRate;
+	}
+
+	public ArrayList<Loan> getLoans() {
+		return loans;
+	}
+
+	public void setLoans(ArrayList<Loan> loans) {
+		this.loans = loans;
 	}
 
 }

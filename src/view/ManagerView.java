@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 
 import controller.Bank;
 import model.*;
+import view.CustomerView.TransactionListListener;
+
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
@@ -74,12 +76,17 @@ public class ManagerView extends JFrame implements Observer {
 
 		String customersData[][] = new String[][] {};
 		String customersHeader[] = new String[] { "ID", "Customer Name" };
-		customersModel = new DefaultTableModel(customersData, customersHeader);
+		customersModel = new DefaultTableModel(customersData, customersHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
 		customersModel = addCustomersToTable(customersModel);
 		customersTable = new JTable(customersModel);
 		customersTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
 		customersTable.setRowHeight(25);
 		customersTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 26));
+		customersTable.getSelectionModel().addListSelectionListener(new CustomerListListener());
 		JScrollPane customersScrollPane = new JScrollPane(customersTable);
 		customersScrollPane.setVisible(true);
 		customersDisplayPanel.add(customersScrollPane);
@@ -101,29 +108,34 @@ public class ManagerView extends JFrame implements Observer {
 
 		String loansData[][] = new String[][] {};
 		String loansHeader[] = new String[] { "ID", "Customer", "Amount", "Approved", "Active" };
-		loansModel = new DefaultTableModel(loansData, loansHeader);
+		loansModel = new DefaultTableModel(loansData, loansHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
 		loansModel = addLoansToTable(loansModel);
 		loansTable = new JTable(loansModel);
+		loansTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
 		loansTable.getTableHeader().setFont(new Font("Tahoma", Font.PLAIN, 26));
 		loansTable.setRowHeight(25);
+		loansTable.getSelectionModel().addListSelectionListener(new LoanListListener());
 		JScrollPane loansScrollPane = new JScrollPane(loansTable);
 		loansScrollPane.setVisible(true);
 		loansDisplayPanel.add(loansScrollPane, BorderLayout.CENTER);
 
 		JPanel centerPanel = new JPanel();
 		getContentPane().add(centerPanel, BorderLayout.CENTER);
-		
+
 		JPanel infoPanel = new JPanel();
 		centerPanel.add(infoPanel);
 		infoPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JLabel lblInformation = new JLabel("Information");
 		lblInformation.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		lblInformation.setHorizontalAlignment(SwingConstants.CENTER);
 		infoPanel.add(lblInformation, BorderLayout.NORTH);
-		
-		
-		
+		centerPanel.setPreferredSize(new Dimension(500, 600));
+
 		infoDetailsTextArea = new JTextArea();
 		infoDetailsTextArea.setText("N/A");
 		infoDetailsTextArea.setColumns(10);
@@ -133,6 +145,7 @@ public class ManagerView extends JFrame implements Observer {
 		infoDetailsTextArea.setForeground(Color.BLUE);
 		infoDetailsTextArea.setFont(new Font("Tahoma", Font.PLAIN, 28));
 		JScrollPane infoScrollPane = new JScrollPane(infoDetailsTextArea);
+		infoScrollPane.setPreferredSize(new Dimension(450, 400));
 		infoPanel.add(infoScrollPane, BorderLayout.CENTER);
 
 		JPanel southPanel = new JPanel();
@@ -151,13 +164,18 @@ public class ManagerView extends JFrame implements Observer {
 
 		String transactionsData[][] = new String[][] {};
 		String transactionsHeader[] = new String[] { "Customer", "From", "To", "Type", "Amount" };
-		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
+		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
 		transactionsModel = addTransactionsToTable(transactionsModel);
 		transactionsTable = new JTable(transactionsModel);
 		transactionsTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
 		transactionsTable.setRowHeight(25);
 		transactionsTable.setPreferredSize(new Dimension(700, 1000));
 		transactionsTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 26));
+		transactionsTable.getSelectionModel().addListSelectionListener(new TransactionListListener());
 		JScrollPane transactionsScrollPane = new JScrollPane(transactionsTable);
 		transactionsScrollPane.setVisible(true);
 		eastPanel.add(transactionsScrollPane, BorderLayout.CENTER);
@@ -197,7 +215,7 @@ public class ManagerView extends JFrame implements Observer {
 		}
 		return model;
 	}
-	
+
 	public class CustomerListListener implements ListSelectionListener {
 
 		@Override
@@ -208,12 +226,12 @@ public class ManagerView extends JFrame implements Observer {
 				return;
 			}
 
+			loansTable.clearSelection();
+			transactionsTable.clearSelection();
 			ArrayList<BankCustomer> customers = bank.getCustomers();
 			BankCustomer customer = customers.get(customersTable.getSelectedRow());
-
-//			accountNameLbl.setText("Account Name: "+account.getAccountName());
-//			Double balance = account.getBalance();
-//			accountBalanceLbl.setText("Account Balance: $"+balance.toString());
+			String info = customer.getCustomerDetails();
+			infoDetailsTextArea.setText(info);
 		}
 
 	}
@@ -227,15 +245,20 @@ public class ManagerView extends JFrame implements Observer {
 			if (transactionsTable.getSelectedRow() == -1) {
 				return;
 			}
+
+			loansTable.clearSelection();
+			customersTable.clearSelection();
+
 			ArrayList<Transaction> transactions = bank.getTransactions();
 			Transaction transaction = transactions.get(transactionsTable.getSelectedRow());
 
 			String info = transaction.detailedDisplay();
+			infoDetailsTextArea.setText("");
 			infoDetailsTextArea.setText(info);
 		}
 
 	}
-	
+
 	public class LoanListListener implements ListSelectionListener {
 
 		@Override
@@ -245,15 +268,19 @@ public class ManagerView extends JFrame implements Observer {
 			if (loansTable.getSelectedRow() == -1) {
 				return;
 			}
+
+			customersTable.clearSelection();
+			transactionsTable.clearSelection();
+
 			ArrayList<Loan> loans = bank.getLoans();
 			Loan loan = loans.get(loansTable.getSelectedRow());
 
-			String info = loan.getDetailedLoanDisplayForCustomer();
+			String info = loan.getDetailedLoanDisplayForManager(0);
+			infoDetailsTextArea.setText("");
 			infoDetailsTextArea.setText(info);
 		}
 
 	}
-	
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
