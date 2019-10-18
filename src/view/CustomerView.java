@@ -618,12 +618,12 @@ public class CustomerView extends JFrame implements Observer {
 										+ accounts.get(index2).getFees("Deposit");
 								bank.addMoneyEarned(fees);
 								transaction = bank.addTransaction(customer.getName(), "Bank",
-										"Transaction Fees - Withdrawal", fees, accounts.get(index1).getAccountName(),
+										"Transaction Fees - Withdrawal", accounts.get(index1).getFees("Withdrawal"), accounts.get(index1).getAccountName(),
 										"My Fancy Bank");
 								bank.addTransactionForCustomer(customer, transaction);
 
 								transaction = bank.addTransaction(customer.getName(), "Bank",
-										"Transaction Fees - Deposit", fees, accounts.get(index2).getAccountName(),
+										"Transaction Fees - Deposit", accounts.get(index2).getFees("Deposit"), accounts.get(index2).getAccountName(),
 										"My Fancy Bank");
 								bank.addTransactionForCustomer(customer, transaction);
 								break;

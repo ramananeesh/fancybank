@@ -18,6 +18,7 @@ public class Bank extends Observable {
 	private double checkingTransactionFee;
 	private double withdrawalFee;
 	private double loanInterestRate;
+	private double highBalance; 
 
 	public Bank() {
 		super();
@@ -30,6 +31,7 @@ public class Bank extends Observable {
 		this.accountOperationFee = 5;
 		this.checkingTransactionFee = 2;
 		this.withdrawalFee = 2;
+		this.highBalance = 100;
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
@@ -140,6 +142,7 @@ public class Bank extends Observable {
 		Transaction transaction = this.addTransaction(customer.getName(), "Bank", "Transaction fees - Account Closing",
 				fees + accountOperationFee, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, transaction);
+		this.addMoneyEarned(fees);
 		setChanged();
 		notifyObservers();
 	}
@@ -158,6 +161,7 @@ public class Bank extends Observable {
 		this.addTransactionForCustomer(customer, t);
 		t = this.addTransaction(customer.getName(), "Bank", "Transaction fees", fees, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, t);
+		this.addMoneyEarned(fees);
 		setChanged();
 		notifyObservers();
 		return true;
@@ -306,4 +310,12 @@ public class Bank extends Observable {
 		this.withdrawalFee = withdrawalFee;
 	}
 
+	public double getHighBalance() {
+		return highBalance;
+	}
+
+	public void setHighBalance(double highBalance) {
+		this.highBalance = highBalance;
+	}
+	
 }
