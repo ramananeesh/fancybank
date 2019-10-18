@@ -367,7 +367,7 @@ public class CustomerView extends JFrame implements Observer {
 		currencyToCombo = new JComboBox();
 		currencyToCombo.setModel(new DefaultComboBoxModel(new String[] {"To"}));
 		for(Currency c: currencies) {
-			currencyFromCombo.addItem(c.getName()+" - "+c.getAbbreviation());
+			currencyToCombo.addItem(c.getName()+" - "+c.getAbbreviation());
 		}
 		panel_1.add(currencyToCombo, BorderLayout.EAST);
 		
