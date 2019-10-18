@@ -113,6 +113,7 @@ public class ManagerView extends JFrame implements Observer {
 		mnActions.add(mntmSavingsInterestRate);
 
 		JMenuItem mntmHighBalanceAmount = new JMenuItem("High Balance Amount");
+		mntmHighBalanceAmount.addActionListener(new BalanceListener());
 		mnActions.add(mntmHighBalanceAmount);
 
 		JMenuItem mntmAccountOperationFee = new JMenuItem("Account Operation Fee");
@@ -373,6 +374,36 @@ public class ManagerView extends JFrame implements Observer {
 			model.addRow(l.getShortLoanDisplayForManager());
 		}
 		return model;
+	}
+
+	public class BalanceListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			JTextField field = new JTextField();
+			Object[] fields = new Object[] { "New High Balance Minimum Limit: ", field, };
+
+			while (true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Set High Balance Minimum Limit",
+						JOptionPane.OK_CANCEL_OPTION);
+				try {
+					double newBalance = Double.parseDouble(field.getText());
+
+					if (newBalance <= 0) {
+						JOptionPane.showMessageDialog(null, "New Limit has to be more than 0", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+					bank.setHighBalance(newBalance);
+					break;
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Enter a valid value more than 0", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					continue;
+				}
+			}
+
+		}
 	}
 
 	public class InterestListener implements ActionListener {
