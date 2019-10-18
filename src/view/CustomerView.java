@@ -501,7 +501,7 @@ public class CustomerView extends JFrame implements Observer {
 								"Withdrawal", Double.parseDouble(amountField.getText()),
 								accounts.get(accountIndex).getAccountName(), "Self");
 						bank.addTransactionForCustomer(customer, transaction);
-						
+
 						bank.addMoneyEarned(fees);
 						transaction = bank.addTransaction(customer.getName(), customer.getName(), "Transaction Fees",
 								fees, accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
@@ -544,26 +544,57 @@ public class CustomerView extends JFrame implements Observer {
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Transfer between Accounts",
 						JOptionPane.OK_CANCEL_OPTION);
 				if (reply == JOptionPane.OK_OPTION) {
-					int index1 = combo1.getSelectedIndex();
-					int index2 = combo2.getSelectedIndex();
-					String amountString = amountField.getText();
-					double amount = Double.parseDouble(amountString);
-					if (index1 != index2) {
-						if (amount > 0) {
-							String account1 = accounts.get(index1).getAccountName();
-							String account2 = accounts.get(index2).getAccountName();
-							bank.transferBetweenAccountsForCustomer(customer, account1, account2, amount);
-							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(),
-									"Internal Transfer", amount, account1, account2);
-							bank.addTransactionForCustomer(customer, transaction);
-							break;
-						} else {
-							JOptionPane.showMessageDialog(null, "Amount cannot be less than or equal to 0", "Error",
-									JOptionPane.ERROR_MESSAGE);
+					while (true) {
+						int index1 = combo1.getSelectedIndex();
+						int index2 = combo2.getSelectedIndex();
+						String amountString = amountField.getText();
+						double amount;
+						try {
+							amount = Double.parseDouble(amountString);
+							if(amount<=0) {
+								JOptionPane.showMessageDialog(null, "Amount should be >=0", "Error",
+										JOptionPane.ERROR_MESSAGE);
+								continue;
+							}
 						}
+						catch(Exception e1) {
+							JOptionPane.showMessageDialog(null, "Amount should be a real value", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						if (index1 != index2) {
+							if (amount > 0) {
+								String account1 = accounts.get(index1).getAccountName();
+								String account2 = accounts.get(index2).getAccountName();
+								boolean flag = bank.transferBetweenAccountsForCustomer(customer, account1, account2, amount);
+								if(!flag) {
+									JOptionPane.showMessageDialog(null, "Error processing deposit. Fee exceeds account balance",
+											"Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
+								
+								Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(),
+										"Internal Transfer", amount, account1, account2);
+								bank.addTransactionForCustomer(customer, transaction);
+								
+								double fees = accounts.get(index1).getFees("Withdrawal")+accounts.get(index2).getFees("Deposit");
+								bank.addMoneyEarned(fees);
+								transaction = bank.addTransaction(customer.getName(), customer.getName(), "Transaction Fees - Withdrawal",
+										fees, accounts.get(index1).getAccountName(), "My Fancy Bank");
+								bank.addTransactionForCustomer(customer, transaction);
+								
+								transaction = bank.addTransaction(customer.getName(), customer.getName(), "Transaction Fees - Deposit",
+										fees, accounts.get(index2).getAccountName(), "My Fancy Bank");
+								bank.addTransactionForCustomer(customer, transaction);
+								break;
+							} else {
+								JOptionPane.showMessageDialog(null, "Amount cannot be less than or equal to 0", "Error",
+										JOptionPane.ERROR_MESSAGE);
+							}
+						}
+						JOptionPane.showMessageDialog(null, "From and to accounts cannot be the same!", "Error",
+								JOptionPane.ERROR_MESSAGE);
 					}
-					JOptionPane.showMessageDialog(null, "From and to accounts cannot be the same!", "Error",
-							JOptionPane.ERROR_MESSAGE);
 				}
 
 			}

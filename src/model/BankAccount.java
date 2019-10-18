@@ -78,7 +78,7 @@ public class BankAccount {
 		
 		return true;
 	}
-
+	
 	public String getType() {
 		return type;
 	}
