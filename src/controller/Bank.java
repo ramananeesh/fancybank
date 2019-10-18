@@ -33,7 +33,7 @@ public class Bank extends Observable {
 		this.checkingTransactionFee = 2;
 		this.withdrawalFee = 2;
 		this.highBalance = 100;
-		this.savingsInterestRate=0.02;
+		this.savingsInterestRate = 0.02;
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
@@ -180,11 +180,72 @@ public class Bank extends Observable {
 				if (acc.getType().equals("Savings")) {
 					if (acc.getBalance() >= highBalance) {
 						double interestAmount = this.savingsInterestRate * acc.getBalance();
-						acc.setBalance(acc.getBalance()+interestAmount);
+						acc.setBalance(acc.getBalance() + interestAmount);
 						Transaction t = this.addTransaction("Bank", customer.getName(), "Interest Settlement",
 								interestAmount, "My Fancy Bank", acc.getAccountName());
 						this.addTransactionForCustomer(customer, t);
 					}
+				}
+			}
+		}
+	}
+
+	public void modifySavingsInterestRate(double newInterestRate) {
+		this.setSavingsInterestRate(newInterestRate);
+		if (customers.size() == 0)
+			return;
+		for (BankCustomer customer : customers) {
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			if (accounts.size() == 0)
+				return;
+			for (BankAccount acc : accounts) {
+				if (acc.getType().equals("Savings"))
+					acc.setRate(newInterestRate);
+			}
+		}
+	}
+
+	public void modifyLoanInterestRate(double newInterestRate) {
+		this.setLoanInterestRate(newInterestRate);
+		if (customers.size() == 0)
+			return;
+		for (BankCustomer customer : customers) {
+			ArrayList<Loan> loans = customer.getLoans();
+			if (loans.size() == 0)
+				return;
+			for (Loan acc : loans) {
+				acc.setInterestRate(newInterestRate);
+			}
+		}
+	}
+	
+	public void modifyFees(String type, double newFees) {
+		if(type.equals("Account Operation")) {
+			this.setAccountOperationFee(newFees);
+		}
+		else if(type.equals("Checking")) {
+			this.setCheckingTransactionFee(newFees);
+		}
+		else if(type.equals("Withdrawal")) {
+			this.setWithdrawalFee(newFees);
+		}
+		
+		this.setSavingsInterestRate(newFees);
+		if (customers.size() == 0)
+			return;
+		for (BankCustomer customer : customers) {
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			if (accounts.size() == 0)
+				return;
+			for (BankAccount acc : accounts) {
+				if(type.equals("Account Operation")) {
+					acc.setAccountOperationFee(newFees);
+				}
+				else if(type.equals("Checking")) {
+					acc.setTransactionFee(newFees);
+				}
+				else if(type.equals("Withdrawal")) {
+					acc.setWithdrawalFee(newFees);
 				}
 			}
 		}

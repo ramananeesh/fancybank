@@ -51,6 +51,7 @@ public class ManagerView extends JFrame implements Observer {
 	private DefaultTableModel transactionsModel;
 	private JTextArea infoDetailsTextArea;
 	private JLabel amountEarnedLbl;
+	private JLabel moneyLbl;
 
 	/**
 	 * Create the application.
@@ -59,21 +60,21 @@ public class ManagerView extends JFrame implements Observer {
 		this.bank = bank;
 		this.manager = manager;
 		this.bank.addObserver(this);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(Color.LIGHT_GRAY);
 		setJMenuBar(menuBar);
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
-		
+
 		JMenu mnOptions = new JMenu("Options");
 		mnOptions.setFont(new Font("Segoe UI", Font.PLAIN, 36));
 		menuBar.add(mnOptions);
-		
+
 		JMenuItem mntmLogOut = new JMenuItem("Log Out");
 		mntmLogOut.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mnOptions.add(mntmLogOut);
 		mntmLogOut.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
@@ -82,10 +83,49 @@ public class ManagerView extends JFrame implements Observer {
 				welcome.setVisible(true);
 			}
 		});
-		
+
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mnOptions.add(mntmExit);
+
+		JMenu mnActions = new JMenu("Actions");
+		menuBar.add(mnActions);
+
+		JMenuItem mntmApproveItem = new JMenuItem("Approve Loan");
+		mntmApproveItem.addActionListener(new ApproveLoanListener());
+		mntmApproveItem.setHorizontalAlignment(SwingConstants.LEFT);
+		mnActions.add(mntmApproveItem);
+
+		JMenuItem mntmSettleInterests = new JMenuItem("Settle Interests");
+		mntmSettleInterests.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				bank.settleInterestsForAllCustomers();
+			}
+		});
+		mnActions.add(mntmSettleInterests);
+
+		JMenuItem mntmInterestRate = new JMenuItem("Loan Interest Rate");
+		mntmInterestRate.addActionListener(new InterestListener("Loan"));
+		mnActions.add(mntmInterestRate);
+
+		JMenuItem mntmSavingsInterestRate = new JMenuItem("Savings Interest Rate");
+		mntmSavingsInterestRate.addActionListener(new InterestListener("Savings"));
+		mnActions.add(mntmSavingsInterestRate);
+
+		JMenuItem mntmHighBalanceAmount = new JMenuItem("High Balance Amount");
+		mnActions.add(mntmHighBalanceAmount);
+
+		JMenuItem mntmAccountOperationFee = new JMenuItem("Account Operation Fee");
+		mntmAccountOperationFee.addActionListener(new FeeListener("Account Operation"));
+		mnActions.add(mntmAccountOperationFee);
+
+		JMenuItem mntmCheckingFee = new JMenuItem("Checking Fee");
+		mntmCheckingFee.addActionListener(new FeeListener("Checking"));
+		mnActions.add(mntmCheckingFee);
+
+		JMenuItem mntmWithdrawalFee = new JMenuItem("Withdrawal Fee");
+		mntmWithdrawalFee.addActionListener(new FeeListener("Withdrawal"));
+		mnActions.add(mntmWithdrawalFee);
 		initialize();
 	}
 
@@ -171,14 +211,14 @@ public class ManagerView extends JFrame implements Observer {
 		panel.setLayout(new BorderLayout(0, 0));
 
 		JPanel infoPanel = new JPanel();
-		panel.add(infoPanel, BorderLayout.SOUTH);
+		panel.add(infoPanel, BorderLayout.CENTER);
 		infoPanel.setLayout(new BorderLayout(0, 0));
 
 		JLabel lblInformation = new JLabel("Information");
 		lblInformation.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		lblInformation.setHorizontalAlignment(SwingConstants.CENTER);
 		infoPanel.add(lblInformation, BorderLayout.NORTH);
-		infoPanel.setPreferredSize(new Dimension(400,600));
+		infoPanel.setPreferredSize(new Dimension(400, 600));
 
 		infoDetailsTextArea = new JTextArea();
 		infoDetailsTextArea.setText("N/A");
@@ -192,25 +232,19 @@ public class ManagerView extends JFrame implements Observer {
 		infoScrollPane.setPreferredSize(new Dimension(450, 400));
 		infoPanel.add(infoScrollPane, BorderLayout.CENTER);
 
-		JPanel btnsPanel = new JPanel();
-		panel.add(btnsPanel, BorderLayout.CENTER);
-		
-		JButton btnApproveLoan = new JButton("Approve Loan");
-		btnsPanel.add(btnApproveLoan);
-		btnApproveLoan.addActionListener(new ApproveLoanListener());
-		
-		JButton btnSetInterestRate = new JButton("Set Interest Rate");
-		btnsPanel.add(btnSetInterestRate);
-		
-		JButton btnSetHighBalance = new JButton("Set High Balance Amount");
-		btnsPanel.add(btnSetHighBalance);
-		
-		JButton btnSettleInterests = new JButton("Settle Interests");
-		btnsPanel.add(btnSettleInterests);
-		
-		amountEarnedLbl = new JLabel("Amount Earned: $");
+		JPanel panel_1 = new JPanel();
+		centerPanel.add(panel_1, BorderLayout.NORTH);
+		panel_1.setLayout(new BorderLayout(0, 0));
+
+		amountEarnedLbl = new JLabel("Amount Earned");
+		panel_1.add(amountEarnedLbl, BorderLayout.NORTH);
+		amountEarnedLbl.setFont(new Font("Tahoma", Font.PLAIN, 40));
 		amountEarnedLbl.setHorizontalAlignment(SwingConstants.CENTER);
-		centerPanel.add(amountEarnedLbl, BorderLayout.SOUTH);
+
+		moneyLbl = new JLabel("$");
+		moneyLbl.setHorizontalAlignment(SwingConstants.CENTER);
+		moneyLbl.setFont(new Font("Tahoma", Font.PLAIN, 34));
+		panel_1.add(moneyLbl, BorderLayout.CENTER);
 
 		JPanel southPanel = new JPanel();
 		getContentPane().add(southPanel, BorderLayout.SOUTH);
@@ -245,8 +279,8 @@ public class ManagerView extends JFrame implements Observer {
 		eastPanel.add(transactionsScrollPane, BorderLayout.CENTER);
 
 	}
-	
-	public class ApproveLoanListener implements ActionListener{
+
+	public class ApproveLoanListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
@@ -254,58 +288,53 @@ public class ManagerView extends JFrame implements Observer {
 			JComboBox combo2 = new JComboBox();
 			JLabel loanAmountLabel = new JLabel("N/A");
 			JLabel collateralAmountLabel = new JLabel("N/A");
-			 
-			
-			for(BankCustomer cust: bank.getCustomers()) {
+
+			for (BankCustomer cust : bank.getCustomers()) {
 				combo1.addItem(cust.getName());
 			}
-			
+
 			combo1.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
 					ArrayList<Loan> customerLoans = bank.getCustomers().get(combo1.getSelectedIndex()).getLoans();
-					
-					for(Loan l: customerLoans) {
+
+					for (Loan l : customerLoans) {
 						combo2.addItem(l.getLoanId());
 					}
 				}
 			});
-			
+
 			combo2.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					Loan l = bank.getCustomers().get(combo1.getSelectedIndex()).getLoans().get(combo2.getSelectedIndex());
-					loanAmountLabel.setText("$"+l.getLoanAmount());
-					collateralAmountLabel.setText("$"+l.getCollateralAmount());
+					Loan l = bank.getCustomers().get(combo1.getSelectedIndex()).getLoans()
+							.get(combo2.getSelectedIndex());
+					loanAmountLabel.setText("$" + l.getLoanAmount());
+					collateralAmountLabel.setText("$" + l.getCollateralAmount());
 				}
 			});
-			
-			Object[] fields = new Object[] {
-				"Customer: ", combo1,
-				"Loan ID: ", combo2, 
-				"Loan Amount: ", loanAmountLabel, 
-				"Collateral Amount: ", collateralAmountLabel,
-			};
-			
-			while(true) {
+
+			Object[] fields = new Object[] { "Customer: ", combo1, "Loan ID: ", combo2, "Loan Amount: ",
+					loanAmountLabel, "Collateral Amount: ", collateralAmountLabel, };
+
+			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Approve Loan", JOptionPane.OK_CANCEL_OPTION);
-				
-				if(reply==JOptionPane.OK_OPTION) {
-					if(combo1.getSelectedIndex()==-1||combo2.getSelectedIndex()==-1) {
-						JOptionPane.showMessageDialog(null, "Select a customer and Loan ID to approve loan",
-								"Error", JOptionPane.ERROR_MESSAGE);
+
+				if (reply == JOptionPane.OK_OPTION) {
+					if (combo1.getSelectedIndex() == -1 || combo2.getSelectedIndex() == -1) {
+						JOptionPane.showMessageDialog(null, "Select a customer and Loan ID to approve loan", "Error",
+								JOptionPane.ERROR_MESSAGE);
 						continue;
 					}
 					BankCustomer customer = bank.getCustomers().get(combo1.getSelectedIndex());
 					Loan l = customer.getLoans().get(combo2.getSelectedIndex());
 					bank.approveLoanForCustomer(customer, l.getLoanId());
 					break;
-				}
-				else {
+				} else {
 					break;
 				}
 			}
@@ -344,6 +373,82 @@ public class ManagerView extends JFrame implements Observer {
 			model.addRow(l.getShortLoanDisplayForManager());
 		}
 		return model;
+	}
+
+	public class InterestListener implements ActionListener {
+		String type;
+
+		public InterestListener(String type) {
+			this.type = type;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+
+			JTextField field = new JTextField();
+			Object[] fields = new Object[] { "New Interest Rate(%): ", field, };
+
+			while (true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Set" + this.type + " Interest Rate Percentage",
+						JOptionPane.OK_CANCEL_OPTION);
+				try {
+					double newRate = Double.parseDouble(field.getText());
+
+					if (newRate <= 0 || newRate >= 100) {
+						JOptionPane.showMessageDialog(null, "Interest has to be more than 0 and less than 100", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+					if (type.equals("Loan"))
+						bank.modifyLoanInterestRate(newRate / 100.0);
+					else if (type.equals("Savings"))
+						bank.modifySavingsInterestRate(newRate / 100.0);
+
+					break;
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Enter a valid value between 0 and 100", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					continue;
+				}
+			}
+		}
+	}
+
+	public class FeeListener implements ActionListener {
+		String type;
+
+		public FeeListener(String type) {
+			this.type = type;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+
+			JTextField field = new JTextField();
+			Object[] fields = new Object[] { "New Fee ($): ", field, };
+
+			while (true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Set" + this.type + " Fee",
+						JOptionPane.OK_CANCEL_OPTION);
+				try {
+					double newFee = Double.parseDouble(field.getText());
+
+					if (newFee <= 0) {
+						JOptionPane.showMessageDialog(null, "Fee has to be more than 0", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+					bank.modifyFees(type, newFee);
+					break;
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Enter a valid value more than 0", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					continue;
+				}
+			}
+		}
 	}
 
 	public class CustomerListListener implements ListSelectionListener {
@@ -425,7 +530,7 @@ public class ManagerView extends JFrame implements Observer {
 		};
 		customersModel = addCustomersToTable(customersModel);
 		customersTable.setModel(customersModel);
-		
+
 		String transactionsData[][] = new String[][] {};
 		String transactionsHeader[] = new String[] { "Customer", "From", "To", "Type", "Amount" };
 		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader) {
@@ -445,6 +550,9 @@ public class ManagerView extends JFrame implements Observer {
 		};
 		loansModel = addLoansToTable(loansModel);
 		loansTable.setModel(loansModel);
+
+		moneyLbl.setText(Double.toString(bank.getMoneyEarned()));
+
 	}
 
 }
