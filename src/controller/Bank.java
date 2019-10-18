@@ -18,7 +18,8 @@ public class Bank extends Observable {
 	private double checkingTransactionFee;
 	private double withdrawalFee;
 	private double loanInterestRate;
-	private double highBalance; 
+	private double highBalance;
+	private double savingsInterestRate;
 
 	public Bank() {
 		super();
@@ -32,6 +33,7 @@ public class Bank extends Observable {
 		this.checkingTransactionFee = 2;
 		this.withdrawalFee = 2;
 		this.highBalance = 100;
+		this.savingsInterestRate=0.02;
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
@@ -111,8 +113,8 @@ public class Bank extends Observable {
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
 		double fees = acc.getFees("Deposit");
 		if (t) {
-			Transaction transaction = this.addTransaction(customer.getName(), "Bank", "Transaction fees - Account Opening",
-					fees + accountOperationFee, accountName, "My Fancy Bank");
+			Transaction transaction = this.addTransaction(customer.getName(), "Bank",
+					"Transaction fees - Account Opening", fees + accountOperationFee, accountName, "My Fancy Bank");
 			this.addTransactionForCustomer(customer, transaction);
 		}
 		return flag;
@@ -134,7 +136,7 @@ public class Bank extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	public void closeAccountForCustomer(BankCustomer customer, String accountName) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		double fees = acc.getAccountOperationFee();
@@ -165,6 +167,27 @@ public class Bank extends Observable {
 		setChanged();
 		notifyObservers();
 		return true;
+	}
+
+	public void settleInterestsForAllCustomers() {
+		if (customers.size() == 0)
+			return;
+		for (BankCustomer customer : customers) {
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			if (accounts.size() == 0)
+				return;
+			for (BankAccount acc : accounts) {
+				if (acc.getType().equals("Savings")) {
+					if (acc.getBalance() > highBalance) {
+						double interestAmount = this.savingsInterestRate * acc.getBalance();
+						acc.setBalance(acc.getBalance()+interestAmount);
+						Transaction t = this.addTransaction("Bank", customer.getName(), "Interest Settlement",
+								interestAmount, "My Fancy Bank", acc.getAccountName());
+						this.addTransactionForCustomer(customer, t);
+					}
+				}
+			}
+		}
 	}
 
 	public Loan getLoanById(String loanId) {
@@ -317,5 +340,13 @@ public class Bank extends Observable {
 	public void setHighBalance(double highBalance) {
 		this.highBalance = highBalance;
 	}
-	
+
+	public double getSavingsInterestRate() {
+		return savingsInterestRate;
+	}
+
+	public void setSavingsInterestRate(double savingsInterestRate) {
+		this.savingsInterestRate = savingsInterestRate;
+	}
+
 }
