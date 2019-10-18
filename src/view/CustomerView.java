@@ -49,6 +49,10 @@ public class CustomerView extends JFrame implements Observer {
 	private JLabel accountBalanceLbl;
 	private JTextArea infoDetailsTextArea;
 	private JTable loansTable;
+	private JComboBox currencyFromCombo;
+	private JTextField currencyConverterField;
+	private JComboBox currencyToCombo;
+	private JLabel convertedAmtLbl;
 
 	/**
 	 * Create the application.
@@ -110,19 +114,14 @@ public class CustomerView extends JFrame implements Observer {
 		getContentPane().add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new BorderLayout(0, 0));
 
-		JLabel messageLabel = new JLabel("Message");
-		messageLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		centerPanel.add(messageLabel, BorderLayout.SOUTH);
-
 		JPanel eastPanel = new JPanel();
 		eastPanel.setPreferredSize(new Dimension(600, 1000));
 		getContentPane().add(eastPanel, BorderLayout.EAST);
 		GridBagLayout gbl_eastPanel = new GridBagLayout();
 		gbl_eastPanel.columnWidths = new int[] { 376, 0 };
-		gbl_eastPanel.rowHeights = new int[] { 265, 265, 0, 0 };
+		gbl_eastPanel.rowHeights = new int[] { 265, 265, 0, 0, 0 };
 		gbl_eastPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_eastPanel.rowWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_eastPanel.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
 		eastPanel.setLayout(gbl_eastPanel);
 
 		JPanel balancePanel = new JPanel();
@@ -332,33 +331,88 @@ public class CustomerView extends JFrame implements Observer {
 		moreOptionsPanel.setBorder(new LineBorder(Color.black, 3));
 		moreOptionsPanel.setPreferredSize(new Dimension(500, 200));
 		GridBagConstraints gbc_moreOptionsPanel = new GridBagConstraints();
+		gbc_moreOptionsPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_moreOptionsPanel.fill = GridBagConstraints.BOTH;
 		gbc_moreOptionsPanel.gridx = 0;
 		gbc_moreOptionsPanel.gridy = 2;
 		eastPanel.add(moreOptionsPanel, gbc_moreOptionsPanel);
+		moreOptionsPanel.setLayout(new BorderLayout(0, 0));
 
-		JButton btnCurrencyConverter = new JButton("Currency Converter");
+		JButton btnCurrencyConverter = new JButton("Convert");
+		btnCurrencyConverter.addActionListener(new CurrencyConverterListener());
 		btnCurrencyConverter.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		moreOptionsPanel.add(btnCurrencyConverter);
-
-		JButton btnLogout = new JButton("Logout");
-		btnLogout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-				Welcome welcome = new Welcome(bank);
-				welcome.setVisible(true);
-			}
-		});
-		btnLogout.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		moreOptionsPanel.add(btnLogout);
-
-		JButton btnExit = new JButton("Exit");
-		btnExit.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		moreOptionsPanel.add(btnExit);
+		moreOptionsPanel.add(btnCurrencyConverter, BorderLayout.SOUTH);
+		
+		JLabel lblA = new JLabel("Currency Converter");
+		lblA.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		lblA.setHorizontalAlignment(SwingConstants.CENTER);
+		moreOptionsPanel.add(lblA, BorderLayout.NORTH);
+		
+		JPanel panel_1 = new JPanel();
+		moreOptionsPanel.add(panel_1, BorderLayout.CENTER);
+		
+		currencyFromCombo = new JComboBox();
+		currencyFromCombo.setModel(new DefaultComboBoxModel(new String[] {"From"}));
+		ArrayList<Currency> currencies = bank.getCurrencies();
+		for(Currency c: currencies) {
+			currencyFromCombo.addItem(c.getName()+" - "+c.getAbbreviation());
+		}
+		panel_1.setLayout(new BorderLayout(0, 0));
+		panel_1.add(currencyFromCombo, BorderLayout.WEST);
+		
+		currencyConverterField = new JTextField();
+		panel_1.add(currencyConverterField, BorderLayout.CENTER);
+		currencyConverterField.setColumns(10);
+		
+		currencyToCombo = new JComboBox();
+		currencyToCombo.setModel(new DefaultComboBoxModel(new String[] {"To"}));
+		for(Currency c: currencies) {
+			currencyFromCombo.addItem(c.getName()+" - "+c.getAbbreviation());
+		}
+		panel_1.add(currencyToCombo, BorderLayout.EAST);
+		
+		convertedAmtLbl = new JLabel("Converted Amount");
+		convertedAmtLbl.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		convertedAmtLbl.setHorizontalAlignment(SwingConstants.CENTER);
+		panel_1.add(convertedAmtLbl, BorderLayout.SOUTH);
+		
 
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
 
+	public class CurrencyConverterListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			String field = currencyConverterField.getText();
+			ArrayList<Currency> currencies = bank.getCurrencies();
+			if(field.equals(""))
+				return;
+			try {
+				double amount = Double.parseDouble(field);
+				if(amount<=0) {
+					JOptionPane.showMessageDialog(null, "Enter an amount greater than 0", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				int fromIndex = currencyFromCombo.getSelectedIndex();
+				int toIndex= currencyToCombo.getSelectedIndex();
+				
+				if(fromIndex!=toIndex && (fromIndex!=0||fromIndex!=-1||toIndex!=0||toIndex!=-1)) {
+					Currency fromCurrency = currencies.get(fromIndex);
+					Currency toCurrency = currencies.get(toIndex);
+					
+					double usdAmount = fromCurrency.getAmountInUSD(amount);
+					double toAmount = toCurrency.getAmountInCurrency(usdAmount);
+					
+					convertedAmtLbl.setText("Converted Amount = "+toCurrency.getAbbreviation()+toAmount);
+				}
+			} catch(Exception e1) {
+				return;
+			}
+		}
+	}
+	
 	public class CloseAccountListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
