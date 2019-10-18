@@ -17,6 +17,9 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -60,12 +63,25 @@ public class ManagerView extends JFrame implements Observer {
 		menuBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
 		
 		JMenu mnOptions = new JMenu("Options");
+		mnOptions.setFont(new Font("Segoe UI", Font.PLAIN, 36));
 		menuBar.add(mnOptions);
 		
 		JMenuItem mntmLogOut = new JMenuItem("Log Out");
+		mntmLogOut.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mnOptions.add(mntmLogOut);
+		mntmLogOut.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				setVisible(false);
+				Welcome welcome = new Welcome(bank);
+				welcome.setVisible(true);
+			}
+		});
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mnOptions.add(mntmExit);
 		initialize();
 	}
