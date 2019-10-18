@@ -617,6 +617,9 @@ public class CustomerView extends JFrame implements Observer {
 				return;
 			}
 
+			loansTable.clearSelection();
+			transactionsTable.clearSelection();
+			
 			ArrayList<BankAccount> accounts = customer.getAccounts();
 			BankAccount account = accounts.get(accountsTable.getSelectedRow());
 
@@ -636,6 +639,10 @@ public class CustomerView extends JFrame implements Observer {
 			if (transactionsTable.getSelectedRow() == -1) {
 				return;
 			}
+			
+			accountsTable.clearSelection();
+			loansTable.clearSelection();
+			
 			ArrayList<Transaction> transactions = customer.getTransactions();
 			Transaction transaction = transactions.get(transactionsTable.getSelectedRow());
 
@@ -654,6 +661,10 @@ public class CustomerView extends JFrame implements Observer {
 			if (loansTable.getSelectedRow() == -1) {
 				return;
 			}
+			
+			accountsTable.clearSelection();
+			transactionsTable.clearSelection();
+			
 			ArrayList<Loan> loans = customer.getLoans();
 			Loan loan = loans.get(loansTable.getSelectedRow());
 

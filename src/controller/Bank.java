@@ -14,10 +14,10 @@ public class Bank extends Observable {
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
 	private double moneyEarned;
-	private double accountOperationFee; 
+	private double accountOperationFee;
 	private double checkingTransactionFee;
 	private double withdrawalFee;
-	private double loanInterestRate; 
+	private double loanInterestRate;
 
 	public Bank() {
 		super();
@@ -49,19 +49,24 @@ public class Bank extends Observable {
 			String password) {
 
 		int customerId = BankCustomer.generateCustomerId(customers);
-		BankCustomer newCustomer = new BankCustomer(name, Integer.toString(customerId), address, phoneNumber, ssn, email, password);
+		BankCustomer newCustomer = new BankCustomer(name, Integer.toString(customerId), address, phoneNumber, ssn,
+				email, password);
 		this.customers.add(newCustomer);
 		return newCustomer;
 	}
 
 	public void addAccount(BankCustomer customer, String accountName, String accountType) {
-		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType,loanInterestRate, withdrawalFee, checkingTransactionFee, accountOperationFee));
+		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType,
+				loanInterestRate, withdrawalFee, checkingTransactionFee, accountOperationFee));
 		setChanged();
 		notifyObservers();
 	}
-	
-	public void addLoan(BankCustomer customer, double loanAmount, double interestRate, int tenure, String collateral, double collateralAmount) {
-		Loan loan = new Loan(customer.getName(), customer.getCustomerId(), Integer.toString(BankCustomer.generateLoanId(customer.getLoans())),loanAmount, interestRate, tenure, collateral, collateralAmount);
+
+	public void addLoan(BankCustomer customer, double loanAmount, double interestRate, int tenure, String collateral,
+			double collateralAmount) {
+		Loan loan = new Loan(customer.getName(), customer.getCustomerId(),
+				Integer.toString(BankCustomer.generateLoanId(customer.getLoans())), loanAmount, interestRate, tenure,
+				collateral, collateralAmount);
 		this.loans.add(loan);
 		this.getCustomerByEmail(customer.getEmail()).addLoan(loan);
 		setChanged();
@@ -87,7 +92,7 @@ public class Bank extends Observable {
 
 		return null;
 	}
-	
+
 	public BankManager getManagerByEmail(String email) {
 
 		for (BankManager m : this.managers) {
@@ -99,7 +104,15 @@ public class Bank extends Observable {
 	}
 
 	public boolean depositForCustomer(BankCustomer customer, String accountName, double amount) {
+		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
+		boolean t = acc.isNewAccount();
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
+		double fees = acc.getFees("Deposit");
+		if (t) {
+			Transaction transaction = this.addTransaction(customer.getName(), "Bank", "Transaction fees - Account Opening",
+					fees + accountOperationFee, accountName, "My Fancy Bank");
+			this.addTransactionForCustomer(customer, transaction);
+		}
 		return flag;
 	}
 
@@ -108,9 +121,10 @@ public class Bank extends Observable {
 		return flag;
 	}
 
-	public boolean transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName, String toAccountName,
-			double amount) {
-		return this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName, amount);
+	public boolean transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName,
+			String toAccountName, double amount) {
+		return this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName,
+				amount);
 	}
 
 	public void addTransactionForCustomer(BankCustomer customer, Transaction transaction) {
@@ -118,15 +132,18 @@ public class Bank extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	public boolean settleLoanForCustomer(BankCustomer customer, String accountName, String loanId, double loanAmount) {
-		
+
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, loanAmount);
-		if(!flag)
+		if (!flag)
 			return false;
-		double fees = this.getCustomerByEmail(customer.getEmail()).getAccounts().get(this.getCustomerByEmail(customer.getEmail()).getAccountIndexByName(accountName)).getFees("Withdrawal");
+		double fees = this.getCustomerByEmail(customer.getEmail()).getAccounts()
+				.get(this.getCustomerByEmail(customer.getEmail()).getAccountIndexByName(accountName))
+				.getFees("Withdrawal");
 		this.getCustomerByEmail(customer.getEmail()).closeLoan(loanId);
-		Transaction t = this.addTransaction(customer.getName(), "Bank", "Loan Settlement", loanAmount, accountName, "My Fancy Bank");
+		Transaction t = this.addTransaction(customer.getName(), "Bank", "Loan Settlement", loanAmount, accountName,
+				"My Fancy Bank");
 		this.addTransactionForCustomer(customer, t);
 		t = this.addTransaction(customer.getName(), "Bank", "Transaction fees", fees, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, t);
@@ -136,51 +153,50 @@ public class Bank extends Observable {
 	}
 
 	public Loan getLoanById(String loanId) {
-		for(Loan l: loans) {
-			if(l.getLoanId().equals(loanId))
+		for (Loan l : loans) {
+			if (l.getLoanId().equals(loanId))
 				return l;
 		}
 		return null;
 	}
-	
+
 	public Loan getLoanById(BankCustomer customer, String loanId) {
-		for(Loan l: customer.getLoans()) {
-			if(l.getLoanId().equals(loanId))
+		for (Loan l : customer.getLoans()) {
+			if (l.getLoanId().equals(loanId))
 				return l;
 		}
 		return null;
 	}
-	
+
 	public int getLoanIndexById(String loanId) {
-		int i=0;
-		for(Loan l: loans) {
-			if(l.getLoanId().equals(loanId))
+		int i = 0;
+		for (Loan l : loans) {
+			if (l.getLoanId().equals(loanId))
 				return i;
 			i++;
 		}
 		return -1;
 	}
-	
+
 	public void approveLoan(String loanId) {
-		for(Loan l: this.loans) {
-			if(l.getLoanId().equals(loanId)) {
+		for (Loan l : this.loans) {
+			if (l.getLoanId().equals(loanId)) {
 				l.approve();
 			}
 		}
 	}
-	
+
 	public void addMoneyEarned(double moneyEarned) {
-		this.moneyEarned+=moneyEarned;
+		this.moneyEarned += moneyEarned;
 	}
-	
+
 	public void approveLoanForCustomer(BankCustomer customer, String loanId) {
 		this.getCustomerByEmail(customer.getEmail()).approveLoan(loanId);
 		this.approveLoan(loanId);
 		setChanged();
 		notifyObservers();
 	}
-	
-	
+
 	public BankCustomer login(String email, String password) {
 		BankCustomer customer = getCustomerByEmail(email);
 		if (customer == null)
@@ -202,6 +218,7 @@ public class Bank extends Observable {
 
 		return null;
 	}
+
 	public ArrayList<BankManager> getManagers() {
 		return managers;
 	}

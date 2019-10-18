@@ -9,6 +9,7 @@ public class BankAccount {
 	private double withdrawalFee;
 	private double accountOperationFee; 
 	private double transactionFee;
+	private boolean isNewAccount;
 	
 	public BankAccount(String name, String type, double rate, double withdrawalFee, double transactionFee, double accountOperationFee) {
 		super();
@@ -19,6 +20,7 @@ public class BankAccount {
 		this.withdrawalFee = withdrawalFee;
 		this.transactionFee=transactionFee;
 		this.accountOperationFee = accountOperationFee;
+		this.isNewAccount = true;
 	}
 	
 	public BankAccount(String name,String type, double balance, double rate, double fee) {
@@ -30,6 +32,30 @@ public class BankAccount {
 		this.withdrawalFee = fee;
 	}
 	
+	public double getAccountOperationFee() {
+		return accountOperationFee;
+	}
+
+	public void setAccountOperationFee(double accountOperationFee) {
+		this.accountOperationFee = accountOperationFee;
+	}
+
+	public double getTransactionFee() {
+		return transactionFee;
+	}
+
+	public void setTransactionFee(double transactionFee) {
+		this.transactionFee = transactionFee;
+	}
+
+	public boolean isNewAccount() {
+		return isNewAccount;
+	}
+
+	public void setNewAccount(boolean isNewAccount) {
+		this.isNewAccount = isNewAccount;
+	}
+
 	public boolean deposit(double deposit) {
 		if(deposit<=0)
 			return false;
@@ -44,9 +70,10 @@ public class BankAccount {
 	
 	public double getFees(String transactionType) {
 		double fees=0;
-		if(transactionType.equals("Deposit") && this.balance==0)
+		if(isNewAccount) {
 			fees+=accountOperationFee;
-		
+			isNewAccount=false;
+		}
 		if(type.equals("Checking"))
 			fees+=transactionFee;
 		
