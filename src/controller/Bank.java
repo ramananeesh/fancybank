@@ -20,6 +20,7 @@ public class Bank extends Observable {
 	private double loanInterestRate;
 	private double highBalance;
 	private double savingsInterestRate;
+	private ArrayList<Currency> currencies;
 
 	public Bank() {
 		super();
@@ -34,6 +35,11 @@ public class Bank extends Observable {
 		this.withdrawalFee = 2;
 		this.highBalance = 100;
 		this.savingsInterestRate = 0.02;
+		
+		this.currencies=new ArrayList<Currency>();
+		currencies.add(new Currency("Indian Rupees", "INR", 0.014));
+		currencies.add(new Currency("British Pounds", "GBP", 1.30));
+		currencies.add(new Currency("Euros", "EUR", 1.12));
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
@@ -408,6 +414,14 @@ public class Bank extends Observable {
 
 	public void setSavingsInterestRate(double savingsInterestRate) {
 		this.savingsInterestRate = savingsInterestRate;
+	}
+
+	public ArrayList<Currency> getCurrencies() {
+		return currencies;
+	}
+
+	public void setCurrencies(ArrayList<Currency> currencies) {
+		this.currencies = currencies;
 	}
 
 }
