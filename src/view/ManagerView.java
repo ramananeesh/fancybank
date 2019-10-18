@@ -125,16 +125,22 @@ public class ManagerView extends JFrame implements Observer {
 
 		JPanel centerPanel = new JPanel();
 		getContentPane().add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setPreferredSize(new Dimension(500, 600));
+		centerPanel.setLayout(new BorderLayout(0, 0));
+
+		JPanel panel = new JPanel();
+		centerPanel.add(panel);
+		panel.setLayout(new BorderLayout(0, 0));
 
 		JPanel infoPanel = new JPanel();
-		centerPanel.add(infoPanel);
+		panel.add(infoPanel, BorderLayout.SOUTH);
 		infoPanel.setLayout(new BorderLayout(0, 0));
 
 		JLabel lblInformation = new JLabel("Information");
 		lblInformation.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		lblInformation.setHorizontalAlignment(SwingConstants.CENTER);
 		infoPanel.add(lblInformation, BorderLayout.NORTH);
-		centerPanel.setPreferredSize(new Dimension(500, 600));
+		infoPanel.setPreferredSize(new Dimension(400,600));
 
 		infoDetailsTextArea = new JTextArea();
 		infoDetailsTextArea.setText("N/A");
@@ -147,6 +153,9 @@ public class ManagerView extends JFrame implements Observer {
 		JScrollPane infoScrollPane = new JScrollPane(infoDetailsTextArea);
 		infoScrollPane.setPreferredSize(new Dimension(450, 400));
 		infoPanel.add(infoScrollPane, BorderLayout.CENTER);
+
+		JPanel btnsPanel = new JPanel();
+		panel.add(btnsPanel, BorderLayout.CENTER);
 
 		JPanel southPanel = new JPanel();
 		getContentPane().add(southPanel, BorderLayout.SOUTH);

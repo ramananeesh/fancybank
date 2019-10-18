@@ -66,6 +66,7 @@ public class CustomerView extends JFrame implements Observer {
 	private void initialize() {
 
 		this.setBounds(100, 100, 1900, 1000);
+		// this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -80,7 +81,7 @@ public class CustomerView extends JFrame implements Observer {
 		westPanel.setPreferredSize(new Dimension(700, 800));
 
 		JPanel accountsPanel = new JPanel();
-		accountsPanel.setPreferredSize(new Dimension(400, 300));
+		accountsPanel.setPreferredSize(new Dimension(400, 400));
 		westPanel.add(accountsPanel, BorderLayout.NORTH);
 
 		String accountsData[][] = new String[][] {};
@@ -94,7 +95,7 @@ public class CustomerView extends JFrame implements Observer {
 		accountsTable.setDefaultRenderer(String.class, centerRenderer);
 		accountsTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 30));
 
-		accountsTable.setPreferredSize(new Dimension(380, 280));
+		accountsTable.setPreferredSize(new Dimension(380, accountsTable.getSize().height));
 		accountsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		accountsTable.setBorder(new EmptyBorder(5, 5, 5, 5));
 		accountsTable.setFont(new Font("Tahoma", Font.PLAIN, 24));
@@ -107,58 +108,6 @@ public class CustomerView extends JFrame implements Observer {
 		JPanel centerPanel = new JPanel();
 		getContentPane().add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new BorderLayout(0, 0));
-
-		JPanel btnsPanel = new JPanel();
-		centerPanel.add(btnsPanel, BorderLayout.CENTER);
-		btnsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JButton btnWithdraw = new JButton("Withdraw");
-		btnWithdraw.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		btnWithdraw.addActionListener(new TransactionActionListener("Withdraw From Account", "Withdraw"));
-		btnsPanel.add(btnWithdraw);
-
-		JButton btnDeposit = new JButton("Deposit");
-		btnDeposit.addActionListener(new TransactionActionListener("Deposit into Account", "Deposit"));
-		btnDeposit.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		btnsPanel.add(btnDeposit);
-
-		JButton btnTransfer = new JButton("Transfer");
-		btnTransfer.addActionListener(new TransferBtnListener());
-		btnTransfer.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		btnsPanel.add(btnTransfer);
-
-		JButton btnAddAccount = new JButton("Add Account");
-		btnAddAccount.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-
-				JTextField nameField = new JTextField();
-
-				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
-				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
-				JComboBox<String> combo = new JComboBox<String>();
-				ArrayList<String> accountType = new ArrayList<String>();
-				accountType.add("Savings");
-				accountType.add("Checking");
-
-				for (int i = 0; i < accountType.size(); i++) {
-					combo.addItem(accountType.get(i));
-				}
-
-				Object[] fields = { "Account name", nameField, "Account Type: ", combo };
-
-				int reply = JOptionPane.showConfirmDialog(null, fields, "Choose Account Type",
-						JOptionPane.OK_CANCEL_OPTION);
-
-				if (reply == JOptionPane.OK_OPTION) {
-					String type;
-					type = combo.getItemAt(combo.getSelectedIndex());
-
-					bank.addAccount(customer, nameField.getText(), type);
-				}
-			}
-		});
-		btnAddAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		btnsPanel.add(btnAddAccount);
 
 		JLabel messageLabel = new JLabel("Message");
 		messageLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
@@ -238,10 +187,10 @@ public class CustomerView extends JFrame implements Observer {
 		loansScrollPane.setPreferredSize(new Dimension(580, 200));
 		loansTable.setPreferredSize(new Dimension(580, 140));
 		loansTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		loansTable.setBorder(new EmptyBorder(5,5,5,5));
+		loansTable.setBorder(new EmptyBorder(5, 5, 5, 5));
 		loansTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
 		loansTable.setRowHeight(20);
-		loansDisplayPanel.setPreferredSize(new Dimension(600,350));
+		loansDisplayPanel.setPreferredSize(new Dimension(600, 350));
 		loansDisplayPanel.add(loansScrollPane);
 
 		accountsPanel.setBorder(new LineBorder(Color.black, 3));
@@ -278,21 +227,14 @@ public class CustomerView extends JFrame implements Observer {
 		JScrollPane js1 = new JScrollPane(transactionsTable);
 		js1.setVisible(true);
 		transactionsPanel.add(js1);
+		balancePanel.setBorder(new LineBorder(Color.black, 3));
 
-		btnsPanel.setBorder(new LineBorder(Color.black, 3));
-
-		JButton btnRequestLoan = new JButton("Request Loan");
-		btnRequestLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		btnsPanel.add(btnRequestLoan);
-		
-		JButton btnCloseLoan = new JButton("Close Loan");
-		btnCloseLoan.addActionListener(new LoanCloseListener());
-		btnCloseLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		btnsPanel.add(btnCloseLoan);
-		btnRequestLoan.addActionListener(new RequestLoanActionListener());
+		JPanel panel = new JPanel();
+		centerPanel.add(panel, BorderLayout.CENTER);
+		panel.setLayout(new BorderLayout(0, 0));
 
 		JPanel infoPanel = new JPanel();
-		centerPanel.add(infoPanel, BorderLayout.NORTH);
+		panel.add(infoPanel, BorderLayout.SOUTH);
 		infoPanel.setLayout(new BorderLayout(0, 0));
 
 		JLabel lblInformationDetails = new JLabel("Information / Details");
@@ -300,7 +242,7 @@ public class CustomerView extends JFrame implements Observer {
 		lblInformationDetails.setHorizontalAlignment(SwingConstants.CENTER);
 		infoPanel.add(lblInformationDetails, BorderLayout.NORTH);
 
-		infoPanel.setPreferredSize(new Dimension(600, 300));
+		infoPanel.setPreferredSize(new Dimension(400, 600));
 		infoDetailsTextArea = new JTextArea("NA");
 		infoDetailsTextArea.setWrapStyleWord(true);
 		infoDetailsTextArea.setLineWrap(true);
@@ -311,13 +253,77 @@ public class CustomerView extends JFrame implements Observer {
 		JScrollPane infoScrollPane = new JScrollPane(infoDetailsTextArea);
 		infoScrollPane.setVisible(true);
 		infoPanel.add(infoScrollPane, BorderLayout.CENTER);
-		balancePanel.setBorder(new LineBorder(Color.black, 3));
 		infoPanel.setBorder(new LineBorder(Color.black, 3));
+
+		JPanel btnsPanel = new JPanel();
+		panel.add(btnsPanel, BorderLayout.CENTER);
+
+		btnsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+		JButton btnWithdraw = new JButton("Withdraw");
+		btnWithdraw.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnWithdraw.addActionListener(new TransactionActionListener("Withdraw From Account", "Withdraw"));
+		btnsPanel.add(btnWithdraw);
+
+		JButton btnDeposit = new JButton("Deposit");
+		btnDeposit.addActionListener(new TransactionActionListener("Deposit into Account", "Deposit"));
+		btnDeposit.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnDeposit);
+
+		JButton btnTransfer = new JButton("Transfer");
+		btnTransfer.addActionListener(new TransferBtnListener());
+		btnTransfer.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnTransfer);
+
+		JButton btnAddAccount = new JButton("Add Account");
+		btnAddAccount.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				JTextField nameField = new JTextField();
+
+				UIManager.put("OptionPane.minimumSize", new Dimension(600, 300));
+				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
+				JComboBox<String> combo = new JComboBox<String>();
+				ArrayList<String> accountType = new ArrayList<String>();
+				accountType.add("Savings");
+				accountType.add("Checking");
+
+				for (int i = 0; i < accountType.size(); i++) {
+					combo.addItem(accountType.get(i));
+				}
+
+				Object[] fields = { "Account name", nameField, "Account Type: ", combo };
+
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Choose Account Type",
+						JOptionPane.OK_CANCEL_OPTION);
+
+				if (reply == JOptionPane.OK_OPTION) {
+					String type;
+					type = combo.getItemAt(combo.getSelectedIndex());
+
+					bank.addAccount(customer, nameField.getText(), type);
+				}
+			}
+		});
+		btnAddAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnAddAccount);
+
+		btnsPanel.setBorder(new LineBorder(Color.black, 3));
+
+		JButton btnRequestLoan = new JButton("Request Loan");
+		btnRequestLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnRequestLoan);
+
+		JButton btnCloseLoan = new JButton("Close Loan");
+		btnCloseLoan.addActionListener(new LoanCloseListener());
+		btnCloseLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnCloseLoan);
+		btnRequestLoan.addActionListener(new RequestLoanActionListener());
 		loansPanel.setBorder(new LineBorder(Color.black, 3));
 
 		JPanel moreOptionsPanel = new JPanel();
 		moreOptionsPanel.setBorder(new LineBorder(Color.black, 3));
-		moreOptionsPanel.setPreferredSize(new Dimension(500,200));
+		moreOptionsPanel.setPreferredSize(new Dimension(500, 200));
 		GridBagConstraints gbc_moreOptionsPanel = new GridBagConstraints();
 		gbc_moreOptionsPanel.fill = GridBagConstraints.BOTH;
 		gbc_moreOptionsPanel.gridx = 0;
@@ -342,7 +348,7 @@ public class CustomerView extends JFrame implements Observer {
 		JButton btnExit = new JButton("Exit");
 		btnExit.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		moreOptionsPanel.add(btnExit);
-		
+
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
 
@@ -540,9 +546,9 @@ public class CustomerView extends JFrame implements Observer {
 			ArrayList<BankAccount> accounts = customer.getAccounts();
 			BankAccount account = accounts.get(accountsTable.getSelectedRow());
 
-			accountNameLbl.setText("Account Name: "+account.getAccountName());
+			accountNameLbl.setText("Account Name: " + account.getAccountName());
 			Double balance = account.getBalance();
-			accountBalanceLbl.setText("Account Balance: $"+balance.toString());
+			accountBalanceLbl.setText("Account Balance: $" + balance.toString());
 		}
 
 	}
@@ -564,7 +570,7 @@ public class CustomerView extends JFrame implements Observer {
 		}
 
 	}
-	
+
 	public class LoanListListener implements ListSelectionListener {
 
 		@Override
@@ -582,35 +588,36 @@ public class CustomerView extends JFrame implements Observer {
 		}
 
 	}
-	
-	public class LoanCloseListener implements ActionListener{
+
+	public class LoanCloseListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			ArrayList<BankAccount> accounts = customer.getAccounts();
-			
+
 			ArrayList<Loan> loans = customer.getLoans();
-			
+
 			JLabel loanAmountLbl = new JLabel("N/A");
-			JLabel accountBalanceLbl = new JLabel ("N/A");
+			JLabel accountBalanceLbl = new JLabel("N/A");
 			JComboBox loanCombo = new JComboBox();
-			for(Loan l: loans) {
+			for (Loan l : loans) {
 				loanCombo.addItem(l.getLoanId());
 			}
-			
+
 			JComboBox accountCombo = new JComboBox();
-			
-			for(BankAccount acc: accounts) {
+
+			for (BankAccount acc : accounts) {
 				accountCombo.addItem(acc.getAccountName());
 			}
-			
-			accountCombo.addActionListener (new ActionListener () {
-			    public void actionPerformed(ActionEvent e) {
-			        accountBalanceLbl.setText(Double.toString(accounts.get(accountCombo.getSelectedIndex()).getBalance()));
-			    }
+
+			accountCombo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					accountBalanceLbl
+							.setText(Double.toString(accounts.get(accountCombo.getSelectedIndex()).getBalance()));
+				}
 			});
-			
+
 			loanCombo.addActionListener(new ActionListener() {
 
 				@Override
@@ -618,59 +625,56 @@ public class CustomerView extends JFrame implements Observer {
 					// TODO Auto-generated method stub
 					loanAmountLbl.setText(Double.toString(loans.get(loanCombo.getSelectedIndex()).getPayoffAmount()));
 				}
-				
+
 			});
-			
-			Object[] fields = {
-				"Loans: ", 	loanCombo,
-				"Accounts: ", accountCombo,
-				"Loan Ammount: ", loanAmountLbl,
-				"Account Balance: ", accountBalanceLbl,
-			};
-			
+
+			Object[] fields = { "Loans: ", loanCombo, "Accounts: ", accountCombo, "Loan Ammount: ", loanAmountLbl,
+					"Account Balance: ", accountBalanceLbl, };
+
 			double minLoanAmount = customer.getMinimumLoanAmount();
 			double maxAccBalance = customer.getMaximumAccountBalance();
-			
-			if(minLoanAmount>maxAccBalance) {
-				JOptionPane.showMessageDialog(null, "The Minimum Settle off Amount for Any loan Exceeds the Maximum account balance from all accounts", "Error", JOptionPane.ERROR_MESSAGE);
+
+			if (minLoanAmount > maxAccBalance) {
+				JOptionPane.showMessageDialog(null,
+						"The Minimum Settle off Amount for Any loan Exceeds the Maximum account balance from all accounts",
+						"Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
-			while(true) {
-				int reply = JOptionPane.showConfirmDialog(null, fields, "Close-off Loan",
-						JOptionPane.OK_CANCEL_OPTION);
-				
-				if(reply==JOptionPane.OK_OPTION) {
-					
+
+			while (true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Close-off Loan", JOptionPane.OK_CANCEL_OPTION);
+
+				if (reply == JOptionPane.OK_OPTION) {
+
 					int accIndex = accountCombo.getSelectedIndex();
 					int loanIndex = loanCombo.getSelectedIndex();
-					
-					if(accIndex==-1 || loanIndex==-1) {
-						JOptionPane.showMessageDialog(null, "Select a loan id and an account to settle the loan", "Error", JOptionPane.ERROR_MESSAGE);
+
+					if (accIndex == -1 || loanIndex == -1) {
+						JOptionPane.showMessageDialog(null, "Select a loan id and an account to settle the loan",
+								"Error", JOptionPane.ERROR_MESSAGE);
 						continue;
-					}
-					else {
+					} else {
 						BankAccount acc = accounts.get(accIndex);
 						Loan loan = loans.get(loanIndex);
-						
-						if(acc.getBalance()<=loan.getPayoffAmount()) {
-							JOptionPane.showMessageDialog(null, "Account balance should be greater than Loan Payoff amount", "Error", JOptionPane.ERROR_MESSAGE);
+
+						if (acc.getBalance() <= loan.getPayoffAmount()) {
+							JOptionPane.showMessageDialog(null,
+									"Account balance should be greater than Loan Payoff amount", "Error",
+									JOptionPane.ERROR_MESSAGE);
 							continue;
-						}
-						else {
-							bank.settleLoanForCustomer(customer, acc.getAccountName(), loan.getLoanId(), loan.getPayoffAmount());
+						} else {
+							bank.settleLoanForCustomer(customer, acc.getAccountName(), loan.getLoanId(),
+									loan.getPayoffAmount());
 							break;
 						}
 					}
-				}
-				else {
+				} else {
 					break;
 				}
 			}
-			
-			
+
 		}
-		
+
 	}
 
 	public DefaultTableModel addAccountsToTable(BankCustomer customer, DefaultTableModel model) {
