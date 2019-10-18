@@ -318,6 +318,12 @@ public class CustomerView extends JFrame implements Observer {
 		btnCloseLoan.addActionListener(new LoanCloseListener());
 		btnCloseLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnCloseLoan);
+		
+		JButton btnCloseAccount = new JButton("Close Account");
+		btnCloseAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnCloseAccount);
+		btnCloseAccount.addActionListener(new CloseAccountListener());
+		
 		btnRequestLoan.addActionListener(new RequestLoanActionListener());
 		loansPanel.setBorder(new LineBorder(Color.black, 3));
 
@@ -352,6 +358,36 @@ public class CustomerView extends JFrame implements Observer {
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
 
+	public class CloseAccountListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			JComboBox<String> combo = new JComboBox<String>();
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			for (int i = 0; i < accounts.size(); i++) {
+				combo.addItem(accounts.get(i).getAccountName());
+			}
+			
+			Object[] fields= {
+				"Account Name: ", combo,	
+			};
+			
+			int reply = JOptionPane.showConfirmDialog(null, fields, "Close Account", JOptionPane.OK_CANCEL_OPTION);
+			
+			if(reply==JOptionPane.OK_OPTION) {
+				BankAccount acc = accounts.get(combo.getSelectedIndex());
+				double amountReturned = customer.closeAccountFee(acc.getAccountName());
+				bank.closeAccountForCustomer(customer, acc.getAccountName());
+				
+				String ret="Account closed successfully! ";
+				if(amountReturned>0) {
+					ret+="You get back $"+amountReturned;
+				}
+				JOptionPane.showMessageDialog(null, ret);
+			}
+		}
+	}
+	
 	public class RequestLoanActionListener implements ActionListener {
 
 		@Override

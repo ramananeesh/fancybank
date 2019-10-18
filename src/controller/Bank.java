@@ -132,6 +132,17 @@ public class Bank extends Observable {
 		setChanged();
 		notifyObservers();
 	}
+	
+	public void closeAccountForCustomer(BankCustomer customer, String accountName) {
+		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
+		double fees = acc.getAccountOperationFee();
+		this.getCustomerByEmail(customer.getEmail()).closeAccount(accountName);
+		Transaction transaction = this.addTransaction(customer.getName(), "Bank", "Transaction fees - Account Closing",
+				fees + accountOperationFee, accountName, "My Fancy Bank");
+		this.addTransactionForCustomer(customer, transaction);
+		setChanged();
+		notifyObservers();
+	}
 
 	public boolean settleLoanForCustomer(BankCustomer customer, String accountName, String loanId, double loanAmount) {
 

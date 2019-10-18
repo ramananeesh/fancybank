@@ -31,6 +31,18 @@ public class BankCustomer extends Customer {
 	public void addAccount(BankAccount newAccount) {
 		this.accounts.add(newAccount);
 	}
+	
+	public void closeAccount(String accountName) {
+		int index = this.getAccountIndexByName(accountName);
+		this.accounts.remove(index);
+	}
+	
+	public double closeAccountFee(String accountName) {
+		int index = this.getAccountIndexByName(accountName);
+		BankAccount acc = this.accounts.get(index);
+		double finalBalance = acc.getBalance();
+		return finalBalance-acc.getAccountOperationFee();
+	}
 
 	public ArrayList<Loan> getLoans() {
 		return loans;
