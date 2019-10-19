@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 import controller.Bank;
@@ -89,6 +90,7 @@ public class Welcome extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				JOptionPane.showMessageDialog(null, "Manager first needs to be created using the Sign up option");
 				loginFrame = new ManagerLogin(bank);
 				setVisible(false);
 				loginFrame.setVisible(true);
@@ -99,6 +101,7 @@ public class Welcome extends JFrame{
 		btnCustomer.setFont(new Font("Tahoma", Font.PLAIN, 55));
 		btnCustomer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "Customer first needs to be created using the Sign up option");
 				loginFrame=new CustomerLogin(bank);
 				setVisible(false);
 				loginFrame.setVisible(true);
