@@ -62,6 +62,41 @@ public class CustomerView extends JFrame implements Observer {
 		this.bank = bank;
 		this.customer = this.bank.getCustomerByEmail(customer.getEmail());
 		this.bank.addObserver(this);
+		
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setFont(new Font("Segoe UI", Font.PLAIN, 30));
+		setJMenuBar(menuBar);
+		
+		JMenu mnOptions = new JMenu("Options");
+		mnOptions.setFont(new Font("Segoe UI", Font.PLAIN, 36));
+		menuBar.add(mnOptions);
+		
+		JMenuItem mntmLogout = new JMenuItem("Logout");
+		mntmLogout.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmLogout.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				setVisible(false);
+				Welcome welcome = new Welcome(bank);
+				welcome.setVisible(true);
+			}
+		});
+		mnOptions.add(mntmLogout);
+		
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmExit.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JOptionPane.showMessageDialog(null, "Thanks for using the ATM. System will now exit");
+				System.exit(0);
+			}
+		});
+		mnOptions.add(mntmExit);
 		initialize();
 	}
 
@@ -69,7 +104,7 @@ public class CustomerView extends JFrame implements Observer {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-
+		this.setLocationRelativeTo(null);
 		this.setBounds(100, 100, 1900, 1000);
 		// this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -318,12 +353,12 @@ public class CustomerView extends JFrame implements Observer {
 		btnCloseLoan.addActionListener(new LoanCloseListener());
 		btnCloseLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnCloseLoan);
-		
+
 		JButton btnCloseAccount = new JButton("Close Account");
 		btnCloseAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnCloseAccount);
 		btnCloseAccount.addActionListener(new CloseAccountListener());
-		
+
 		btnRequestLoan.addActionListener(new RequestLoanActionListener());
 		loansPanel.setBorder(new LineBorder(Color.black, 3));
 
@@ -342,78 +377,84 @@ public class CustomerView extends JFrame implements Observer {
 		btnCurrencyConverter.addActionListener(new CurrencyConverterListener());
 		btnCurrencyConverter.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		moreOptionsPanel.add(btnCurrencyConverter, BorderLayout.SOUTH);
-		
+
 		JLabel lblA = new JLabel("Currency Converter");
 		lblA.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		lblA.setHorizontalAlignment(SwingConstants.CENTER);
 		moreOptionsPanel.add(lblA, BorderLayout.NORTH);
-		
+
 		JPanel panel_1 = new JPanel();
 		moreOptionsPanel.add(panel_1, BorderLayout.CENTER);
-		
+
 		currencyFromCombo = new JComboBox();
-		currencyFromCombo.setModel(new DefaultComboBoxModel(new String[] {"From"}));
+		currencyFromCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
+		currencyFromCombo.setModel(new DefaultComboBoxModel(new String[] { "From" }));
 		ArrayList<Currency> currencies = bank.getCurrencies();
-		for(Currency c: currencies) {
-			currencyFromCombo.addItem(c.getName()+" - "+c.getAbbreviation());
+		for (Currency c : currencies) {
+			currencyFromCombo.addItem(c.getName() + " - " + c.getAbbreviation());
 		}
 		panel_1.setLayout(new BorderLayout(0, 0));
 		panel_1.add(currencyFromCombo, BorderLayout.WEST);
-		
+
 		currencyConverterField = new JTextField();
+		currencyConverterField.setHorizontalAlignment(SwingConstants.CENTER);
+		currencyConverterField.setFont(new Font("Tahoma", Font.PLAIN, 34));
+		currencyConverterField.setPreferredSize(new Dimension(40,50));
 		panel_1.add(currencyConverterField, BorderLayout.CENTER);
 		currencyConverterField.setColumns(10);
-		
+
 		currencyToCombo = new JComboBox();
-		currencyToCombo.setModel(new DefaultComboBoxModel(new String[] {"To"}));
-		for(Currency c: currencies) {
-			currencyToCombo.addItem(c.getName()+" - "+c.getAbbreviation());
+		currencyToCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
+		currencyToCombo.setModel(new DefaultComboBoxModel(new String[] { "To" }));
+		for (Currency c : currencies) {
+			currencyToCombo.addItem(c.getName() + " - " + c.getAbbreviation());
 		}
 		panel_1.add(currencyToCombo, BorderLayout.EAST);
-		
+
 		convertedAmtLbl = new JLabel("Converted Amount");
 		convertedAmtLbl.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		convertedAmtLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_1.add(convertedAmtLbl, BorderLayout.SOUTH);
-		
 
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
 	}
 
-	public class CurrencyConverterListener implements ActionListener{
+	public class CurrencyConverterListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			String field = currencyConverterField.getText();
 			ArrayList<Currency> currencies = bank.getCurrencies();
-			if(field.equals(""))
+			if (field.equals(""))
 				return;
 			try {
 				double amount = Double.parseDouble(field);
-				if(amount<=0) {
+				if (amount <= 0) {
 					JOptionPane.showMessageDialog(null, "Enter an amount greater than 0", "Error",
 							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				int fromIndex = currencyFromCombo.getSelectedIndex();
-				int toIndex= currencyToCombo.getSelectedIndex();
-				
-				if(fromIndex!=toIndex && (fromIndex!=0||fromIndex!=-1||toIndex!=0||toIndex!=-1)) {
-					Currency fromCurrency = currencies.get(fromIndex);
-					Currency toCurrency = currencies.get(toIndex);
-					
+				int toIndex = currencyToCombo.getSelectedIndex();
+
+				if ((fromIndex != 0 && fromIndex != -1 && toIndex != 0 && toIndex != -1)) {
+					Currency fromCurrency = currencies.get(fromIndex - 1);
+					Currency toCurrency = currencies.get(toIndex - 1);
+
 					double usdAmount = fromCurrency.getAmountInUSD(amount);
 					double toAmount = toCurrency.getAmountInCurrency(usdAmount);
-					
-					convertedAmtLbl.setText("Converted Amount = "+toCurrency.getAbbreviation()+toAmount);
+
+					convertedAmtLbl.setText("Converted Amount = " + toCurrency.getAbbreviation() + " " + toAmount);
 				}
-			} catch(Exception e1) {
+			} catch (Exception e1) {
+				JOptionPane.showMessageDialog(null, "Enter a valid amount greater than 0", "Error",
+						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}
 	}
-	
-	public class CloseAccountListener implements ActionListener{
+
+	public class CloseAccountListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
@@ -422,27 +463,25 @@ public class CustomerView extends JFrame implements Observer {
 			for (int i = 0; i < accounts.size(); i++) {
 				combo.addItem(accounts.get(i).getAccountName());
 			}
-			
-			Object[] fields= {
-				"Account Name: ", combo,	
-			};
-			
+
+			Object[] fields = { "Account Name: ", combo, };
+
 			int reply = JOptionPane.showConfirmDialog(null, fields, "Close Account", JOptionPane.OK_CANCEL_OPTION);
-			
-			if(reply==JOptionPane.OK_OPTION) {
+
+			if (reply == JOptionPane.OK_OPTION) {
 				BankAccount acc = accounts.get(combo.getSelectedIndex());
 				double amountReturned = customer.closeAccountFee(acc.getAccountName());
 				bank.closeAccountForCustomer(customer, acc.getAccountName());
-				
-				String ret="Account closed successfully! ";
-				if(amountReturned>0) {
-					ret+="You get back $"+amountReturned;
+
+				String ret = "Account closed successfully! ";
+				if (amountReturned > 0) {
+					ret += "You get back $" + amountReturned;
 				}
 				JOptionPane.showMessageDialog(null, ret);
 			}
 		}
 	}
-	
+
 	public class RequestLoanActionListener implements ActionListener {
 
 		@Override
@@ -541,14 +580,14 @@ public class CustomerView extends JFrame implements Observer {
 			for (int i = 0; i < accounts.size(); i++) {
 				combo.addItem(accounts.get(i).getAccountName());
 			}
-			
-			for(Currency c: currencies) {
-				currencyCombo.addItem(c.getName()+" - "+c.getAbbreviation());
+
+			for (Currency c : currencies) {
+				currencyCombo.addItem(c.getName() + " - " + c.getAbbreviation());
 			}
-			
+
 			JTextField amountField = new JTextField();
 
-			Object[] fields = { "Account Name: ", combo, "Amount in USD: $", amountField, };
+			Object[] fields = { "Account Name: ", combo, "Currency", currencyCombo, "Amount in USD: $", amountField, };
 			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, title, JOptionPane.OK_CANCEL_OPTION);
 
@@ -562,9 +601,9 @@ public class CustomerView extends JFrame implements Observer {
 									JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
-						
+
 						Currency currency = currencies.get(currencyCombo.getSelectedIndex());
-						
+
 						amount = currency.getAmountInUSD(inputAmount);
 					} catch (Exception e1) {
 						JOptionPane.showMessageDialog(null, "Error processing deposit. Deposit should be a real value",
@@ -582,34 +621,38 @@ public class CustomerView extends JFrame implements Observer {
 							continue;
 						}
 						Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Deposit",
-								Double.parseDouble(amountField.getText()), "Self",
-								accounts.get(accountIndex).getAccountName());
+								amount, "Self", accounts.get(accountIndex).getAccountName());
 						bank.addTransactionForCustomer(customer, transaction);
-
-						bank.addMoneyEarned(fees);
-						transaction = bank.addTransaction(customer.getName(), "Bank", "Transaction Fees",
-								fees, accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
-						bank.addTransactionForCustomer(customer, transaction);
+						if (fees != 0) {
+							bank.addMoneyEarned(fees);
+							transaction = bank.addTransaction(customer.getName(), "Bank", "Transaction Fees", fees,
+									accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
+							bank.addTransactionForCustomer(customer, transaction);
+						}
 						break;
 					} else if (this.type.equals("Withdraw")) {
 						boolean flag = bank.withdrawForCustomer(customer, combo.getItemAt(accountIndex), amount);
 						double fees = accounts.get(combo.getSelectedIndex()).getFees("Withdrawal");
 						if (!flag) {
-							JOptionPane.showMessageDialog(null, "Error processing withdrawal. Fee exceeds account balance",
-									"Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null,
+									"Error processing withdrawal. Fee exceeds account balance", "Error",
+									JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
-						Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Withdrawal",
-								Double.parseDouble(amountField.getText()), accounts.get(accountIndex).getAccountName(),
-								"Self");
+						Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(),
+								"Withdrawal", amount, accounts.get(accountIndex).getAccountName(), "Self");
 						bank.addTransactionForCustomer(customer, transaction);
 
-						bank.addMoneyEarned(fees);
-						transaction = bank.addTransaction(customer.getName(), "Bank", "Transaction Fees", fees,
-								accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
-						bank.addTransactionForCustomer(customer, transaction);
+						if (fees != 0) {
+							bank.addMoneyEarned(fees);
+							transaction = bank.addTransaction(customer.getName(), "Bank", "Transaction Fees", fees,
+									accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
+							bank.addTransactionForCustomer(customer, transaction);
+						}
 						break;
 					}
+				} else {
+					break;
 				}
 			}
 		}
@@ -645,8 +688,9 @@ public class CustomerView extends JFrame implements Observer {
 
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Transfer between Accounts",
 						JOptionPane.OK_CANCEL_OPTION);
-				if (reply == JOptionPane.OK_OPTION) {
-					while (true) {
+				while (true) {
+					if (reply == JOptionPane.OK_OPTION) {
+
 						int index1 = combo1.getSelectedIndex();
 						int index2 = combo2.getSelectedIndex();
 						String amountString = amountField.getText();
@@ -684,13 +728,13 @@ public class CustomerView extends JFrame implements Observer {
 										+ accounts.get(index2).getFees("Deposit");
 								bank.addMoneyEarned(fees);
 								transaction = bank.addTransaction(customer.getName(), "Bank",
-										"Transaction Fees - Withdrawal", accounts.get(index1).getFees("Withdrawal"), accounts.get(index1).getAccountName(),
-										"My Fancy Bank");
+										"Transaction Fees - Withdrawal", accounts.get(index1).getFees("Withdrawal"),
+										accounts.get(index1).getAccountName(), "My Fancy Bank");
 								bank.addTransactionForCustomer(customer, transaction);
 
 								transaction = bank.addTransaction(customer.getName(), "Bank",
-										"Transaction Fees - Deposit", accounts.get(index2).getFees("Deposit"), accounts.get(index2).getAccountName(),
-										"My Fancy Bank");
+										"Transaction Fees - Deposit", accounts.get(index2).getFees("Deposit"),
+										accounts.get(index2).getAccountName(), "My Fancy Bank");
 								bank.addTransactionForCustomer(customer, transaction);
 								break;
 							} else {
@@ -700,6 +744,8 @@ public class CustomerView extends JFrame implements Observer {
 						}
 						JOptionPane.showMessageDialog(null, "From and to accounts cannot be the same!", "Error",
 								JOptionPane.ERROR_MESSAGE);
+					} else {
+						break;
 					}
 				}
 
@@ -721,7 +767,7 @@ public class CustomerView extends JFrame implements Observer {
 
 			loansTable.clearSelection();
 			transactionsTable.clearSelection();
-			
+
 			ArrayList<BankAccount> accounts = customer.getAccounts();
 			BankAccount account = accounts.get(accountsTable.getSelectedRow());
 
@@ -741,10 +787,10 @@ public class CustomerView extends JFrame implements Observer {
 			if (transactionsTable.getSelectedRow() == -1) {
 				return;
 			}
-			
+
 			accountsTable.clearSelection();
 			loansTable.clearSelection();
-			
+
 			ArrayList<Transaction> transactions = customer.getTransactions();
 			Transaction transaction = transactions.get(transactionsTable.getSelectedRow());
 
@@ -763,10 +809,10 @@ public class CustomerView extends JFrame implements Observer {
 			if (loansTable.getSelectedRow() == -1) {
 				return;
 			}
-			
+
 			accountsTable.clearSelection();
 			transactionsTable.clearSelection();
-			
+
 			ArrayList<Loan> loans = customer.getLoans();
 			Loan loan = loans.get(loansTable.getSelectedRow());
 

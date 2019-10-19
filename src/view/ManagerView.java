@@ -89,14 +89,17 @@ public class ManagerView extends JFrame implements Observer {
 		mnOptions.add(mntmExit);
 
 		JMenu mnActions = new JMenu("Actions");
+		mnActions.setFont(new Font("Segoe UI", Font.PLAIN, 36));
 		menuBar.add(mnActions);
 
 		JMenuItem mntmApproveItem = new JMenuItem("Approve Loan");
+		mntmApproveItem.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmApproveItem.addActionListener(new ApproveLoanListener());
 		mntmApproveItem.setHorizontalAlignment(SwingConstants.LEFT);
 		mnActions.add(mntmApproveItem);
 
 		JMenuItem mntmSettleInterests = new JMenuItem("Settle Interests");
+		mntmSettleInterests.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmSettleInterests.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				bank.settleInterestsForAllCustomers();
@@ -105,26 +108,32 @@ public class ManagerView extends JFrame implements Observer {
 		mnActions.add(mntmSettleInterests);
 
 		JMenuItem mntmInterestRate = new JMenuItem("Loan Interest Rate");
+		mntmInterestRate.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmInterestRate.addActionListener(new InterestListener("Loan"));
 		mnActions.add(mntmInterestRate);
 
 		JMenuItem mntmSavingsInterestRate = new JMenuItem("Savings Interest Rate");
+		mntmSavingsInterestRate.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmSavingsInterestRate.addActionListener(new InterestListener("Savings"));
 		mnActions.add(mntmSavingsInterestRate);
 
 		JMenuItem mntmHighBalanceAmount = new JMenuItem("High Balance Amount");
+		mntmHighBalanceAmount.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmHighBalanceAmount.addActionListener(new BalanceListener());
 		mnActions.add(mntmHighBalanceAmount);
 
 		JMenuItem mntmAccountOperationFee = new JMenuItem("Account Operation Fee");
+		mntmAccountOperationFee.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmAccountOperationFee.addActionListener(new FeeListener("Account Operation"));
 		mnActions.add(mntmAccountOperationFee);
 
 		JMenuItem mntmCheckingFee = new JMenuItem("Checking Fee");
+		mntmCheckingFee.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmCheckingFee.addActionListener(new FeeListener("Checking"));
 		mnActions.add(mntmCheckingFee);
 
 		JMenuItem mntmWithdrawalFee = new JMenuItem("Withdrawal Fee");
+		mntmWithdrawalFee.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmWithdrawalFee.addActionListener(new FeeListener("Withdrawal"));
 		mnActions.add(mntmWithdrawalFee);
 		initialize();
