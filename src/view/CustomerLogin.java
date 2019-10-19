@@ -158,6 +158,11 @@ public class CustomerLogin extends JFrame {
 								continue;
 							}
 						}
+						if(street.equals("")||house.equals("")||city.equals("")||zipcode.equals("")||state.equals("")) {
+							JOptionPane.showMessageDialog(null, "Address fields cannot be empty", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
 						
 						bank.addCustomer(name, new Address(house, street, city, zipcode, state), phone, ssn, email,
 								password);
