@@ -95,7 +95,7 @@ public class Welcome extends JFrame{
 		btnCustomer.setFont(new Font("Tahoma", Font.PLAIN, 55));
 		btnCustomer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				loginFrame=new Login(bank);
+				loginFrame=new CustomerLogin(bank);
 				setVisible(false);
 				loginFrame.setVisible(true);
 			}

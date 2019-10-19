@@ -19,14 +19,14 @@ import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.GridLayout;
 
-public class Login extends JFrame {
+public class CustomerLogin extends JFrame {
 
 	private BankBranch bank;
 
 	/**
 	 * Create the application.
 	 */
-	public Login(BankBranch bank) {
+	public CustomerLogin(BankBranch bank) {
 		super();
 		this.bank = bank;
 		// test purpose
