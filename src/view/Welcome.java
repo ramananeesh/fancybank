@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import controller.Bank;
 import controller.BankBranch;
 
 import javax.swing.JPanel;
@@ -35,8 +36,11 @@ public class Welcome extends JFrame{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					BankBranch bank = new BankBranch();
-					Welcome window = new Welcome(bank);
+					
+					Bank bank = new Bank("My Fancy Bank");
+					BankBranch bankBranch = new BankBranch();
+					bank.addBranch(bankBranch);
+					Welcome window = new Welcome(bankBranch);
 					window.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
