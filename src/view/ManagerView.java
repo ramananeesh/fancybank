@@ -19,6 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -79,13 +80,29 @@ public class ManagerView extends JFrame implements Observer {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				setVisible(false);
-				Welcome welcome = new Welcome(bank);
-				welcome.setVisible(true);
+				Welcome welcome;
+				try {
+					welcome = new Welcome(bank);
+					welcome.setVisible(true);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 			}
 		});
 
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmExit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JOptionPane.showMessageDialog(null, "Thanks for using the ATM. System will now exit");
+				System.exit(0);
+			}
+		});
 		mnOptions.add(mntmExit);
 
 		JMenu mnActions = new JMenu("Actions");
@@ -251,7 +268,7 @@ public class ManagerView extends JFrame implements Observer {
 		amountEarnedLbl.setFont(new Font("Tahoma", Font.PLAIN, 40));
 		amountEarnedLbl.setHorizontalAlignment(SwingConstants.CENTER);
 
-		moneyLbl = new JLabel("$");
+		moneyLbl = new JLabel("$"+bank.getMoneyEarned());
 		moneyLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		moneyLbl.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		panel_1.add(moneyLbl, BorderLayout.CENTER);
@@ -345,7 +362,7 @@ public class ManagerView extends JFrame implements Observer {
 					bank.approveLoanForCustomer(customer, l.getLoanId());
 					break;
 				} else {
-					break;
+					return;
 				}
 			}
 		}
@@ -591,7 +608,7 @@ public class ManagerView extends JFrame implements Observer {
 		loansModel = addLoansToTable(loansModel);
 		loansTable.setModel(loansModel);
 
-		moneyLbl.setText(Double.toString(bank.getMoneyEarned()));
+		moneyLbl.setText("$"+bank.getMoneyEarned());
 
 	}
 

@@ -117,12 +117,15 @@ public class Bank extends Observable {
 	public boolean depositForCustomer(BankCustomer customer, String accountName, double amount) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		boolean t = acc.isNewAccount();
-		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
 		double fees = acc.getFees("Deposit");
+		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
+	
 		if (t) {
+			
 			Transaction transaction = this.addTransaction(customer.getName(), "Bank",
 					"Transaction fees - Account Opening", fees + accountOperationFee, accountName, "My Fancy Bank");
 			this.addTransactionForCustomer(customer, transaction);
+			this.addMoneyEarned(fees);
 		}
 		return flag;
 	}

@@ -31,6 +31,7 @@ import controller.Bank;
 import javafx.collections.SetChangeListener;
 
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 
 public class CustomerView extends JFrame implements Observer {
@@ -79,8 +80,15 @@ public class CustomerView extends JFrame implements Observer {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				setVisible(false);
-				Welcome welcome = new Welcome(bank);
-				welcome.setVisible(true);
+				Welcome welcome;
+				try {
+					welcome = new Welcome(bank);
+					welcome.setVisible(true);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 			}
 		});
 		mnOptions.add(mntmLogout);
@@ -127,6 +135,7 @@ public class CustomerView extends JFrame implements Observer {
 		String accountsData[][] = new String[][] {};
 		String accountsHeader[] = new String[] { "Account Name", "Account Type" };
 		accountsModel = new DefaultTableModel(accountsData, accountsHeader);
+		accountsModel = addAccountsToTable(customer, accountsModel);
 		accountsTable = new JTable(accountsModel);
 		accountsPanel.setLayout(new BorderLayout(0, 0));
 		accountsTable.getSelectionModel().addListSelectionListener(new AccountListListener());
@@ -214,6 +223,7 @@ public class CustomerView extends JFrame implements Observer {
 		String loansData[][] = new String[][] {};
 		String loansHeader[] = new String[] { "ID", "Amount", "Status", "Active" };
 		loansModel = new DefaultTableModel(loansData, loansHeader);
+		loansModel = addLoansToTable(customer, loansModel);
 		loansTable = new JTable(loansModel);
 		loansTable.getSelectionModel().addListSelectionListener(new LoanListListener());
 		loansTable.setDefaultRenderer(String.class, centerRenderer);
@@ -247,6 +257,7 @@ public class CustomerView extends JFrame implements Observer {
 		String transactionsData[][] = new String[][] {};
 		String transactionsHeader[] = new String[] { "From", "To", "Type", "Amount($)" };
 		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
+		transactionsModel = addTransactionsToTable(customer, transactionsModel);
 		transactionsTable = new JTable(transactionsModel);
 		transactionsTable.getSelectionModel().addListSelectionListener(new TransactionListListener());
 		transactionsTable.setVisible(true);
@@ -388,6 +399,7 @@ public class CustomerView extends JFrame implements Observer {
 
 		currencyFromCombo = new JComboBox();
 		currencyFromCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
+		currencyFromCombo.setPreferredSize(new Dimension(140,40));
 		currencyFromCombo.setModel(new DefaultComboBoxModel(new String[] { "From" }));
 		ArrayList<Currency> currencies = bank.getCurrencies();
 		for (Currency c : currencies) {
@@ -399,11 +411,12 @@ public class CustomerView extends JFrame implements Observer {
 		currencyConverterField = new JTextField();
 		currencyConverterField.setHorizontalAlignment(SwingConstants.CENTER);
 		currencyConverterField.setFont(new Font("Tahoma", Font.PLAIN, 34));
-		currencyConverterField.setPreferredSize(new Dimension(40,50));
+		currencyConverterField.setPreferredSize(new Dimension(30,50));
 		panel_1.add(currencyConverterField, BorderLayout.CENTER);
 		currencyConverterField.setColumns(10);
 
 		currencyToCombo = new JComboBox();
+		currencyToCombo.setPreferredSize(new Dimension(140,40));
 		currencyToCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		currencyToCombo.setModel(new DefaultComboBoxModel(new String[] { "To" }));
 		for (Currency c : currencies) {
@@ -417,6 +430,7 @@ public class CustomerView extends JFrame implements Observer {
 		panel_1.add(convertedAmtLbl, BorderLayout.SOUTH);
 
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
+		
 	}
 
 	public class CurrencyConverterListener implements ActionListener {
@@ -445,6 +459,9 @@ public class CustomerView extends JFrame implements Observer {
 					double toAmount = toCurrency.getAmountInCurrency(usdAmount);
 
 					convertedAmtLbl.setText("Converted Amount = " + toCurrency.getAbbreviation() + " " + toAmount);
+//					currencyConverterField.setText("000");
+//					currencyFromCombo.setSelectedIndex(-1);
+//					currencyToCombo.setSelectedIndex(-1);
 				}
 			} catch (Exception e1) {
 				JOptionPane.showMessageDialog(null, "Enter a valid amount greater than 0", "Error",
@@ -512,7 +529,7 @@ public class CustomerView extends JFrame implements Observer {
 
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Loan Application Window",
 						JOptionPane.OK_CANCEL_OPTION);
-
+				
 				if (reply == JOptionPane.OK_OPTION) {
 					try {
 						UIManager.put("OptionPane.minimumSize", new Dimension(300, 100));
@@ -542,7 +559,7 @@ public class CustomerView extends JFrame implements Observer {
 								JOptionPane.ERROR_MESSAGE);
 					}
 				} else {
-					break;
+					return;
 				}
 
 			}
@@ -590,7 +607,7 @@ public class CustomerView extends JFrame implements Observer {
 			Object[] fields = { "Account Name: ", combo, "Currency", currencyCombo, "Amount in USD: $", amountField, };
 			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, title, JOptionPane.OK_CANCEL_OPTION);
-
+				
 				if (reply == JOptionPane.OK_OPTION) {
 					int accountIndex = combo.getSelectedIndex();
 					double inputAmount, amount;
@@ -652,7 +669,7 @@ public class CustomerView extends JFrame implements Observer {
 						break;
 					}
 				} else {
-					break;
+					return;
 				}
 			}
 		}
@@ -745,7 +762,7 @@ public class CustomerView extends JFrame implements Observer {
 						JOptionPane.showMessageDialog(null, "From and to accounts cannot be the same!", "Error",
 								JOptionPane.ERROR_MESSAGE);
 					} else {
-						break;
+						return;
 					}
 				}
 
@@ -920,7 +937,8 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addAccountsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<BankAccount> accounts = customer.getAccounts();
-
+		if(accounts.size()==0)
+			return model;
 		for (BankAccount acc : accounts) {
 			model.addRow(acc.getDetails());
 		}
@@ -931,6 +949,8 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addTransactionsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<Transaction> transactions = customer.getTransactions();
+		if(transactions.size()==0)
+			return model;
 		for (Transaction t : transactions) {
 			model.addRow(t.shortCustomerDisplay());
 		}
@@ -940,6 +960,8 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addLoansToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<Loan> loans = customer.getLoans();
+		if(loans.size()==0)
+			return model;
 		for (Loan l : loans) {
 			model.addRow(l.getShortLoanDisplayForCustomer());
 		}

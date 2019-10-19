@@ -11,10 +11,15 @@ import controller.Bank;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 
@@ -42,8 +47,9 @@ public class Welcome extends JFrame{
 
 	/**
 	 * Create the application.
+	 * @throws IOException 
 	 */
-	public Welcome(Bank bank) {
+	public Welcome(Bank bank) throws IOException {
 		
 		super();
 		this.bank = bank;
@@ -52,11 +58,13 @@ public class Welcome extends JFrame{
 
 	/**
 	 * Initialize the contents of the frame.
+	 * @throws IOException 
 	 */
-	private void initialize() {
+	private void initialize() throws IOException {
 		
 		this.setTitle("My Fancy Bank ATM\r\n");
-		this.setBounds(100, 100, 1400, 800);
+		this.setBounds(100, 100, 1000, 800);
+		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getContentPane().setLayout(new BorderLayout(0, 0));
 		
@@ -93,6 +101,14 @@ public class Welcome extends JFrame{
 			}
 		});
 		panel.add(btnCustomer);
+		
+		JLabel background = new JLabel();
+		ImageIcon icon= new ImageIcon("src/img/bank.jpg");
+		background.setIcon(icon);
+		JPanel panel_1 = new JPanel();
+		background.setBounds(0, 0, 515, 515);
+		panel_1.add(background);
+		getContentPane().add(panel_1, BorderLayout.CENTER);
 	}
 
 }

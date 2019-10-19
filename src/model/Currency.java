@@ -26,7 +26,7 @@ public class Currency {
 	}
 	
 	public double getAmountInCurrency(double amount) {
-		return amount;
+		return amount*reverseRate;
 	}
 	
 	public String getName() {
