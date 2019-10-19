@@ -35,8 +35,8 @@ public class Bank extends Observable {
 		this.withdrawalFee = 2;
 		this.highBalance = 100;
 		this.savingsInterestRate = 0.02;
-		
-		this.currencies=new ArrayList<Currency>();
+
+		this.currencies = new ArrayList<Currency>();
 		currencies.add(new Currency("US Dollars", "USD", 1, 1));
 		currencies.add(new Currency("Indian Rupees", "INR", 0.014, 72.14));
 		currencies.add(new Currency("British Pounds", "GBP", 1.30, 0.77));
@@ -117,16 +117,17 @@ public class Bank extends Observable {
 	public boolean depositForCustomer(BankCustomer customer, String accountName, double amount) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		boolean t = acc.isNewAccount();
-		double fees = acc.getFees("Deposit");
+
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
-	
+
 		if (t) {
-			
 			Transaction transaction = this.addTransaction(customer.getName(), "Bank",
-					"Transaction fees - Account Opening", fees + accountOperationFee, accountName, "My Fancy Bank");
+					"Transaction fees - Account Opening", accountOperationFee, accountName, "My Fancy Bank");
 			this.addTransactionForCustomer(customer, transaction);
-			this.addMoneyEarned(fees);
+			this.addMoneyEarned(accountOperationFee);
+			customer.getAccounts().get(customer.getAccountIndexByName(accountName)).setNewAccount(false);
 		}
+
 		return flag;
 	}
 
@@ -228,18 +229,16 @@ public class Bank extends Observable {
 			}
 		}
 	}
-	
+
 	public void modifyFees(String type, double newFees) {
-		if(type.equals("Account Operation")) {
+		if (type.equals("Account Operation")) {
 			this.setAccountOperationFee(newFees);
-		}
-		else if(type.equals("Checking")) {
+		} else if (type.equals("Checking")) {
 			this.setCheckingTransactionFee(newFees);
-		}
-		else if(type.equals("Withdrawal")) {
+		} else if (type.equals("Withdrawal")) {
 			this.setWithdrawalFee(newFees);
 		}
-		
+
 		this.setSavingsInterestRate(newFees);
 		if (customers.size() == 0)
 			return;
@@ -248,13 +247,11 @@ public class Bank extends Observable {
 			if (accounts.size() == 0)
 				return;
 			for (BankAccount acc : accounts) {
-				if(type.equals("Account Operation")) {
+				if (type.equals("Account Operation")) {
 					acc.setAccountOperationFee(newFees);
-				}
-				else if(type.equals("Checking")) {
+				} else if (type.equals("Checking")) {
 					acc.setTransactionFee(newFees);
-				}
-				else if(type.equals("Withdrawal")) {
+				} else if (type.equals("Withdrawal")) {
 					acc.setWithdrawalFee(newFees);
 				}
 			}

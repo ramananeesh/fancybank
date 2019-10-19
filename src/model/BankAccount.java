@@ -73,7 +73,6 @@ public class BankAccount {
 		double fees = 0;
 		if (isNewAccount) {
 			fees += accountOperationFee;
-			isNewAccount = false;
 		}
 		if (type.equals("Checking"))
 			fees += transactionFee;

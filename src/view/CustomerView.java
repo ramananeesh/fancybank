@@ -63,15 +63,15 @@ public class CustomerView extends JFrame implements Observer {
 		this.bank = bank;
 		this.customer = this.bank.getCustomerByEmail(customer.getEmail());
 		this.bank.addObserver(this);
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setFont(new Font("Segoe UI", Font.PLAIN, 30));
 		setJMenuBar(menuBar);
-		
+
 		JMenu mnOptions = new JMenu("Options");
 		mnOptions.setFont(new Font("Segoe UI", Font.PLAIN, 36));
 		menuBar.add(mnOptions);
-		
+
 		JMenuItem mntmLogout = new JMenuItem("Logout");
 		mntmLogout.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmLogout.addActionListener(new ActionListener() {
@@ -88,15 +88,15 @@ public class CustomerView extends JFrame implements Observer {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 			}
 		});
 		mnOptions.add(mntmLogout);
-		
+
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmExit.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
@@ -399,7 +399,7 @@ public class CustomerView extends JFrame implements Observer {
 
 		currencyFromCombo = new JComboBox();
 		currencyFromCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
-		currencyFromCombo.setPreferredSize(new Dimension(140,40));
+		currencyFromCombo.setPreferredSize(new Dimension(140, 40));
 		currencyFromCombo.setModel(new DefaultComboBoxModel(new String[] { "From" }));
 		ArrayList<Currency> currencies = bank.getCurrencies();
 		for (Currency c : currencies) {
@@ -411,12 +411,12 @@ public class CustomerView extends JFrame implements Observer {
 		currencyConverterField = new JTextField();
 		currencyConverterField.setHorizontalAlignment(SwingConstants.CENTER);
 		currencyConverterField.setFont(new Font("Tahoma", Font.PLAIN, 34));
-		currencyConverterField.setPreferredSize(new Dimension(30,50));
+		currencyConverterField.setPreferredSize(new Dimension(30, 50));
 		panel_1.add(currencyConverterField, BorderLayout.CENTER);
 		currencyConverterField.setColumns(10);
 
 		currencyToCombo = new JComboBox();
-		currencyToCombo.setPreferredSize(new Dimension(140,40));
+		currencyToCombo.setPreferredSize(new Dimension(140, 40));
 		currencyToCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		currencyToCombo.setModel(new DefaultComboBoxModel(new String[] { "To" }));
 		for (Currency c : currencies) {
@@ -430,7 +430,7 @@ public class CustomerView extends JFrame implements Observer {
 		panel_1.add(convertedAmtLbl, BorderLayout.SOUTH);
 
 		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
-		
+
 	}
 
 	public class CurrencyConverterListener implements ActionListener {
@@ -529,7 +529,7 @@ public class CustomerView extends JFrame implements Observer {
 
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Loan Application Window",
 						JOptionPane.OK_CANCEL_OPTION);
-				
+
 				if (reply == JOptionPane.OK_OPTION) {
 					try {
 						UIManager.put("OptionPane.minimumSize", new Dimension(300, 100));
@@ -607,7 +607,7 @@ public class CustomerView extends JFrame implements Observer {
 			Object[] fields = { "Account Name: ", combo, "Currency", currencyCombo, "Amount in USD: $", amountField, };
 			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, title, JOptionPane.OK_CANCEL_OPTION);
-				
+
 				if (reply == JOptionPane.OK_OPTION) {
 					int accountIndex = combo.getSelectedIndex();
 					double inputAmount, amount;
@@ -629,8 +629,10 @@ public class CustomerView extends JFrame implements Observer {
 					}
 
 					if (this.type.equals("Deposit")) {
-						boolean flag = bank.depositForCustomer(customer, combo.getItemAt(accountIndex), amount);
+						boolean f = accounts.get(accountIndex).isNewAccount();
 						double fees = accounts.get(combo.getSelectedIndex()).getFees("Deposit");
+						boolean flag = bank.depositForCustomer(customer, combo.getItemAt(accountIndex), amount);
+
 						if (!flag) {
 							JOptionPane.showMessageDialog(null,
 									"Error processing deposit. Fee exceeds account balance including deposit", "Error",
@@ -641,6 +643,9 @@ public class CustomerView extends JFrame implements Observer {
 								amount, "Self", accounts.get(accountIndex).getAccountName());
 						bank.addTransactionForCustomer(customer, transaction);
 						if (fees != 0) {
+							if (f)
+								fees -= bank.getAccountOperationFee();
+							
 							bank.addMoneyEarned(fees);
 							transaction = bank.addTransaction(customer.getName(), "Bank", "Transaction Fees", fees,
 									accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
@@ -937,7 +942,7 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addAccountsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<BankAccount> accounts = customer.getAccounts();
-		if(accounts.size()==0)
+		if (accounts.size() == 0)
 			return model;
 		for (BankAccount acc : accounts) {
 			model.addRow(acc.getDetails());
@@ -949,7 +954,7 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addTransactionsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<Transaction> transactions = customer.getTransactions();
-		if(transactions.size()==0)
+		if (transactions.size() == 0)
 			return model;
 		for (Transaction t : transactions) {
 			model.addRow(t.shortCustomerDisplay());
@@ -960,7 +965,7 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addLoansToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<Loan> loans = customer.getLoans();
-		if(loans.size()==0)
+		if (loans.size() == 0)
 			return model;
 		for (Loan l : loans) {
 			model.addRow(l.getShortLoanDisplayForCustomer());

@@ -30,7 +30,7 @@ public class Login extends JFrame {
 		super();
 		this.bank = bank;
 		// test purpose
-		this.bank.addCustomer("Aneesh", new Address("","","","",""), "" , "", "test", "1234");
+		//this.bank.addCustomer("Aneesh", new Address("","","","",""), "" , "", "test", "1234");
 		initialize();
 	}
 
