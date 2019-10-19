@@ -22,19 +22,19 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import controller.Bank;
+import controller.BankBranch;
 import model.Address;
 import model.BankCustomer;
 import model.BankManager;
 
 public class ManagerLogin extends JFrame {
 
-	private Bank bank;
+	private BankBranch bank;
 
 	/**
 	 * Create the application.
 	 */
-	public ManagerLogin(Bank bank) {
+	public ManagerLogin(BankBranch bank) {
 		this.bank = bank;
 		int id = BankManager.generateId(this.bank.getManagers());
 		//this.bank.addManager("Manager", Integer.toString(id), "manager", "1111", "1234");

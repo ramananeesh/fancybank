@@ -8,7 +8,7 @@ import java.util.Observer;
 
 import javax.swing.JFrame;
 
-import controller.Bank;
+import controller.BankBranch;
 import model.*;
 import view.CustomerView.TransactionListListener;
 
@@ -42,7 +42,7 @@ import javax.swing.JOptionPane;
 
 public class ManagerView extends JFrame implements Observer {
 
-	private Bank bank;
+	private BankBranch bank;
 	private BankManager manager;
 	private JTable customersTable;
 	private DefaultTableModel customersModel;
@@ -57,7 +57,7 @@ public class ManagerView extends JFrame implements Observer {
 	/**
 	 * Create the application.
 	 */
-	public ManagerView(Bank bank, BankManager manager) {
+	public ManagerView(BankBranch bank, BankManager manager) {
 		this.bank = bank;
 		this.manager = manager;
 		this.bank.addObserver(this);

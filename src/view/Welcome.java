@@ -7,7 +7,7 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import controller.Bank;
+import controller.BankBranch;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -26,7 +26,7 @@ import java.awt.Font;
 public class Welcome extends JFrame{
 
 	private JFrame loginFrame;
-	private Bank bank;
+	private BankBranch bank;
 
 	/**
 	 * Launch the application.
@@ -35,7 +35,7 @@ public class Welcome extends JFrame{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Bank bank = new Bank();
+					BankBranch bank = new BankBranch();
 					Welcome window = new Welcome(bank);
 					window.setVisible(true);
 				} catch (Exception e) {
@@ -49,7 +49,7 @@ public class Welcome extends JFrame{
 	 * Create the application.
 	 * @throws IOException 
 	 */
-	public Welcome(Bank bank) throws IOException {
+	public Welcome(BankBranch bank) throws IOException {
 		
 		super();
 		this.bank = bank;

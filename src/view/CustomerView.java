@@ -27,7 +27,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import controller.Bank;
+import controller.BankBranch;
 import javafx.collections.SetChangeListener;
 
 import java.awt.event.ActionListener;
@@ -36,7 +36,7 @@ import java.awt.event.ActionEvent;
 
 public class CustomerView extends JFrame implements Observer {
 	private BankCustomer customer;
-	private Bank bank;
+	private BankBranch bank;
 
 	private JTable accountsTable;
 	private JTable transactionsTable;
@@ -58,7 +58,7 @@ public class CustomerView extends JFrame implements Observer {
 	/**
 	 * Create the application.
 	 */
-	public CustomerView(Bank bank, BankCustomer customer) {
+	public CustomerView(BankBranch bank, BankCustomer customer) {
 
 		this.bank = bank;
 		this.customer = this.bank.getCustomerByEmail(customer.getEmail());

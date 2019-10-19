@@ -7,7 +7,7 @@ import javax.swing.DefaultListModel;
 
 import model.*;
 
-public class Bank extends Observable {
+public class BankBranch extends Observable {
 
 	private ArrayList<BankManager> managers;
 	private ArrayList<BankCustomer> customers;
@@ -22,7 +22,7 @@ public class Bank extends Observable {
 	private double savingsInterestRate;
 	private ArrayList<Currency> currencies;
 
-	public Bank() {
+	public BankBranch() {
 		super();
 		managers = new ArrayList<BankManager>();
 		customers = new ArrayList<BankCustomer>();

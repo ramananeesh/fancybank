@@ -21,12 +21,12 @@ import java.awt.GridLayout;
 
 public class Login extends JFrame {
 
-	private Bank bank;
+	private BankBranch bank;
 
 	/**
 	 * Create the application.
 	 */
-	public Login(Bank bank) {
+	public Login(BankBranch bank) {
 		super();
 		this.bank = bank;
 		// test purpose
