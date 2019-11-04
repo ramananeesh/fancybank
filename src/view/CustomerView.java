@@ -8,6 +8,7 @@ import java.awt.Dimension;
 
 import javax.swing.border.Border;
 
+import controller.Bank;
 import model.*;
 import model.Currency;
 
@@ -41,15 +42,19 @@ public class CustomerView extends JFrame implements Observer {
 	private JTable accountsTable;
 	private JTable transactionsTable;
 	private JLabel lblCustomerView;
+	private JTable allStocksTable;
 
 	private DefaultTableModel accountsModel;
 	private DefaultTableModel transactionsModel;
 	private DefaultTableModel loansModel;
+	private DefaultTableModel stocksModel;
+	private DefaultTableModel allStocksModel;
 
 	private JLabel accountNameLbl;
 	private JLabel accountBalanceLbl;
 	private JTextArea infoDetailsTextArea;
 	private JTable loansTable;
+	private JTable stocksTable;
 	private JComboBox currencyFromCombo;
 	private JTextField currencyConverterField;
 	private JComboBox currencyToCombo;
@@ -365,6 +370,16 @@ public class CustomerView extends JFrame implements Observer {
 		btnCloseLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnCloseLoan);
 
+		JButton btnBuyStocks = new JButton("Buy Stock");
+		btnBuyStocks.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnBuyStocks);
+		btnBuyStocks.addActionListener(new BuyStockActionListener());
+
+		JButton btnSellStocks = new JButton("Sell Stock");
+		btnSellStocks.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnsPanel.add(btnSellStocks);
+		btnSellStocks.addActionListener(new SellStockActionListener());
+
 		JButton btnCloseAccount = new JButton("Close Account");
 		btnCloseAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		btnsPanel.add(btnCloseAccount);
@@ -384,52 +399,46 @@ public class CustomerView extends JFrame implements Observer {
 		eastPanel.add(moreOptionsPanel, gbc_moreOptionsPanel);
 		moreOptionsPanel.setLayout(new BorderLayout(0, 0));
 
-		JButton btnCurrencyConverter = new JButton("Convert");
-		btnCurrencyConverter.addActionListener(new CurrencyConverterListener());
-		btnCurrencyConverter.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		moreOptionsPanel.add(btnCurrencyConverter, BorderLayout.SOUTH);
+//		JButton btnCurrencyConverter = new JButton("Convert");
+//		btnCurrencyConverter.addActionListener(new CurrencyConverterListener());
+//		btnCurrencyConverter.setFont(new Font("Tahoma", Font.PLAIN, 30));
+//		moreOptionsPanel.add(btnCurrencyConverter, BorderLayout.SOUTH);
 
-		JLabel lblA = new JLabel("Currency Converter");
+//		JLabel lblA = new JLabel("Currency Converter");
+		JLabel lblA = new JLabel("Stocks");
 		lblA.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		lblA.setHorizontalAlignment(SwingConstants.CENTER);
 		moreOptionsPanel.add(lblA, BorderLayout.NORTH);
 
-		JPanel panel_1 = new JPanel();
-		moreOptionsPanel.add(panel_1, BorderLayout.CENTER);
+//		JPanel panel_1 = new JPanel();
+//		moreOptionsPanel.add(panel_1, BorderLayout.CENTER);
+//		JPanel stocksDisplayPanel = new JPanel();
+//		moreOptionsPanel.add(stocksDisplayPanel, BorderLayout.CENTER);
 
-		currencyFromCombo = new JComboBox();
-		currencyFromCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
-		currencyFromCombo.setPreferredSize(new Dimension(140, 40));
-		currencyFromCombo.setModel(new DefaultComboBoxModel(new String[] { "From" }));
-		ArrayList<Currency> currencies = bank.getCurrencies();
-		for (Currency c : currencies) {
-			currencyFromCombo.addItem(c.getName() + " - " + c.getAbbreviation());
-		}
-		panel_1.setLayout(new BorderLayout(0, 0));
-		panel_1.add(currencyFromCombo, BorderLayout.WEST);
+		String stockData[][] = new String[][] {};
+		String stockHeader[] = new String[] {"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks" };
+		stocksModel = new DefaultTableModel(stockData, stockHeader);
+		stocksModel = addStocksToTable(customer, stocksModel);
+		stocksTable = new JTable(stocksModel);
+		stocksTable.getSelectionModel().addListSelectionListener(new StockListListener());
+		stocksTable.setVisible(true);
 
-		currencyConverterField = new JTextField();
-		currencyConverterField.setHorizontalAlignment(SwingConstants.CENTER);
-		currencyConverterField.setFont(new Font("Tahoma", Font.PLAIN, 34));
-		currencyConverterField.setPreferredSize(new Dimension(30, 50));
-		panel_1.add(currencyConverterField, BorderLayout.CENTER);
-		currencyConverterField.setColumns(10);
+		stocksTable.setDefaultRenderer(String.class, centerRenderer);
+		stocksTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 18));
+		JScrollPane stocksScrollPane = new JScrollPane(stocksTable);
+		stocksScrollPane.setPreferredSize(new Dimension(580, 200));
+		stocksTable.setPreferredSize(new Dimension(580, 140));
+		stocksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		stocksTable.setBorder(new EmptyBorder(5, 5, 5, 5));
+		stocksTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
+		stocksTable.setRowHeight(20);
 
-		currencyToCombo = new JComboBox();
-		currencyToCombo.setPreferredSize(new Dimension(140, 40));
-		currencyToCombo.setFont(new Font("Tahoma", Font.PLAIN, 34));
-		currencyToCombo.setModel(new DefaultComboBoxModel(new String[] { "To" }));
-		for (Currency c : currencies) {
-			currencyToCombo.addItem(c.getName() + " - " + c.getAbbreviation());
-		}
-		panel_1.add(currencyToCombo, BorderLayout.EAST);
+		JScrollPane jsStock = new JScrollPane(stocksTable);
+		jsStock.setVisible(true);
+		moreOptionsPanel.add(jsStock);
 
-		convertedAmtLbl = new JLabel("Converted Amount");
-		convertedAmtLbl.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		convertedAmtLbl.setHorizontalAlignment(SwingConstants.CENTER);
-		panel_1.add(convertedAmtLbl, BorderLayout.SOUTH);
-
-		transactionsPanel.setBorder(new LineBorder(Color.black, 3));
+//		stocksDisplayPanel.setPreferredSize(new Dimension(600, 350));
+//		stocksDisplayPanel.add(stocksScrollPane);
 
 	}
 
@@ -568,6 +577,150 @@ public class CustomerView extends JFrame implements Observer {
 
 	}
 
+	public class BuyStockActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (customer.getAccounts().size() == 0) {
+				JOptionPane.showMessageDialog(null, "No Accounts exist for Customer", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			boolean satisfySecure = false;
+			BankAccount currAccount = null;
+			for (int i = 0; i < accounts.size(); i++) {
+				if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > 500) {
+					satisfySecure = true;
+					currAccount = accounts.get(i);
+				}
+			}
+			if(satisfySecure == false){
+				JOptionPane.showMessageDialog(null, "Do not satisfy a secure account", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+			centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+			while(true){
+				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
+				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
+
+				String allStockData[][] = new String[][] {};
+				String allStockHeader[] = new String[] {"Stock Name", "Value", "Total Available"};
+				allStocksModel = new DefaultTableModel(allStockData, allStockHeader);
+				allStocksModel = addAllStocksToTable(allStocksModel);
+				allStocksTable = new JTable(allStocksModel);
+
+				allStocksTable.setDefaultRenderer(String.class, centerRenderer);
+				allStocksTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 18));
+				JScrollPane allStocksScrollPane = new JScrollPane(allStocksTable);
+				allStocksScrollPane.setPreferredSize(new Dimension(580, 200));
+
+				allStocksTable.setPreferredSize(new Dimension(580, 140));
+				allStocksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+				allStocksTable.setBorder(new EmptyBorder(5, 5, 5, 5));
+				allStocksTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
+				allStocksTable.setRowHeight(20);
+				int reply = JOptionPane.showConfirmDialog(null, allStocksScrollPane, "All Stocks", JOptionPane.OK_CANCEL_OPTION);
+				if(reply == JOptionPane.OK_OPTION) {
+					try {
+						JComboBox<String> stocksCombo = new JComboBox<String>();
+						ArrayList<BankStock> allStocks = bank.getAllStocks();
+						for(int i = 0; i < allStocks.size(); i++) {
+							stocksCombo.addItem(allStocks.get(i).getStockName());
+						}
+						JTextField stockIDField = new JTextField();
+						JTextField numStocksField = new JTextField();
+						Object[] fields = {"Stock ID: ", stockIDField, "Stock Name: ", stocksCombo, "Number of Stocks: ", numStocksField, };
+						while(true) {
+							reply = JOptionPane.showConfirmDialog(null, fields, "Buy Stock", JOptionPane.OK_CANCEL_OPTION);
+							if (reply == JOptionPane.OK_OPTION) {
+								int stockIndex = stocksCombo.getSelectedIndex();
+								BankStock stock = allStocks.get(stockIndex);
+								if(stock.getNumStocks() - Integer.valueOf(numStocksField.getText()) <= 0){
+									JOptionPane.showMessageDialog(null,
+											"Stocks not enough", "Error",
+											JOptionPane.ERROR_MESSAGE);
+									return;
+								}
+								double balance = currAccount.getBalance() - Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()) - bank.getBuyStockFee();
+								if(balance < 500){
+									JOptionPane.showMessageDialog(null,
+											"Account too low", "Error",
+											JOptionPane.ERROR_MESSAGE);
+									return;
+								}
+								bank.addMoneyEarned(bank.getBuyStockFee());
+								currAccount.setBalance(balance);
+								bank.addStock(customer, stockIDField.getText(), stock.getStockName(), Double.valueOf(stock.getValue()), Integer.parseInt(numStocksField.getText()));
+								stock.setNumStocks(stock.getNumStocks() - Integer.valueOf(numStocksField.getText()));
+								break;
+							}
+							else{
+								return;
+							}
+						}
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null,
+								"Error", "Error",
+								JOptionPane.ERROR_MESSAGE);
+					}
+					break;
+				}
+				else{
+					return;
+				}
+			}
+		}
+	}
+
+	public class SellStockActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(customer.getStock().size() == 0) {
+				JOptionPane.showMessageDialog(null, "No Stocks to sell", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			BankAccount currAccount = null;
+			for (int i = 0; i < accounts.size(); i++) {
+				if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() >= 500) {
+					currAccount = accounts.get(i);
+					break;
+				}
+			}
+			while(true){
+				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
+				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
+				JComboBox<String> stockCombo = new JComboBox<String>();
+				ArrayList<Stock> stocks = customer.getStock();
+				for(Stock s : stocks){
+					stockCombo.addItem(s.getStockID());
+				}
+
+				Object[] fields = {"Stock Name: ", stockCombo, };
+				while(true) {
+					int reply = JOptionPane.showConfirmDialog(null, fields, "Sell Stock", JOptionPane.OK_CANCEL_OPTION);
+					if (reply == JOptionPane.OK_OPTION) {
+						int stockIndex = stockCombo.getSelectedIndex();
+						try {
+							bank.sellStock(customer, currAccount, stocks.get(stockIndex));
+						} catch (Exception e1) {
+							JOptionPane.showMessageDialog(null, "Error",
+									"Error", JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						break;
+					}
+					else{
+						return;
+					}
+				}
+			}
+		}
+	}
+
 	public class TransactionActionListener implements ActionListener {
 
 		String title;
@@ -645,7 +798,7 @@ public class CustomerView extends JFrame implements Observer {
 						if (fees != 0) {
 							if (f)
 								fees -= bank.getAccountOperationFee();
-							
+
 							bank.addMoneyEarned(fees);
 							transaction = bank.addTransaction(customer.getName(), "Bank", "Transaction Fees", fees,
 									accounts.get(accountIndex).getAccountName(), "My Fancy Bank");
@@ -939,6 +1092,25 @@ public class CustomerView extends JFrame implements Observer {
 
 	}
 
+
+	public class StockListListener implements ListSelectionListener {
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			if(stocksTable.getSelectedRow() == -1){
+				return;
+			}
+			accountsTable.clearSelection();
+			transactionsTable.clearSelection();
+
+			ArrayList<Stock> stocks = customer.getStock();
+			Stock stock = stocks.get(stocksTable.getSelectedRow());
+
+			String info = stock.getDetailedStockDisplayForCustomer();
+			infoDetailsTextArea.setText(info);
+		}
+	}
+
+
 	public DefaultTableModel addAccountsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<BankAccount> accounts = customer.getAccounts();
@@ -973,6 +1145,25 @@ public class CustomerView extends JFrame implements Observer {
 		return model;
 	}
 
+	public DefaultTableModel addStocksToTable(BankCustomer customer, DefaultTableModel model) {
+		customer = this.bank.getCustomerByEmail(customer.getEmail());
+		ArrayList<Stock> stocks = customer.getStock();
+		if(stocks.size() == 0)
+			return model;
+		for(Stock s : stocks) {
+			model.addRow(s.getShortStockDisplayForCustomer());
+		}
+		return model;
+	}
+
+	public DefaultTableModel addAllStocksToTable(DefaultTableModel model) {
+		ArrayList<BankStock> allStocks = this.bank.getAllStocks();
+		for (BankStock s : allStocks) {
+			model.addRow(s.getShortAllStockDisplayForCustomer());
+		}
+		return model;
+	}
+
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub
@@ -994,6 +1185,12 @@ public class CustomerView extends JFrame implements Observer {
 		loansModel = new DefaultTableModel(loansData, loansHeader);
 		loansModel = addLoansToTable(customer, loansModel);
 		loansTable.setModel(loansModel);
+
+		String stockData[][] = new String[][] {};
+		String stockHeader[] = new String[] {"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks"};
+		stocksModel = new DefaultTableModel(stockData, stockHeader);
+		stocksModel = addStocksToTable(customer, stocksModel);
+		stocksTable.setModel(stocksModel);
 
 	}
 

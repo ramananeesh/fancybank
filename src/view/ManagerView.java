@@ -8,6 +8,7 @@ import java.util.Observer;
 
 import javax.swing.JFrame;
 
+import controller.Bank;
 import controller.BankBranch;
 import model.*;
 import view.CustomerView.TransactionListListener;
@@ -50,6 +51,8 @@ public class ManagerView extends JFrame implements Observer {
 	private DefaultTableModel loansModel;
 	private JTable transactionsTable;
 	private DefaultTableModel transactionsModel;
+	private JTable stocksTable;
+	private DefaultTableModel stocksModel;
 	private JTextArea infoDetailsTextArea;
 	private JLabel amountEarnedLbl;
 	private JLabel moneyLbl;
@@ -88,7 +91,7 @@ public class ManagerView extends JFrame implements Observer {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 			}
 		});
 
@@ -153,6 +156,17 @@ public class ManagerView extends JFrame implements Observer {
 		mntmWithdrawalFee.setFont(new Font("Segoe UI", Font.PLAIN, 34));
 		mntmWithdrawalFee.addActionListener(new FeeListener("Withdrawal"));
 		mnActions.add(mntmWithdrawalFee);
+
+		JMenuItem mntmAddStocks = new JMenuItem("Add Stocks");
+		mntmAddStocks.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmAddStocks.addActionListener(new AddStocks());
+		mnActions.add(mntmAddStocks);
+
+		JMenuItem mntmModifyStocks = new JMenuItem("Modify Stocks");
+		mntmModifyStocks.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmModifyStocks.addActionListener(new ModifyStocks());
+		mnActions.add(mntmModifyStocks);
+
 		initialize();
 	}
 
@@ -282,10 +296,15 @@ public class ManagerView extends JFrame implements Observer {
 		eastPanel.setLayout(new BorderLayout(0, 0));
 		eastPanel.setPreferredSize(new Dimension(750, eastPanel.getSize().height));
 
+		JPanel allTransactionPanel = new JPanel();
+		allTransactionPanel.setBorder(new LineBorder(new Color(0, 0, 0), 3));
+		eastPanel.add(allTransactionPanel, BorderLayout.CENTER);
+		allTransactionPanel.setLayout(new BorderLayout(0, 0));
+
 		JLabel lblNewLabel = new JLabel("Today's Transactions");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		eastPanel.add(lblNewLabel, BorderLayout.NORTH);
+		allTransactionPanel.add(lblNewLabel, BorderLayout.NORTH);
 
 		String transactionsData[][] = new String[][] {};
 		String transactionsHeader[] = new String[] { "Customer", "From", "To", "Type", "Amount" };
@@ -303,7 +322,34 @@ public class ManagerView extends JFrame implements Observer {
 		transactionsTable.getSelectionModel().addListSelectionListener(new TransactionListListener());
 		JScrollPane transactionsScrollPane = new JScrollPane(transactionsTable);
 		transactionsScrollPane.setVisible(true);
-		eastPanel.add(transactionsScrollPane, BorderLayout.CENTER);
+		allTransactionPanel.add(transactionsScrollPane);
+
+		JPanel stocksDisplayPanel = new JPanel();
+		stocksDisplayPanel.setBorder(new LineBorder(new Color(0, 0, 0), 3));
+		eastPanel.add(stocksDisplayPanel, BorderLayout.SOUTH);
+		stocksDisplayPanel.setLayout(new BorderLayout(0, 0));
+
+		JLabel lblStocks = new JLabel("Stocks");
+		lblStocks.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		lblStocks.setHorizontalAlignment(SwingConstants.CENTER);
+		stocksDisplayPanel.add(lblStocks, BorderLayout.NORTH);
+
+		String stocksData[][] = new String[][] {};
+		String stocksHeader[] = new String[] {"Stock Name", "Value", "# Stocks"};
+		stocksModel = new DefaultTableModel(stocksData, stocksHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+		stocksModel = addStocksToTable(stocksModel);
+		stocksTable = new JTable(stocksModel);
+		stocksTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
+		stocksTable.getTableHeader().setFont(new Font("Tahoma", Font.PLAIN, 26));
+		stocksTable.setRowHeight(25);
+		stocksTable.getSelectionModel().addListSelectionListener(new StockListListener());
+		JScrollPane stocksScrollPane = new JScrollPane(stocksTable);
+		stocksScrollPane.setVisible(true);
+		stocksDisplayPanel.add(stocksScrollPane, BorderLayout.CENTER);
 
 	}
 
@@ -398,6 +444,17 @@ public class ManagerView extends JFrame implements Observer {
 		}
 		for (Loan l : loans) {
 			model.addRow(l.getShortLoanDisplayForManager());
+		}
+		return model;
+	}
+
+	public DefaultTableModel addStocksToTable(DefaultTableModel model) {
+		ArrayList<BankStock> stocks = bank.getAllStocks();
+		if(stocks.size() == 0) {
+			return model;
+		}
+		for(BankStock s : stocks) {
+			model.addRow(s.getShortAllStockDisplayForManager());
 		}
 		return model;
 	}
@@ -508,6 +565,86 @@ public class ManagerView extends JFrame implements Observer {
 		}
 	}
 
+	public class AddStocks implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JTextField stockNameField = new JTextField();
+			JTextField valueField = new JTextField();
+			JTextField numStocksField = new JTextField();
+
+			Object[] fields = new Object[] {"Stock Name: ", stockNameField, "Value: ", valueField,
+					"Number of Stocks: ", numStocksField, };
+
+			while(true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Add Stock",
+						JOptionPane.OK_CANCEL_OPTION);
+				try{
+					String stockName = stockNameField.getText();
+					double value = Double.parseDouble(valueField.getText());
+					int numStocks = Integer.parseInt(numStocksField.getText());
+
+					if(numStocks <= 0){
+						JOptionPane.showMessageDialog(null, "Number of Stocks has to be more than 0", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+					if(value <= 0) {
+						JOptionPane.showMessageDialog(null, "Stocks value has to be more than 0", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+					bank.addAllStocks(stockName, value, numStocks);
+					break;
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Please enter a valid value", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					continue;
+				}
+			}
+		}
+	}
+
+	public class ModifyStocks implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(bank.getAllStocks().size() == 0){
+				JOptionPane.showMessageDialog(null, "No Stocks", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			JComboBox<String> stockNameCombo = new JComboBox<String>();
+			ArrayList<BankStock> allStocks = bank.getAllStocks();
+			for (int i = 0; i < allStocks.size(); i++) {
+				stockNameCombo.addItem(allStocks.get(i).getStockName());
+			}
+			JTextField valueField = new JTextField();
+			JTextField numStocksField = new JTextField();
+
+			Object[] fields = {"Stock Name: ", stockNameCombo, "Value: ", valueField, "Number of Stocks: ", numStocksField};
+			while(true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Modify Stocks", JOptionPane.OK_CANCEL_OPTION);
+
+				if (reply == JOptionPane.OK_OPTION) {
+					try{
+						int stockIndex = stockNameCombo.getSelectedIndex();
+						double value = Double.parseDouble(valueField.getText());
+						int numStocks = Integer.parseInt(numStocksField.getText());
+						bank.modifyAllStocks(stockIndex, value, numStocks);
+
+						break;
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Error",
+								"Error", JOptionPane.ERROR_MESSAGE);
+						continue;
+					}
+				}
+				else{
+					return;
+				}
+			}
+		}
+	}
+
 	public class CustomerListListener implements ListSelectionListener {
 
 		@Override
@@ -574,6 +711,25 @@ public class ManagerView extends JFrame implements Observer {
 
 	}
 
+	public class StockListListener implements ListSelectionListener {
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			if(stocksTable.getSelectedRow() == -1) {
+				return;
+			}
+
+			customersTable.clearSelection();
+			transactionsTable.clearSelection();
+
+			ArrayList<BankStock> stocks = bank.getAllStocks();
+			BankStock stock = stocks.get(stocksTable.getSelectedRow());
+
+			String info = stock.getDetailedAllStockDisplayForManager();
+			infoDetailsTextArea.setText("");
+			infoDetailsTextArea.setText(info);
+		}
+	}
+
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
@@ -607,6 +763,16 @@ public class ManagerView extends JFrame implements Observer {
 		};
 		loansModel = addLoansToTable(loansModel);
 		loansTable.setModel(loansModel);
+
+		String stocksData[][] = new String[][] {};
+		String stocksHeader[] = new String[] {"Stock Name", "Value", "# Stocks"};
+		stocksModel = new DefaultTableModel(stocksData, stocksHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
+		stocksModel = addStocksToTable(stocksModel);
+		stocksTable.setModel(stocksModel);
 
 		moneyLbl.setText("$"+bank.getMoneyEarned());
 

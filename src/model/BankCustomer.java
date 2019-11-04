@@ -9,19 +9,21 @@ public class BankCustomer extends Customer {
 	private ArrayList<BankAccount> accounts;
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
+	private ArrayList<Stock> stocks;
 	static Random rand = new Random();
 
 	public BankCustomer(String name, String customerId, Address address, String phoneNumber, String ssn, String email,
-			String password) {
+						String password) {
 		super(name, customerId, address, phoneNumber, ssn, email);
 		this.password = password;
 		this.accounts = new ArrayList<BankAccount>();
 		this.transactions = new ArrayList<Transaction>();
 		this.loans = new ArrayList<Loan>();
+		this.stocks = new ArrayList<Stock>();
 	}
 
 	public BankCustomer(String name, String customerId, Address address, String phoneNumber, String ssn, String email,
-			String password, ArrayList<BankAccount> accounts, ArrayList<Transaction> transactions) {
+						String password, ArrayList<BankAccount> accounts, ArrayList<Transaction> transactions) {
 		super(name, customerId, address, phoneNumber, ssn, email);
 		this.password = password;
 		this.accounts = accounts;
@@ -31,12 +33,12 @@ public class BankCustomer extends Customer {
 	public void addAccount(BankAccount newAccount) {
 		this.accounts.add(newAccount);
 	}
-	
+
 	public void closeAccount(String accountName) {
 		int index = this.getAccountIndexByName(accountName);
 		this.accounts.remove(index);
 	}
-	
+
 	public double closeAccountFee(String accountName) {
 		int index = this.getAccountIndexByName(accountName);
 		BankAccount acc = this.accounts.get(index);
@@ -52,12 +54,36 @@ public class BankCustomer extends Customer {
 		this.loans = loans;
 	}
 
+	public ArrayList<Stock> getStock() {
+		return stocks;
+	}
+
+	public void setStocks(ArrayList<Stock> stocks) {
+		this.stocks = stocks;
+	}
+
 	public void addTransaction(Transaction newTransaction) {
 		this.transactions.add(newTransaction);
 	}
-	
+
 	public void addLoan(Loan newLoan) {
 		this.loans.add(newLoan);
+	}
+
+	public void addStock(Stock newStock) {
+		this.stocks.add(newStock);
+	}
+
+	public void sellStock(Stock stock) {
+		this.stocks.remove(stock);
+	}
+
+	public void modifyStock(BankStock newStock){
+		for(Stock s : this.stocks){
+			if(s.getStockName().equals(newStock.getStockName())){
+				s.setCurrentValue(newStock.getValue());
+			}
+		}
 	}
 
 	public BankAccount removeAccount(int accountIndex) {
@@ -97,10 +123,10 @@ public class BankCustomer extends Customer {
 	public boolean transferBetweenAccounts(String fromAccountName, String toAccountName, double amount) {
 		int fromIndex = getAccountIndexByName(fromAccountName);
 		int toIndex = getAccountIndexByName(toAccountName);
-		
+
 		BankAccount fromAccount = this.accounts.get(fromIndex);
 		BankAccount toAccount = this.accounts.get(toIndex);
-		
+
 		boolean flag1 = fromAccount.withdraw(amount);
 		if(!flag1)
 			return false;
@@ -109,33 +135,33 @@ public class BankCustomer extends Customer {
 			fromAccount.setBalance(fromAccount.getBalance()+amount);
 			return false;
 		}
-	
+
 		this.accounts.set(fromIndex, fromAccount);
 		this.accounts.set(toIndex, toAccount);
-		
+
 		return flag1&&flag2;
 	}
-	
+
 	public void closeLoan(String loanId) {
 		int loanIndex = getLoanIndexByLoanId(loanId);
-		
+
 		this.loans.get(loanIndex).close();
 	}
-	
+
 	public int getLoanIndexByLoanId(String loanId) {
-		
+
 		int i=0;
-		
+
 		for(Loan l: loans) {
 			if(l.getLoanId().equals(loanId)) {
-				return i; 
+				return i;
 			}
-			
+
 			i++;
 		}
 		return i;
 	}
-	
+
 	public int getAccountIndexByName(String accountName) {
 		for (int i = 0; i < this.accounts.size(); i++) {
 			if (this.accounts.get(i).getAccountName().equals(accountName))
@@ -159,11 +185,11 @@ public class BankCustomer extends Customer {
 	public void setAccounts(ArrayList<BankAccount> accounts) {
 		this.accounts = accounts;
 	}
-	
+
 	public String[] getDetails() {
 		return new String[] {this.getCustomerId(),this.getName()};
 	}
-	
+
 	public void approveLoan(String loanId) {
 		for(Loan l: loans) {
 			if(l.getLoanId().equals(loanId)) {
@@ -189,7 +215,7 @@ public class BankCustomer extends Customer {
 
 		return c;
 	}
-	
+
 	public static int generateLoanId(ArrayList<Loan> existingLoans) {
 		rand = new Random();
 		int c = 0;
@@ -207,17 +233,17 @@ public class BankCustomer extends Customer {
 
 		return c;
 	}
-	
+
 	public boolean customerHasBalanceInAnyAccount() {
-		
+
 		for(BankAccount acc: accounts) {
 			if(acc.getBalance()>0)
 				return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	public double getMinimumLoanAmount() {
 		double min = loans.get(0).getPayoffAmount();
 		for(Loan l: loans) {
@@ -226,7 +252,7 @@ public class BankCustomer extends Customer {
 		}
 		return min;
 	}
-	
+
 	public double getMaximumAccountBalance() {
 		double max = accounts.get(0).getBalance();
 		for(BankAccount acc: accounts) {
@@ -235,7 +261,7 @@ public class BankCustomer extends Customer {
 		}
 		return max;
 	}
-	
+
 	public String getCustomerDetails() {
 		String ret="";
 		ret+="Customer ID: "+this.getCustomerId()+"\n";

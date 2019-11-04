@@ -13,6 +13,7 @@ public class BankBranch extends Observable {
 	private ArrayList<BankCustomer> customers;
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
+	private ArrayList<BankStock> allStocks;
 	private double moneyEarned;
 	private double accountOperationFee;
 	private double checkingTransactionFee;
@@ -20,6 +21,7 @@ public class BankBranch extends Observable {
 	private double loanInterestRate;
 	private double highBalance;
 	private double savingsInterestRate;
+	private double buyStockFee;
 	private ArrayList<Currency> currencies;
 
 	public BankBranch() {
@@ -28,6 +30,7 @@ public class BankBranch extends Observable {
 		customers = new ArrayList<BankCustomer>();
 		transactions = new ArrayList<Transaction>();
 		loans = new ArrayList<Loan>();
+		allStocks = new ArrayList<BankStock>();
 		this.loanInterestRate = 0.1;
 		this.moneyEarned = 0;
 		this.accountOperationFee = 5;
@@ -35,6 +38,7 @@ public class BankBranch extends Observable {
 		this.withdrawalFee = 2;
 		this.highBalance = 100;
 		this.savingsInterestRate = 0.02;
+		this.buyStockFee = 2;
 
 		this.currencies = new ArrayList<Currency>();
 		currencies.add(new Currency("US Dollars", "USD", 1, 1));
@@ -50,14 +54,14 @@ public class BankBranch extends Observable {
 	}
 
 	public Transaction addTransaction(String fromCustomer, String toCustomer, String type, double amount,
-			String fromAccount, String toAccount) {
+									  String fromAccount, String toAccount) {
 		Transaction newTransaction = new Transaction(fromCustomer, toCustomer, type, amount, fromAccount, toAccount);
 		transactions.add(newTransaction);
 		return newTransaction;
 	}
 
 	public BankCustomer addCustomer(String name, Address address, String phoneNumber, String ssn, String email,
-			String password) {
+									String password) {
 
 		int customerId = BankCustomer.generateCustomerId(customers);
 		BankCustomer newCustomer = new BankCustomer(name, Integer.toString(customerId), address, phoneNumber, ssn,
@@ -74,12 +78,45 @@ public class BankBranch extends Observable {
 	}
 
 	public void addLoan(BankCustomer customer, double loanAmount, double interestRate, int tenure, String collateral,
-			double collateralAmount) {
+						double collateralAmount) {
 		Loan loan = new Loan(customer.getName(), customer.getCustomerId(),
 				Integer.toString(BankCustomer.generateLoanId(customer.getLoans())), loanAmount, interestRate, tenure,
 				collateral, collateralAmount);
 		this.loans.add(loan);
 		this.getCustomerByEmail(customer.getEmail()).addLoan(loan);
+		setChanged();
+		notifyObservers();
+	}
+
+	public void addStock(BankCustomer customer, String stockID, String stockName, double value, int numStocks){
+		customer.addStock(new Stock(stockID, stockName, value, value, numStocks));
+		setChanged();
+		notifyObservers();
+	}
+
+	public void sellStock(BankCustomer customer, BankAccount account, Stock stock){
+		customer.sellStock(stock);
+		double newBalance = account.getBalance() + Double.parseDouble(stock.getCurrentValue()) * Double.parseDouble(stock.getNumStocks());
+		account.setBalance(newBalance);
+		setChanged();
+		notifyObservers();
+	}
+
+	public void addAllStocks(String stockName, double value, int numStocks) {
+		BankStock bankStock = new BankStock(stockName, value, numStocks);
+		this.allStocks.add(bankStock);
+		setChanged();
+		notifyObservers();
+	}
+
+	public void modifyAllStocks(int stockIndex, double value, int numStocks) {
+		BankStock stock = this.allStocks.get(stockIndex);
+		stock.setValue(value);
+		stock.setNumStocks(numStocks);
+
+		for(BankCustomer c: customers){
+			c.modifyStock(stock);
+		}
 		setChanged();
 		notifyObservers();
 	}
@@ -137,7 +174,7 @@ public class BankBranch extends Observable {
 	}
 
 	public boolean transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName,
-			String toAccountName, double amount) {
+													  String toAccountName, double amount) {
 		return this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName,
 				amount);
 	}
@@ -349,6 +386,14 @@ public class BankBranch extends Observable {
 		this.transactions = transactions;
 	}
 
+	public ArrayList<BankStock> getAllStocks() {
+		return allStocks;
+	}
+
+	public void setAllStocks(ArrayList<BankStock> allStocks) {
+		this.allStocks = allStocks;
+	}
+
 	public double getLoanInterestRate() {
 		return loanInterestRate;
 	}
@@ -383,6 +428,14 @@ public class BankBranch extends Observable {
 
 	public void setAccountOperationFee(double accountOperationFee) {
 		this.accountOperationFee = accountOperationFee;
+	}
+
+	public double getBuyStockFee() {
+		return buyStockFee;
+	}
+
+	public void setBuyStockFee(double buyStockFee) {
+		this.buyStockFee = buyStockFee;
 	}
 
 	public double getCheckingTransactionFee() {
