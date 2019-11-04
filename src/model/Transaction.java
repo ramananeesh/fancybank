@@ -2,6 +2,7 @@ package model;
 
 public class Transaction {
 
+	private String id; 
 	private String fromCustomer;
 	private String toCustomer;
 	private String type;
@@ -19,13 +20,26 @@ public class Transaction {
 		this.fromAccount = fromAccount;
 		this.toAccount = toAccount;
 	}
-
-//	public String shortCustomerDisplay() {
-//		return this.fromAccount + " " + this.toAccount + " " + this.type + " "
-//				+ this.amount;
-//	}
-//
 	
+	public Transaction(String id, String fromCustomer, String toCustomer, String type, double amount, String fromAccount,
+			String toAccount) {
+		super();
+		this.fromCustomer = fromCustomer;
+		this.toCustomer = toCustomer;
+		this.type = type;
+		this.amount = amount;
+		this.fromAccount = fromAccount;
+		this.toAccount = toAccount;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String detailedDisplay() {
 		return "Transaction Detail: " + this.type + " of $" + this.amount + " between " + this.fromCustomer
 				+ "'s " + this.fromAccount + " account to " + this.toCustomer + "'s " + this.toAccount + " account\n";

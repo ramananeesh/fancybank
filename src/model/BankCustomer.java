@@ -53,6 +53,7 @@ public class BankCustomer extends Customer {
 	}
 
 	public void addTransaction(Transaction newTransaction) {
+		newTransaction.setId(Integer.toString(this.getTransactions().size()+1));
 		this.transactions.add(newTransaction);
 	}
 	
