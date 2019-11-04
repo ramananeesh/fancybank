@@ -215,4 +215,13 @@ public class Loan {
 				+ isApproved + ", loanStartDate=" + loanStartDate + "]";
 	}
 
+	public String getLoanApprovedStatus() {
+		return loanApprovedStatus;
+	}
+
+	public void setLoanApprovedStatus(String loanApprovedStatus) {
+		this.loanApprovedStatus = loanApprovedStatus;
+	}
+	
+
 }

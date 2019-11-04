@@ -37,7 +37,7 @@ public class ManagerLogin extends JFrame {
 	public ManagerLogin(BankBranch bank) {
 		this.bank = bank;
 		int id = BankManager.generateId(this.bank.getManagers());
-		//this.bank.addManager("Manager", Integer.toString(id), "manager", "1111", "1234");
+		this.bank.addManager("Manager", Integer.toString(id), "manager", "1111", "1234");
 		initialize();
 	}
 

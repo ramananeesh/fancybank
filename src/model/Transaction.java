@@ -77,4 +77,26 @@ public class Transaction {
 				+ fromAccount + "]";
 	}
 
+	public String getFromCustomer() {
+		return fromCustomer;
+	}
+
+	public void setFromCustomer(String fromCustomer) {
+		this.fromCustomer = fromCustomer;
+	}
+
+	public String getToCustomer() {
+		return toCustomer;
+	}
+
+	public void setToCustomer(String toCustomer) {
+		this.toCustomer = toCustomer;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
+	
+	
+
 }
