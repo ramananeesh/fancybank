@@ -41,6 +41,24 @@ public class Read {
 		return rs;
 	}
 
+	public static boolean checkCredentials(String email, String password) {
+		String query = "Select password from customer where email='" + email + "'";
+		ResultSet rs = performRead(query);
+
+		try {
+			while (rs.next()) {
+				String p = rs.getString("password");
+
+				if (!p.equals(password))
+					return false;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+
 	public static BankCustomer getCustomer(String email) {
 		BankCustomer cust = null;
 		String customerId, name, phoneNumber, ssn, password;
@@ -50,10 +68,12 @@ public class Read {
 
 		// get address
 		Address addr = getAddress(customerInfo.get("customerId"));
-		
-		//get Transactions
-		
-		//get Loans
+
+		// get Transactions
+
+		// get Loans
+
+		// get securities
 		return cust;
 	}
 
@@ -85,8 +105,8 @@ public class Read {
 		ResultSet rs = performRead(query);
 		try {
 			while (rs.next()) {
-				address = new Address(rs.getString("houseNumber"), rs.getString("street"),
-						rs.getString("city"), rs.getString("state"), rs.getString("zipcode"));
+				address = new Address(rs.getString("houseNumber"), rs.getString("street"), rs.getString("city"),
+						rs.getString("state"), rs.getString("zipcode"));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -94,11 +114,11 @@ public class Read {
 		}
 		return address;
 	}
-	
+
 	public static ArrayList<Transaction> getTransactions(String customerId) {
-		ArrayList<Transaction> t = null; 
+		ArrayList<Transaction> t = null;
 		String query = "Select id, fromAccount, toAccount, type, fromCustomer, toCustomer, "
-				+ "amount from transaction where customerId='"+customerId+"'";
+				+ "amount from transaction where customerId='" + customerId + "'";
 		ResultSet rs = performRead(query);
 		try {
 			while (rs.next()) {
@@ -107,21 +127,52 @@ public class Read {
 				String toAccount = rs.getString("toAccount");
 				String type = rs.getString("type");
 				String fromCustomer = rs.getString("fromCustomer");
-				String toCustomer=  rs.getString("toCustomer");
-				String amount= rs.getString("amount");
-				t.add(new Transaction(id, fromCustomer, toCustomer, type, Double.parseDouble(amount),fromAccount, toAccount));
+				String toCustomer = rs.getString("toCustomer");
+				String amount = rs.getString("amount");
+				t.add(new Transaction(id, fromCustomer, toCustomer, type, Double.parseDouble(amount), fromAccount,
+						toAccount));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return t; 
+		return t;
 	}
-	
-	public static ArrayList<Loan> getLoans(String customerId){
+
+	public static ArrayList<Loan> getLoans(String customerId) {
 		ArrayList<Loan> loans = null;
-		
+		String query = "select loanid, customerid, customername, " + "loanamount, interestrate, tenure, isactive,"
+				+ "isapproved, startdate, collateral, collateralamount" + "from loan where customerid='" + customerId
+				+ "'";
+
+		ResultSet rs = performRead(query);
+
+		try {
+			while (rs.next()) {
+				String loanId = rs.getString("loanId");
+				String customerName = rs.getString("customerName");
+				double loanAmount = Double.parseDouble(rs.getString("loanAmount"));
+				double interestRate = Double.parseDouble(rs.getString("interestRate"));
+				int tenure = Integer.parseInt(rs.getString("tenure"));
+				boolean isActive = Boolean.parseBoolean(rs.getString("isActive"));
+				boolean isApproved = Boolean.parseBoolean(rs.getString("isApproved"));
+				Date startDate = getDateFromString(rs.getString("startDate"));
+				String collateral = rs.getString("collateral");
+				double collateralAmount = Double.parseDouble(rs.getString("collateralAmount"));
+				loans.add(new Loan(loanId, customerName, customerId, loanAmount, interestRate, tenure, isActive,
+						isApproved, startDate, collateral, collateralAmount));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return loans;
+	}
+
+	public static Date getDateFromString(String date) {
+		String[] x = date.split("/");
+
+		return new Date(Integer.parseInt(x[0]), Integer.parseInt(x[1]), Integer.parseInt(x[2]));
 	}
 
 	public static void main(String[] args) {

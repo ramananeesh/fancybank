@@ -35,7 +35,7 @@ public class Loan {
 		this.loanStartDate = new Date();
 	}
 
-	public Loan(String loanId, String customerName, String customerId, double loanAmount, float interestRate,
+	public Loan(String loanId, String customerName, String customerId, double loanAmount, double interestRate,
 			int tenure, boolean isActive, boolean isApproved, Date loanStartDate, String collateral,
 			double collateralAmount) {
 		super();
