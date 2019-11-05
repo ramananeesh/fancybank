@@ -139,8 +139,10 @@ public class Read {
 				double accountOperationFee = Double.parseDouble(rs.getString("accountOperationFee"));
 				double transactionFee = Double.parseDouble(rs.getString("transactionFee"));
 				boolean isNewAccount = Boolean.parseBoolean(rs.getString("isNewAccount"));
+				double tradingThreshold = Double.parseDouble(rs.getString("tradingThreshold"));
+				double tradingFee = Double.parseDouble(rs.getString("tradingFee"));
 				accounts.add(new BankAccount(name, accountType, balance, rate, withdrawalFee, transactionFee,
-						accountOperationFee, isNewAccount));
+						accountOperationFee, isNewAccount,tradingThreshold,tradingFee));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
