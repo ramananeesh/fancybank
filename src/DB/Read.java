@@ -77,7 +77,9 @@ public class Read {
 		// get Loans
 		ArrayList<Loan> l = getLoans(customerId);
 
-		// get securities
+		// get securities/stocks
+		ArrayList<CustomerStock> stocks = getCustomerStocks(customerId);
+		accounts = matchStocksWithAccounts(accounts, stocks);
 
 		cust = new BankCustomer(customerInfo.get("name"), customerInfo.get("customerId"), addr,
 				customerInfo.get("phoneNumber"), customerInfo.get("ssn"), customerInfo.get("email"),
@@ -107,7 +109,7 @@ public class Read {
 	}
 
 	public static Address getAddress(String customerId) {
-		Address address = new Address("","","","","");
+		Address address = new Address("", "", "", "", "");
 		String query = "Select houseNumber, street, city, state, zipcode " + "from address where customerId='"
 				+ customerId + "'";
 		ResultSet rs = performRead(query);
@@ -142,7 +144,7 @@ public class Read {
 				double tradingThreshold = Double.parseDouble(rs.getString("tradingThreshold"));
 				double tradingFee = Double.parseDouble(rs.getString("tradingFee"));
 				accounts.add(new BankAccount(name, accountType, balance, rate, withdrawalFee, transactionFee,
-						accountOperationFee, isNewAccount,tradingThreshold,tradingFee));
+						accountOperationFee, isNewAccount, tradingThreshold, tradingFee));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -177,9 +179,10 @@ public class Read {
 
 	public static ArrayList<Loan> getLoans(String customerId) {
 		ArrayList<Loan> loans = new ArrayList<Loan>();
-		String query = "Select 'loanId', 'customerId', 'customerName', " + "'loanAmount', 'interestRate', 'tenure', 'isActive',"
-				+ "'isApproved', 'startDate', 'collateral', 'collateralAmount'" + "from loan where customerId='" + customerId
-				+ "'";
+		String query = "Select 'loanId', 'customerId', 'customerName', "
+				+ "'loanAmount', 'interestRate', 'tenure', 'isActive',"
+				+ "'isApproved', 'startDate', 'collateral', 'collateralAmount'" + "from loan where customerId='"
+				+ customerId + "'";
 
 		ResultSet rs = performRead(query);
 
@@ -203,6 +206,42 @@ public class Read {
 			e.printStackTrace();
 		}
 		return loans;
+	}
+
+	public static ArrayList<CustomerStock> getCustomerStocks(String customerId) {
+		ArrayList<CustomerStock> stocks = new ArrayList<CustomerStock>();
+		String query = "Select stockId, stockName, buyingValue, currentValue,"
+				+ "numstocks from customerStock where customerId='" + customerId + "'";
+		ResultSet rs = performRead(query);
+
+		try {
+			while (rs.next()) {
+				String stockId = rs.getString("stockId");
+				String stockName = rs.getString("stockName");
+				double buyingValue = Double.parseDouble(rs.getString("buyingValue"));
+				double currentValue = Double.parseDouble(rs.getString("currentValue"));
+				int numStocks = Integer.parseInt(rs.getString("numStocks"));
+				String accountName = rs.getString("accountName");
+				stocks.add(new CustomerStock(stockId, stockName, buyingValue, currentValue, numStocks, accountName));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return stocks;
+	}
+
+	public static ArrayList<BankAccount> matchStocksWithAccounts(ArrayList<BankAccount> accounts,
+			ArrayList<CustomerStock> stocks) {
+		for (CustomerStock stock : stocks) {
+			for (BankAccount acc : accounts) {
+				if (stock.getAccountName().equals(acc.getAccountName())) {
+					acc.addStock(stock);
+				}
+			}
+		}
+
+		return accounts;
 	}
 
 	public static Date getDateFromString(String date) {

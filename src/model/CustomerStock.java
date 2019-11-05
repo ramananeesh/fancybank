@@ -6,15 +6,17 @@ public class CustomerStock {
     private double buyingValue;
     private double currentValue;
     private int numStocks;
+    private String accountName; 
 
     public CustomerStock(String stockID, String stockName, double buyingValue,
-                 double currentValue, int numStocks) {
+                 double currentValue, int numStocks, String accountName) {
         super();
         this.stockID = stockID;
         this.stockName = stockName;
         this.buyingValue = buyingValue;
         this.currentValue = currentValue;
         this.numStocks = numStocks;
+        this.accountName = accountName; 
     }
 
     public String getStockID(){
@@ -85,5 +87,14 @@ public class CustomerStock {
         return "Stock [stockID=" + stockID + "stockName=" + stockName + ", buyingValue=" + buyingValue
                 + ", currentValue=" + currentValue + ", numStocks=" + numStocks + "]";
     }
+
+	public String getAccountName() {
+		return accountName;
+	}
+
+	public void setAccountName(String accountName) {
+		this.accountName = accountName;
+	}
+    
 }
 
