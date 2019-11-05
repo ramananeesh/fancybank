@@ -116,7 +116,10 @@ public class BankBranch extends Observable {
 		stock.setNumStocks(numStocks);
 
 		for(BankCustomer c: customers){
-			c.modifyStock(stock);
+			ArrayList<BankAccount> accounts = c.getAccounts();
+			for(BankAccount acc: accounts) {
+				acc.modifyStock(stock);
+			}
 		}
 		setChanged();
 		notifyObservers();
