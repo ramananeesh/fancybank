@@ -107,7 +107,7 @@ public class Read {
 	}
 
 	public static Address getAddress(String customerId) {
-		Address address = null;
+		Address address = new Address("","","","","");
 		String query = "Select houseNumber, street, city, state, zipcode " + "from address where customerId='"
 				+ customerId + "'";
 		ResultSet rs = performRead(query);
@@ -124,7 +124,7 @@ public class Read {
 	}
 
 	public static ArrayList<BankAccount> getAccounts(String customerId) {
-		ArrayList<BankAccount> accounts = null;
+		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 		String query = "select accountName, accountType, balance, rate, "
 				+ "withdrawalFee, accountOperationFee, transactionFee,"
 				+ "isNewAccount from bankaccount where customerId='" + customerId + "'";
@@ -150,7 +150,7 @@ public class Read {
 	}
 
 	public static ArrayList<Transaction> getTransactions(String customerId) {
-		ArrayList<Transaction> t = null;
+		ArrayList<Transaction> t = new ArrayList<Transaction>();
 		String query = "Select id, fromAccount, toAccount, type, fromCustomer, toCustomer, "
 				+ "amount from transaction where customerId='" + customerId + "'";
 		ResultSet rs = performRead(query);
@@ -174,9 +174,9 @@ public class Read {
 	}
 
 	public static ArrayList<Loan> getLoans(String customerId) {
-		ArrayList<Loan> loans = null;
-		String query = "select loanid, customerid, customername, " + "loanamount, interestrate, tenure, isactive,"
-				+ "isapproved, startdate, collateral, collateralamount" + "from loan where customerid='" + customerId
+		ArrayList<Loan> loans = new ArrayList<Loan>();
+		String query = "Select 'loanId', 'customerId', 'customerName', " + "'loanAmount', 'interestRate', 'tenure', 'isActive',"
+				+ "'isApproved', 'startDate', 'collateral', 'collateralAmount'" + "from loan where customerId='" + customerId
 				+ "'";
 
 		ResultSet rs = performRead(query);
@@ -211,7 +211,7 @@ public class Read {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		getCustomerInfo("test");
+		getCustomer("test");
 	}
 
 }
