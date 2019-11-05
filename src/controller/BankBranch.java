@@ -23,6 +23,7 @@ public class BankBranch extends Observable {
 	private double savingsInterestRate;
 	private double buyStockFee;
 	private ArrayList<Currency> currencies;
+	private double tradeThreshold; 
 
 	public BankBranch() {
 		super();
@@ -72,7 +73,7 @@ public class BankBranch extends Observable {
 
 	public void addAccount(BankCustomer customer, String accountName, String accountType) {
 		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType,
-				loanInterestRate, withdrawalFee, checkingTransactionFee, accountOperationFee));
+				loanInterestRate, withdrawalFee, checkingTransactionFee, accountOperationFee, tradeThreshold, buyStockFee));
 		setChanged();
 		notifyObservers();
 	}
@@ -88,14 +89,16 @@ public class BankBranch extends Observable {
 		notifyObservers();
 	}
 
-	public void addStock(BankCustomer customer, String stockID, String stockName, double value, int numStocks){
-		customer.addStock(new CustomerStock(stockID, stockName, value, value, numStocks));
+	public void addStock(BankCustomer customer, String accountName, String stockID, String stockName, double value, int numStocks){
+		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
+		acc.addStock(new CustomerStock(stockID, stockName, value, value, numStocks));
 		setChanged();
 		notifyObservers();
 	}
 
-	public void sellStock(BankCustomer customer, CustomerStock stock){
-		customer.sellStock(stock);
+	public void sellStock(BankCustomer customer, String accountName, CustomerStock stock){
+		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
+		acc.sellStock(stock);
 		setChanged();
 		notifyObservers();
 	}
@@ -476,6 +479,14 @@ public class BankBranch extends Observable {
 
 	public void setCurrencies(ArrayList<Currency> currencies) {
 		this.currencies = currencies;
+	}
+
+	public double getTradeThreshold() {
+		return tradeThreshold;
+	}
+
+	public void setTradeThreshold(double tradeThreshold) {
+		this.tradeThreshold = tradeThreshold;
 	}
 
 }

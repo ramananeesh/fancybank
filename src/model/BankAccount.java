@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+
 public class BankAccount {
 
 	private String accountName;
@@ -10,9 +12,13 @@ public class BankAccount {
 	private double accountOperationFee;
 	private double transactionFee;
 	private boolean isNewAccount;
-
+	private ArrayList<CustomerStock> stocks;
+	private boolean isTradable; 
+	private double tradeThreshold; 
+	private double tradingFee; 
+	
 	public BankAccount(String name, String type, double rate, double withdrawalFee, double transactionFee,
-			double accountOperationFee) {
+			double accountOperationFee, double tradeThreshold, double tradingFee) {
 		super();
 		this.accountName = name;
 		this.type = type;
@@ -22,10 +28,13 @@ public class BankAccount {
 		this.transactionFee = transactionFee;
 		this.accountOperationFee = accountOperationFee;
 		this.isNewAccount = true;
+		this.isTradable = false;
+		this.tradeThreshold = tradeThreshold;
+		this.tradingFee = tradingFee;
 	}
 
 	public BankAccount(String name, String type, double balance, double rate, double withdrawalFee, double transactionFee,
-			double accountOperationFee, boolean isNewAccount) {
+			double accountOperationFee, boolean isNewAccount, double tradeThreshold, double tradingFee) {
 		super();
 		this.accountName = name;
 		this.type = type;
@@ -35,9 +44,14 @@ public class BankAccount {
 		this.transactionFee = transactionFee;
 		this.accountOperationFee = accountOperationFee;
 		this.isNewAccount = isNewAccount; 
+		this.isTradable = determineTradability();
+		this.tradeThreshold = tradeThreshold;
+		this.tradingFee = tradingFee;
 	}
 
-	
+	public boolean determineTradability() {
+		return this.balance > this.tradeThreshold;
+	}
 	public BankAccount(String name, String type, double balance, double rate, double fee) {
 		super();
 		this.accountName = name;
@@ -53,6 +67,18 @@ public class BankAccount {
 
 	public void setAccountOperationFee(double accountOperationFee) {
 		this.accountOperationFee = accountOperationFee;
+	}
+
+	public boolean isTradable() {
+		return isTradable;
+	}
+
+	public void setTradable(boolean isTradable) {
+		this.isTradable = isTradable;
+	}
+
+	public ArrayList<CustomerStock> getStocks() {
+		return stocks;
 	}
 
 	public double getTransactionFee() {
@@ -167,5 +193,29 @@ public class BankAccount {
 
 	public String toString(double args) {
 		return "\t\tAccount Type: " + type + "\n\t\tBalance: " + balance + "\n";
+	}
+	
+	public void addStock(CustomerStock newStock) {
+		this.stocks.add(newStock);
+	}
+
+	public void sellStock(CustomerStock stock) {
+		this.stocks.remove(stock);
+	}
+	
+	public void modifyStock(BankStock newStock) {
+		for (CustomerStock s : this.stocks) {
+			if (s.getStockName().equals(newStock.getStockName())) {
+				s.setCurrentValue(newStock.getValue());
+			}
+		}
+	}
+	
+	public ArrayList<CustomerStock> getStock() {
+		return stocks;
+	}
+
+	public void setStocks(ArrayList<CustomerStock> stocks) {
+		this.stocks = stocks;
 	}
 }
