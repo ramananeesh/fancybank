@@ -218,4 +218,21 @@ public class BankAccount {
 	public void setStocks(ArrayList<CustomerStock> stocks) {
 		this.stocks = stocks;
 	}
+
+	public double getTradeThreshold() {
+		return tradeThreshold;
+	}
+
+	public void setTradeThreshold(double tradeThreshold) {
+		this.tradeThreshold = tradeThreshold;
+	}
+
+	public double getTradingFee() {
+		return tradingFee;
+	}
+
+	public void setTradingFee(double tradingFee) {
+		this.tradingFee = tradingFee;
+	}
+	
 }
