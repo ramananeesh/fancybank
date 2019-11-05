@@ -156,7 +156,13 @@ public class Read {
 	public static ArrayList<Transaction> getTransactions(String customerId) {
 		ArrayList<Transaction> t = new ArrayList<Transaction>();
 		String query = "Select id, fromAccount, toAccount, type, fromCustomer, toCustomer, "
-				+ "amount from transaction where customerId='" + customerId + "'";
+				+ "amount from transaction";
+		
+		// customerId = manager when manager is querying
+		if (!customerId.equals("manager")) {
+			query += " where customerId='" + customerId + "'";
+		}
+		
 		ResultSet rs = performRead(query);
 		try {
 			while (rs.next()) {
@@ -179,10 +185,15 @@ public class Read {
 
 	public static ArrayList<Loan> getLoans(String customerId) {
 		ArrayList<Loan> loans = new ArrayList<Loan>();
+
 		String query = "Select 'loanId', 'customerId', 'customerName', "
 				+ "'loanAmount', 'interestRate', 'tenure', 'isActive',"
-				+ "'isApproved', 'startDate', 'collateral', 'collateralAmount'" + "from loan where customerId='"
-				+ customerId + "'";
+				+ "'isApproved', 'startDate', 'collateral', 'collateralAmount'" + "from loan";
+
+		// customerId = manager when manager is querying
+		if (!customerId.equals("manager")) {
+			query += " where customerId='" + customerId + "'";
+		}
 
 		ResultSet rs = performRead(query);
 
@@ -242,6 +253,26 @@ public class Read {
 		}
 
 		return accounts;
+	}
+	
+	public static ArrayList<BankStock> getBankStocks(){
+		ArrayList<BankStock> stocks = new ArrayList<BankStock>();
+		String query = "Select stockName, value, numberOfStocks from bankStock";
+		ResultSet rs = performRead(query);
+		
+		try {
+			while(rs.next()) {
+				String stockName = rs.getString("stockName");
+				double value = Double.parseDouble(rs.getString("value"));
+				int numberOfStocks = Integer.parseInt(rs.getString("numberOfStocks"));
+				
+				stocks.add(new BankStock(stockName, value, numberOfStocks));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return stocks;
 	}
 
 	public static Date getDateFromString(String date) {
