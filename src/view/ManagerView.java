@@ -167,6 +167,11 @@ public class ManagerView extends JFrame implements Observer {
 		mntmModifyStocks.addActionListener(new ModifyStocks());
 		mnActions.add(mntmModifyStocks);
 
+		JMenuItem mntmBuyStockFee = new JMenuItem("Buy Stock Fee");
+		mntmBuyStockFee.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmBuyStockFee.addActionListener(new FeeListener("BuyStock"));
+		mnActions.add(mntmBuyStockFee);
+
 		initialize();
 	}
 

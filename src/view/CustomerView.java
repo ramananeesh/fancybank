@@ -654,6 +654,15 @@ public class CustomerView extends JFrame implements Observer {
 								currAccount.setBalance(balance);
 								bank.addStock(customer, stockIDField.getText(), stock.getStockName(), Double.valueOf(stock.getValue()), Integer.parseInt(numStocksField.getText()));
 								stock.setNumStocks(stock.getNumStocks() - Integer.valueOf(numStocksField.getText()));
+								Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Buy Stock",
+										Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()), "Savings", "Secure");
+								bank.addTransactionForCustomer(customer, transaction);
+								double fees = bank.getBuyStockFee();
+								if (fees != 0) {
+									transaction = bank.addTransaction(customer.getName(), "Bank", "Buy Stock Fees", fees,
+											currAccount.getAccountName(), "My Fancy Bank");
+									bank.addTransactionForCustomer(customer, transaction);
+								}
 								break;
 							}
 							else{
@@ -683,13 +692,6 @@ public class CustomerView extends JFrame implements Observer {
 				return;
 			}
 			ArrayList<BankAccount> accounts = customer.getAccounts();
-			BankAccount currAccount = null;
-			for (int i = 0; i < accounts.size(); i++) {
-				if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() >= 500) {
-					currAccount = accounts.get(i);
-					break;
-				}
-			}
 			while(true){
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
 				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
@@ -705,7 +707,16 @@ public class CustomerView extends JFrame implements Observer {
 					if (reply == JOptionPane.OK_OPTION) {
 						int stockIndex = stockCombo.getSelectedIndex();
 						try {
-							bank.sellStock(customer, currAccount, stocks.get(stockIndex));
+							Stock currStock = stocks.get(stockIndex);
+							bank.sellStock(customer, currStock);
+							double amount = Double.parseDouble(currStock.getCurrentValue())*Integer.parseInt(currStock.getNumStocks());
+							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Sell Stock",
+									 amount, "Secure", "Withdraw");
+							bank.addTransactionForCustomer(customer, transaction);
+							JOptionPane.showMessageDialog(null,
+									"You have withdrawn $" + amount + ". You can select an account to deposit.", "Sell Stock",
+									JOptionPane.OK_OPTION);
+
 						} catch (Exception e1) {
 							JOptionPane.showMessageDialog(null, "Error",
 									"Error", JOptionPane.ERROR_MESSAGE);

@@ -94,10 +94,8 @@ public class BankBranch extends Observable {
 		notifyObservers();
 	}
 
-	public void sellStock(BankCustomer customer, BankAccount account, Stock stock){
+	public void sellStock(BankCustomer customer, Stock stock){
 		customer.sellStock(stock);
-		double newBalance = account.getBalance() + Double.parseDouble(stock.getCurrentValue()) * Double.parseDouble(stock.getNumStocks());
-		account.setBalance(newBalance);
 		setChanged();
 		notifyObservers();
 	}
@@ -274,6 +272,8 @@ public class BankBranch extends Observable {
 			this.setCheckingTransactionFee(newFees);
 		} else if (type.equals("Withdrawal")) {
 			this.setWithdrawalFee(newFees);
+		} else if (type.equals("BuyStock")) {
+			this.setBuyStockFee(newFees);
 		}
 
 		this.setSavingsInterestRate(newFees);
