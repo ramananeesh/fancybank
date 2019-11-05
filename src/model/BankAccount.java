@@ -24,6 +24,20 @@ public class BankAccount {
 		this.isNewAccount = true;
 	}
 
+	public BankAccount(String name, String type, double balance, double rate, double withdrawalFee, double transactionFee,
+			double accountOperationFee, boolean isNewAccount) {
+		super();
+		this.accountName = name;
+		this.type = type;
+		this.rate = rate;
+		this.balance = balance;
+		this.withdrawalFee = withdrawalFee;
+		this.transactionFee = transactionFee;
+		this.accountOperationFee = accountOperationFee;
+		this.isNewAccount = isNewAccount; 
+	}
+
+	
 	public BankAccount(String name, String type, double balance, double rate, double fee) {
 		super();
 		this.accountName = name;

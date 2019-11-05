@@ -61,19 +61,27 @@ public class Read {
 
 	public static BankCustomer getCustomer(String email) {
 		BankCustomer cust = null;
-		String customerId, name, phoneNumber, ssn, password;
 
 		// get customer info
 		HashMap<String, String> customerInfo = getCustomerInfo(email);
-
+		String customerId = customerInfo.get("customerId");
 		// get address
-		Address addr = getAddress(customerInfo.get("customerId"));
+		Address addr = getAddress(customerId);
+
+		// get accounts
+		ArrayList<BankAccount> accounts = getAccounts(customerId);
 
 		// get Transactions
+		ArrayList<Transaction> t = getTransactions(customerId);
 
 		// get Loans
+		ArrayList<Loan> l = getLoans(customerId);
 
 		// get securities
+
+		cust = new BankCustomer(customerInfo.get("name"), customerInfo.get("customerId"), addr,
+				customerInfo.get("phoneNumber"), customerInfo.get("ssn"), customerInfo.get("email"),
+				customerInfo.get("password"), accounts, t, l);
 		return cust;
 	}
 
@@ -113,6 +121,32 @@ public class Read {
 			e.printStackTrace();
 		}
 		return address;
+	}
+
+	public static ArrayList<BankAccount> getAccounts(String customerId) {
+		ArrayList<BankAccount> accounts = null;
+		String query = "select accountName, accountType, balance, rate, "
+				+ "withdrawalFee, accountOperationFee, transactionFee,"
+				+ "isNewAccount from bankaccount where customerId='" + customerId + "'";
+		ResultSet rs = performRead(query);
+		try {
+			while (rs.next()) {
+				String name = rs.getString("accountName");
+				String accountType = rs.getString("accountType");
+				double balance = Double.parseDouble(rs.getString("balance"));
+				double rate = Double.parseDouble(rs.getString("rate"));
+				double withdrawalFee = Double.parseDouble(rs.getString("withdrawalFee"));
+				double accountOperationFee = Double.parseDouble(rs.getString("accountOperationFee"));
+				double transactionFee = Double.parseDouble(rs.getString("transactionFee"));
+				boolean isNewAccount = Boolean.parseBoolean(rs.getString("isNewAccount"));
+				accounts.add(new BankAccount(name, accountType, balance, rate, withdrawalFee, transactionFee,
+						accountOperationFee, isNewAccount));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return accounts;
 	}
 
 	public static ArrayList<Transaction> getTransactions(String customerId) {
