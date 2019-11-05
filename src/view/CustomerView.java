@@ -696,8 +696,8 @@ public class CustomerView extends JFrame implements Observer {
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
 				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
 				JComboBox<String> stockCombo = new JComboBox<String>();
-				ArrayList<Stock> stocks = customer.getStock();
-				for(Stock s : stocks){
+				ArrayList<CustomerStock> stocks = customer.getStock();
+				for(CustomerStock s : stocks){
 					stockCombo.addItem(s.getStockID());
 				}
 
@@ -707,7 +707,7 @@ public class CustomerView extends JFrame implements Observer {
 					if (reply == JOptionPane.OK_OPTION) {
 						int stockIndex = stockCombo.getSelectedIndex();
 						try {
-							Stock currStock = stocks.get(stockIndex);
+							CustomerStock currStock = stocks.get(stockIndex);
 							bank.sellStock(customer, currStock);
 							double amount = Double.parseDouble(currStock.getCurrentValue())*Integer.parseInt(currStock.getNumStocks());
 							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Sell Stock",
@@ -1113,8 +1113,8 @@ public class CustomerView extends JFrame implements Observer {
 			accountsTable.clearSelection();
 			transactionsTable.clearSelection();
 
-			ArrayList<Stock> stocks = customer.getStock();
-			Stock stock = stocks.get(stocksTable.getSelectedRow());
+			ArrayList<CustomerStock> stocks = customer.getStock();
+			CustomerStock stock = stocks.get(stocksTable.getSelectedRow());
 
 			String info = stock.getDetailedStockDisplayForCustomer();
 			infoDetailsTextArea.setText(info);
@@ -1158,10 +1158,10 @@ public class CustomerView extends JFrame implements Observer {
 
 	public DefaultTableModel addStocksToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
-		ArrayList<Stock> stocks = customer.getStock();
+		ArrayList<CustomerStock> stocks = customer.getStock();
 		if(stocks.size() == 0)
 			return model;
-		for(Stock s : stocks) {
+		for(CustomerStock s : stocks) {
 			model.addRow(s.getShortStockDisplayForCustomer());
 		}
 		return model;

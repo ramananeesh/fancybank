@@ -1,13 +1,13 @@
 package model;
 
-public class Stock {
+public class CustomerStock {
     private String stockID;
     private String stockName;
     private double buyingValue;
     private double currentValue;
     private int numStocks;
 
-    public Stock(String stockID, String stockName, double buyingValue,
+    public CustomerStock(String stockID, String stockName, double buyingValue,
                  double currentValue, int numStocks) {
         super();
         this.stockID = stockID;

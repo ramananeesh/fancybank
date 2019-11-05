@@ -10,7 +10,7 @@ public class BankCustomer extends Customer {
 	private ArrayList<BankAccount> accounts;
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
-	private ArrayList<Stock> stocks;
+	private ArrayList<CustomerStock> stocks;
 	static Random rand = new Random();
 
 	public BankCustomer(String name, String customerId, Address address, String phoneNumber, String ssn, String email,
@@ -20,7 +20,7 @@ public class BankCustomer extends Customer {
 		this.accounts = new ArrayList<BankAccount>();
 		this.transactions = new ArrayList<Transaction>();
 		this.loans = new ArrayList<Loan>();
-		this.stocks = new ArrayList<Stock>();
+		this.stocks = new ArrayList<CustomerStock>();
 	}
 
 	public BankCustomer(String name, String customerId, Address address, String phoneNumber, String ssn, String email,
@@ -64,11 +64,11 @@ public class BankCustomer extends Customer {
 		this.loans = loans;
 	}
 
-	public ArrayList<Stock> getStock() {
+	public ArrayList<CustomerStock> getStock() {
 		return stocks;
 	}
 
-	public void setStocks(ArrayList<Stock> stocks) {
+	public void setStocks(ArrayList<CustomerStock> stocks) {
 		this.stocks = stocks;
 	}
 
@@ -81,16 +81,16 @@ public class BankCustomer extends Customer {
 		this.loans.add(newLoan);
 	}
 
-	public void addStock(Stock newStock) {
+	public void addStock(CustomerStock newStock) {
 		this.stocks.add(newStock);
 	}
 
-	public void sellStock(Stock stock) {
+	public void sellStock(CustomerStock stock) {
 		this.stocks.remove(stock);
 	}
 
 	public void modifyStock(BankStock newStock) {
-		for (Stock s : this.stocks) {
+		for (CustomerStock s : this.stocks) {
 			if (s.getStockName().equals(newStock.getStockName())) {
 				s.setCurrentValue(newStock.getValue());
 			}

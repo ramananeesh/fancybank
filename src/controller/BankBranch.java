@@ -89,12 +89,12 @@ public class BankBranch extends Observable {
 	}
 
 	public void addStock(BankCustomer customer, String stockID, String stockName, double value, int numStocks){
-		customer.addStock(new Stock(stockID, stockName, value, value, numStocks));
+		customer.addStock(new CustomerStock(stockID, stockName, value, value, numStocks));
 		setChanged();
 		notifyObservers();
 	}
 
-	public void sellStock(BankCustomer customer, Stock stock){
+	public void sellStock(BankCustomer customer, CustomerStock stock){
 		customer.sellStock(stock);
 		setChanged();
 		notifyObservers();
