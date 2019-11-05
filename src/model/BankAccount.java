@@ -49,6 +49,23 @@ public class BankAccount {
 		this.tradingFee = tradingFee;
 	}
 
+	public BankAccount(String name, String type, double balance, double rate, double withdrawalFee, double transactionFee,
+			double accountOperationFee, boolean isNewAccount, double tradeThreshold, double tradingFee, ArrayList<CustomerStock> stocks) {
+		super();
+		this.accountName = name;
+		this.type = type;
+		this.rate = rate;
+		this.balance = balance;
+		this.withdrawalFee = withdrawalFee;
+		this.transactionFee = transactionFee;
+		this.accountOperationFee = accountOperationFee;
+		this.isNewAccount = isNewAccount; 
+		this.isTradable = determineTradability();
+		this.tradeThreshold = tradeThreshold;
+		this.tradingFee = tradingFee;
+		this.stocks = stocks; 
+	}
+
 	public boolean determineTradability() {
 		return this.balance > this.tradeThreshold;
 	}
