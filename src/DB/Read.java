@@ -16,7 +16,7 @@ public class Read {
 
 			// Do something with the Connection
 
-		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+		} catch (Exception ex) {
 			// handle any errors
 			System.out.println("Exception: " + ex.getMessage());
 
