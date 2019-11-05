@@ -1,39 +1,23 @@
 package view;
 
-import java.awt.EventQueue;
-import java.util.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-
-import javax.swing.border.Border;
-
-import controller.Bank;
+import controller.BankBranch;
 import model.*;
-import model.Currency;
-
-import java.awt.Font;
 
 import javax.swing.*;
-
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
-import java.awt.Insets;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-
-import controller.BankBranch;
-import javafx.collections.SetChangeListener;
-
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 public class CustomerView extends JFrame implements Observer {
 	private BankCustomer customer;
@@ -70,15 +54,15 @@ public class CustomerView extends JFrame implements Observer {
 		this.bank.addObserver(this);
 
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.setFont(new Font("Segoe UI", Font.PLAIN, 30));
+		menuBar.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		setJMenuBar(menuBar);
 
 		JMenu mnOptions = new JMenu("Options");
-		mnOptions.setFont(new Font("Segoe UI", Font.PLAIN, 36));
+		mnOptions.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		menuBar.add(mnOptions);
 
 		JMenuItem mntmLogout = new JMenuItem("Logout");
-		mntmLogout.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmLogout.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		mntmLogout.addActionListener(new ActionListener() {
 
 			@Override
@@ -99,7 +83,7 @@ public class CustomerView extends JFrame implements Observer {
 		mnOptions.add(mntmLogout);
 
 		JMenuItem mntmExit = new JMenuItem("Exit");
-		mntmExit.setFont(new Font("Segoe UI", Font.PLAIN, 34));
+		mntmExit.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		mntmExit.addActionListener(new ActionListener() {
 
 			@Override
@@ -118,13 +102,13 @@ public class CustomerView extends JFrame implements Observer {
 	 */
 	private void initialize() {
 		this.setLocationRelativeTo(null);
-		this.setBounds(100, 100, 1900, 1000);
+		this.setBounds(SizeManager.getWindowBounds());
 		// this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		lblCustomerView = new JLabel("Welcome " + customer.getName());
-		lblCustomerView.setFont(new Font("Tahoma", Font.PLAIN, 45));
+		lblCustomerView.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeDescription()));
 		lblCustomerView.setHorizontalAlignment(SwingConstants.CENTER);
 		getContentPane().add(lblCustomerView, BorderLayout.NORTH);
 
@@ -137,8 +121,8 @@ public class CustomerView extends JFrame implements Observer {
 		accountsPanel.setPreferredSize(new Dimension(400, 400));
 		westPanel.add(accountsPanel, BorderLayout.NORTH);
 
-		String accountsData[][] = new String[][] {};
-		String accountsHeader[] = new String[] { "Account Name", "Account Type" };
+		String accountsData[][] = new String[][]{};
+		String accountsHeader[] = new String[]{"Account Name", "Account Type"};
 		accountsModel = new DefaultTableModel(accountsData, accountsHeader);
 		accountsModel = addAccountsToTable(customer, accountsModel);
 		accountsTable = new JTable(accountsModel);
@@ -147,7 +131,8 @@ public class CustomerView extends JFrame implements Observer {
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
 		accountsTable.setDefaultRenderer(String.class, centerRenderer);
-		accountsTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 30));
+		accountsTable.getTableHeader().setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
+		;
 
 		accountsTable.setPreferredSize(new Dimension(380, 380));
 		accountsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -167,10 +152,10 @@ public class CustomerView extends JFrame implements Observer {
 		eastPanel.setPreferredSize(new Dimension(600, 1000));
 		getContentPane().add(eastPanel, BorderLayout.EAST);
 		GridBagLayout gbl_eastPanel = new GridBagLayout();
-		gbl_eastPanel.columnWidths = new int[] { 376, 0 };
-		gbl_eastPanel.rowHeights = new int[] { 265, 265, 0, 0, 0 };
-		gbl_eastPanel.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
-		gbl_eastPanel.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gbl_eastPanel.columnWidths = new int[]{376, 0};
+		gbl_eastPanel.rowHeights = new int[]{265, 265, 0, 0, 0};
+		gbl_eastPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_eastPanel.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		eastPanel.setLayout(gbl_eastPanel);
 
 		JPanel balancePanel = new JPanel();
@@ -217,7 +202,7 @@ public class CustomerView extends JFrame implements Observer {
 		loansPanel.setLayout(new BorderLayout(0, 0));
 
 		JLabel lblNewLabel_1 = new JLabel("Loans");
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		lblNewLabel_1.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		lblNewLabel_1.setVerticalAlignment(SwingConstants.BOTTOM);
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 		loansPanel.add(lblNewLabel_1, BorderLayout.NORTH);
@@ -225,8 +210,8 @@ public class CustomerView extends JFrame implements Observer {
 		JPanel loansDisplayPanel = new JPanel();
 		loansPanel.add(loansDisplayPanel, BorderLayout.CENTER);
 
-		String loansData[][] = new String[][] {};
-		String loansHeader[] = new String[] { "ID", "Amount", "Status", "Active" };
+		String[][] loansData = new String[][]{};
+		String[] loansHeader = new String[]{"ID", "Amount", "Status", "Active"};
 		loansModel = new DefaultTableModel(loansData, loansHeader);
 		loansModel = addLoansToTable(customer, loansModel);
 		loansTable = new JTable(loansModel);
@@ -259,8 +244,8 @@ public class CustomerView extends JFrame implements Observer {
 		lblTransactions.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		transactionsPanel.add(lblTransactions, BorderLayout.NORTH);
 
-		String transactionsData[][] = new String[][] {};
-		String transactionsHeader[] = new String[] { "From", "To", "Type", "Amount($)" };
+		String[][] transactionsData = new String[][]{};
+		String[] transactionsHeader = new String[]{"From", "To", "Type", "Amount($)"};
 		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
 		transactionsModel = addTransactionsToTable(customer, transactionsModel);
 		transactionsTable = new JTable(transactionsModel);
@@ -312,18 +297,18 @@ public class CustomerView extends JFrame implements Observer {
 		btnsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		JButton btnWithdraw = new JButton("Withdraw");
-		btnWithdraw.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnWithdraw.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnWithdraw.addActionListener(new TransactionActionListener("Withdraw From Account", "Withdraw"));
 		btnsPanel.add(btnWithdraw);
 
 		JButton btnDeposit = new JButton("Deposit");
 		btnDeposit.addActionListener(new TransactionActionListener("Deposit into Account", "Deposit"));
-		btnDeposit.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnDeposit.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnDeposit);
 
 		JButton btnTransfer = new JButton("Transfer");
 		btnTransfer.addActionListener(new TransferBtnListener());
-		btnTransfer.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnTransfer.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnTransfer);
 
 		JButton btnAddAccount = new JButton("Add Account");
@@ -343,7 +328,7 @@ public class CustomerView extends JFrame implements Observer {
 					combo.addItem(accountType.get(i));
 				}
 
-				Object[] fields = { "Account name", nameField, "Account Type: ", combo };
+				Object[] fields = {"Account name", nameField, "Account Type: ", combo};
 
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Choose Account Type",
 						JOptionPane.OK_CANCEL_OPTION);
@@ -356,32 +341,32 @@ public class CustomerView extends JFrame implements Observer {
 				}
 			}
 		});
-		btnAddAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnAddAccount.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnAddAccount);
 
 		btnsPanel.setBorder(new LineBorder(Color.black, 3));
 
 		JButton btnRequestLoan = new JButton("Request Loan");
-		btnRequestLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnRequestLoan.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnRequestLoan);
 
 		JButton btnCloseLoan = new JButton("Close Loan");
 		btnCloseLoan.addActionListener(new LoanCloseListener());
-		btnCloseLoan.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnCloseLoan.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnCloseLoan);
 
 		JButton btnBuyStocks = new JButton("Buy Stock");
-		btnBuyStocks.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnBuyStocks.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnBuyStocks);
 		btnBuyStocks.addActionListener(new BuyStockActionListener());
 
 		JButton btnSellStocks = new JButton("Sell Stock");
-		btnSellStocks.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnSellStocks.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnSellStocks);
 		btnSellStocks.addActionListener(new SellStockActionListener());
 
 		JButton btnCloseAccount = new JButton("Close Account");
-		btnCloseAccount.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		btnCloseAccount.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		btnsPanel.add(btnCloseAccount);
 		btnCloseAccount.addActionListener(new CloseAccountListener());
 
@@ -401,12 +386,12 @@ public class CustomerView extends JFrame implements Observer {
 
 //		JButton btnCurrencyConverter = new JButton("Convert");
 //		btnCurrencyConverter.addActionListener(new CurrencyConverterListener());
-//		btnCurrencyConverter.setFont(new Font("Tahoma", Font.PLAIN, 30));
+//		btnCurrencyConverter.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 //		moreOptionsPanel.add(btnCurrencyConverter, BorderLayout.SOUTH);
 
 //		JLabel lblA = new JLabel("Currency Converter");
 		JLabel lblA = new JLabel("Stocks");
-		lblA.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		lblA.setFont(FontManager.getFontText().deriveFont(Font.PLAIN, SizeManager.getTextSizeText()));
 		lblA.setHorizontalAlignment(SwingConstants.CENTER);
 		moreOptionsPanel.add(lblA, BorderLayout.NORTH);
 
@@ -415,8 +400,8 @@ public class CustomerView extends JFrame implements Observer {
 //		JPanel stocksDisplayPanel = new JPanel();
 //		moreOptionsPanel.add(stocksDisplayPanel, BorderLayout.CENTER);
 
-		String stockData[][] = new String[][] {};
-		String stockHeader[] = new String[] {"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks" };
+		String stockData[][] = new String[][]{};
+		String stockHeader[] = new String[]{"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks"};
 		stocksModel = new DefaultTableModel(stockData, stockHeader);
 		stocksModel = addStocksToTable(customer, stocksModel);
 		stocksTable = new JTable(stocksModel);
@@ -490,7 +475,7 @@ public class CustomerView extends JFrame implements Observer {
 				combo.addItem(accounts.get(i).getAccountName());
 			}
 
-			Object[] fields = { "Account Name: ", combo, };
+			Object[] fields = {"Account Name: ", combo,};
 
 			int reply = JOptionPane.showConfirmDialog(null, fields, "Close Account", JOptionPane.OK_CANCEL_OPTION);
 
@@ -517,9 +502,7 @@ public class CustomerView extends JFrame implements Observer {
 				JOptionPane.showMessageDialog(null, "No Accounts exist for Customer", "Error",
 						JOptionPane.ERROR_MESSAGE);
 				return;
-			}
-
-			else if (!customer.customerHasBalanceInAnyAccount()) {
+			} else if (!customer.customerHasBalanceInAnyAccount()) {
 				JOptionPane.showMessageDialog(null, "At least one account needs to have some balance amount", "Error",
 						JOptionPane.ERROR_MESSAGE);
 				return;
@@ -530,8 +513,8 @@ public class CustomerView extends JFrame implements Observer {
 			JTextField collateralField = new JTextField();
 			JTextField collateralAmountField = new JTextField();
 
-			Object[] fields = { "Loan Amount: ", loanAmountField, "Tenure in Months: ", tenureField,
-					"Collateral Name: ", collateralField, "Collateral Value($): ", collateralAmountField, };
+			Object[] fields = {"Loan Amount: ", loanAmountField, "Tenure in Months: ", tenureField,
+					"Collateral Name: ", collateralField, "Collateral Value($): ", collateralAmountField,};
 
 			while (true) {
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
@@ -589,24 +572,24 @@ public class CustomerView extends JFrame implements Observer {
 			boolean satisfySecure = false;
 			BankAccount currAccount = null;
 			for (int i = 0; i < accounts.size(); i++) {
-				if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > 500) {
+				if (accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > 500) {
 					satisfySecure = true;
 					currAccount = accounts.get(i);
 				}
 			}
-			if(satisfySecure == false){
+			if (satisfySecure == false) {
 				JOptionPane.showMessageDialog(null, "Do not satisfy a secure account", "Error",
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 			centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-			while(true){
+			while (true) {
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
 				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
 
-				String allStockData[][] = new String[][] {};
-				String allStockHeader[] = new String[] {"Stock Name", "Value", "Total Available"};
+				String allStockData[][] = new String[][]{};
+				String allStockHeader[] = new String[]{"Stock Name", "Value", "Total Available"};
 				allStocksModel = new DefaultTableModel(allStockData, allStockHeader);
 				allStocksModel = addAllStocksToTable(allStocksModel);
 				allStocksTable = new JTable(allStocksModel);
@@ -622,29 +605,29 @@ public class CustomerView extends JFrame implements Observer {
 				allStocksTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
 				allStocksTable.setRowHeight(20);
 				int reply = JOptionPane.showConfirmDialog(null, allStocksScrollPane, "All Stocks", JOptionPane.OK_CANCEL_OPTION);
-				if(reply == JOptionPane.OK_OPTION) {
+				if (reply == JOptionPane.OK_OPTION) {
 					try {
 						JComboBox<String> stocksCombo = new JComboBox<String>();
 						ArrayList<BankStock> allStocks = bank.getAllStocks();
-						for(int i = 0; i < allStocks.size(); i++) {
+						for (int i = 0; i < allStocks.size(); i++) {
 							stocksCombo.addItem(allStocks.get(i).getStockName());
 						}
 						JTextField stockIDField = new JTextField();
 						JTextField numStocksField = new JTextField();
-						Object[] fields = {"Stock ID: ", stockIDField, "Stock Name: ", stocksCombo, "Number of Stocks: ", numStocksField, };
-						while(true) {
+						Object[] fields = {"Stock ID: ", stockIDField, "Stock Name: ", stocksCombo, "Number of Stocks: ", numStocksField,};
+						while (true) {
 							reply = JOptionPane.showConfirmDialog(null, fields, "Buy Stock", JOptionPane.OK_CANCEL_OPTION);
 							if (reply == JOptionPane.OK_OPTION) {
 								int stockIndex = stocksCombo.getSelectedIndex();
 								BankStock stock = allStocks.get(stockIndex);
-								if(stock.getNumStocks() - Integer.valueOf(numStocksField.getText()) <= 0){
+								if (stock.getNumStocks() - Integer.valueOf(numStocksField.getText()) <= 0) {
 									JOptionPane.showMessageDialog(null,
 											"Stocks not enough", "Error",
 											JOptionPane.ERROR_MESSAGE);
 									return;
 								}
-								double balance = currAccount.getBalance() - Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()) - bank.getBuyStockFee();
-								if(balance < 500){
+								double balance = currAccount.getBalance() - Double.valueOf(stock.getValue()) * Integer.parseInt(numStocksField.getText()) - bank.getBuyStockFee();
+								if (balance < 500) {
 									JOptionPane.showMessageDialog(null,
 											"Account too low", "Error",
 											JOptionPane.ERROR_MESSAGE);
@@ -655,7 +638,7 @@ public class CustomerView extends JFrame implements Observer {
 								bank.addStock(customer, stockIDField.getText(), stock.getStockName(), Double.valueOf(stock.getValue()), Integer.parseInt(numStocksField.getText()));
 								stock.setNumStocks(stock.getNumStocks() - Integer.valueOf(numStocksField.getText()));
 								Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Buy Stock",
-										Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()), "Savings", "Secure");
+										Double.valueOf(stock.getValue()) * Integer.parseInt(numStocksField.getText()), "Savings", "Secure");
 								bank.addTransactionForCustomer(customer, transaction);
 								double fees = bank.getBuyStockFee();
 								if (fees != 0) {
@@ -664,8 +647,7 @@ public class CustomerView extends JFrame implements Observer {
 									bank.addTransactionForCustomer(customer, transaction);
 								}
 								break;
-							}
-							else{
+							} else {
 								return;
 							}
 						}
@@ -675,8 +657,7 @@ public class CustomerView extends JFrame implements Observer {
 								JOptionPane.ERROR_MESSAGE);
 					}
 					break;
-				}
-				else{
+				} else {
 					return;
 				}
 			}
@@ -686,32 +667,32 @@ public class CustomerView extends JFrame implements Observer {
 	public class SellStockActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(customer.getStock().size() == 0) {
+			if (customer.getStock().size() == 0) {
 				JOptionPane.showMessageDialog(null, "No Stocks to sell", "Error",
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			ArrayList<BankAccount> accounts = customer.getAccounts();
-			while(true){
+			while (true) {
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
 				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
 				JComboBox<String> stockCombo = new JComboBox<String>();
 				ArrayList<Stock> stocks = customer.getStock();
-				for(Stock s : stocks){
+				for (Stock s : stocks) {
 					stockCombo.addItem(s.getStockID());
 				}
 
-				Object[] fields = {"Stock Name: ", stockCombo, };
-				while(true) {
+				Object[] fields = {"Stock Name: ", stockCombo,};
+				while (true) {
 					int reply = JOptionPane.showConfirmDialog(null, fields, "Sell Stock", JOptionPane.OK_CANCEL_OPTION);
 					if (reply == JOptionPane.OK_OPTION) {
 						int stockIndex = stockCombo.getSelectedIndex();
 						try {
 							Stock currStock = stocks.get(stockIndex);
 							bank.sellStock(customer, currStock);
-							double amount = Double.parseDouble(currStock.getCurrentValue())*Integer.parseInt(currStock.getNumStocks());
+							double amount = Double.parseDouble(currStock.getCurrentValue()) * Integer.parseInt(currStock.getNumStocks());
 							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Sell Stock",
-									 amount, "Secure", "Withdraw");
+									amount, "Secure", "Withdraw");
 							bank.addTransactionForCustomer(customer, transaction);
 							JOptionPane.showMessageDialog(null,
 									"You have withdrawn $" + amount + ". You can select an account to deposit.", "Sell Stock",
@@ -723,8 +704,7 @@ public class CustomerView extends JFrame implements Observer {
 							continue;
 						}
 						break;
-					}
-					else{
+					} else {
 						return;
 					}
 				}
@@ -768,7 +748,7 @@ public class CustomerView extends JFrame implements Observer {
 
 			JTextField amountField = new JTextField();
 
-			Object[] fields = { "Account Name: ", combo, "Currency", currencyCombo, "Amount in USD: $", amountField, };
+			Object[] fields = {"Account Name: ", combo, "Currency", currencyCombo, "Amount in USD: $", amountField,};
 			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, title, JOptionPane.OK_CANCEL_OPTION);
 
@@ -869,8 +849,8 @@ public class CustomerView extends JFrame implements Observer {
 
 				JTextField amountField = new JTextField();
 
-				Object[] fields = { "From Account Name: ", combo1, "To Account Name: ", combo2, "Amount in USD: $",
-						amountField, };
+				Object[] fields = {"From Account Name: ", combo1, "To Account Name: ", combo2, "Amount in USD: $",
+						amountField,};
 
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Transfer between Accounts",
 						JOptionPane.OK_CANCEL_OPTION);
@@ -1047,8 +1027,8 @@ public class CustomerView extends JFrame implements Observer {
 
 			});
 
-			Object[] fields = { "Loans: ", loanCombo, "Accounts: ", accountCombo, "Loan Ammount: ", loanAmountLbl,
-					"Account Balance: ", accountBalanceLbl, };
+			Object[] fields = {"Loans: ", loanCombo, "Accounts: ", accountCombo, "Loan Ammount: ", loanAmountLbl,
+					"Account Balance: ", accountBalanceLbl,};
 
 			double minLoanAmount = customer.getMinimumLoanAmount();
 			double maxAccBalance = customer.getMaximumAccountBalance();
@@ -1107,7 +1087,7 @@ public class CustomerView extends JFrame implements Observer {
 	public class StockListListener implements ListSelectionListener {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			if(stocksTable.getSelectedRow() == -1){
+			if (stocksTable.getSelectedRow() == -1) {
 				return;
 			}
 			accountsTable.clearSelection();
@@ -1159,9 +1139,9 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addStocksToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<Stock> stocks = customer.getStock();
-		if(stocks.size() == 0)
+		if (stocks.size() == 0)
 			return model;
-		for(Stock s : stocks) {
+		for (Stock s : stocks) {
 			model.addRow(s.getShortStockDisplayForCustomer());
 		}
 		return model;
@@ -1179,26 +1159,26 @@ public class CustomerView extends JFrame implements Observer {
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub
 
-		String accountsData[][] = new String[][] {};
-		String accountsHeader[] = new String[] { "Account Name", "Account Type" };
+		String accountsData[][] = new String[][]{};
+		String accountsHeader[] = new String[]{"Account Name", "Account Type"};
 		accountsModel = new DefaultTableModel(accountsData, accountsHeader);
 		accountsModel = addAccountsToTable(this.customer, accountsModel);
 		accountsTable.setModel(accountsModel);
 
-		String transactionsData[][] = new String[][] {};
-		String transactionsHeader[] = new String[] { "From", "To", "Type", "Amount($)" };
+		String transactionsData[][] = new String[][]{};
+		String transactionsHeader[] = new String[]{"From", "To", "Type", "Amount($)"};
 		transactionsModel = new DefaultTableModel(transactionsData, transactionsHeader);
 		transactionsModel = addTransactionsToTable(customer, transactionsModel);
 		transactionsTable.setModel(transactionsModel);
 
-		String loansData[][] = new String[][] {};
-		String loansHeader[] = new String[] { "ID", "Amount", "Status", "Active" };
+		String loansData[][] = new String[][]{};
+		String loansHeader[] = new String[]{"ID", "Amount", "Status", "Active"};
 		loansModel = new DefaultTableModel(loansData, loansHeader);
 		loansModel = addLoansToTable(customer, loansModel);
 		loansTable.setModel(loansModel);
 
-		String stockData[][] = new String[][] {};
-		String stockHeader[] = new String[] {"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks"};
+		String stockData[][] = new String[][]{};
+		String stockHeader[] = new String[]{"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks"};
 		stocksModel = new DefaultTableModel(stockData, stockHeader);
 		stocksModel = addStocksToTable(customer, stocksModel);
 		stocksTable.setModel(stocksModel);
