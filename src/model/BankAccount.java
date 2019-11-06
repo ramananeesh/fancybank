@@ -227,10 +227,6 @@ public class BankAccount {
 			}
 		}
 	}
-	
-	public ArrayList<CustomerStock> getStock() {
-		return stocks;
-	}
 
 	public void setStocks(ArrayList<CustomerStock> stocks) {
 		this.stocks = stocks;

@@ -23,7 +23,8 @@ public class BankBranch extends Observable {
 	private double savingsInterestRate;
 	private double buyStockFee;
 	private ArrayList<Currency> currencies;
-	private double tradeThreshold; 
+	private double tradeThreshold;
+	private int stockID;
 
 	public BankBranch() {
 		super();
@@ -40,6 +41,7 @@ public class BankBranch extends Observable {
 		this.highBalance = 100;
 		this.savingsInterestRate = 0.02;
 		this.buyStockFee = 2;
+		this.stockID = 0;
 
 		this.currencies = new ArrayList<Currency>();
 		currencies.add(new Currency("US Dollars", "USD", 1, 1));
@@ -89,9 +91,17 @@ public class BankBranch extends Observable {
 		notifyObservers();
 	}
 
-	public void addStock(BankCustomer customer, String accountName, String stockID, String stockName, double value, int numStocks){
+	public void addStock(BankCustomer customer, String accountName, int stockID, String stockName, double value, int numStocks, double balance){
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
-		acc.addStock(new CustomerStock(stockID, stockName, value, value, numStocks));
+		acc.setBalance(balance);
+		BankStock currStock = null;
+		for(int i = 0; i < allStocks.size(); i++){
+			if(allStocks.get(i).getStockName().equals(stockName)){
+				currStock = allStocks.get(i);
+				currStock.setNumStocks(currStock.getNumStocks() - numStocks);
+			}
+		}
+		acc.addStock(new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks, acc.getAccountName()));
 		setChanged();
 		notifyObservers();
 	}
@@ -99,6 +109,12 @@ public class BankBranch extends Observable {
 	public void sellStock(BankCustomer customer, String accountName, CustomerStock stock){
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		acc.sellStock(stock);
+		for(int i = 0; i < allStocks.size(); i++){
+			if(allStocks.get(i).getStockName().equals(stock.getStockName())){
+				modifyAllStocks(i, Double.parseDouble(stock.getCurrentValue()), allStocks.get(i).getNumStocks() + Integer.parseInt(stock.getNumStocks()));
+			}
+		}
+
 		setChanged();
 		notifyObservers();
 	}
@@ -491,5 +507,14 @@ public class BankBranch extends Observable {
 	public void setTradeThreshold(double tradeThreshold) {
 		this.tradeThreshold = tradeThreshold;
 	}
+
+	public int getStockID() {
+		return this.stockID;
+	}
+
+	public void setStockID(int id) {
+		this.stockID = id;
+	}
+
 
 }
