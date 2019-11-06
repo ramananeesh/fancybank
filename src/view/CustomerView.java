@@ -734,13 +734,13 @@ public class CustomerView extends JFrame implements Observer {
 				while(true) {
 					int reply = JOptionPane.showConfirmDialog(null, fields, "Sell Stock", JOptionPane.OK_CANCEL_OPTION);
 					if (reply == JOptionPane.OK_OPTION) {
-						String stockID = stockCombo.getSelectedItem().toString();
+						String stockName = stockCombo.getSelectedItem().toString();
 						try {
 							CustomerStock currStock = null;
 							BankAccount currAccount = null;
 							for(BankAccount acc : accounts) {
 								for (CustomerStock s : acc.getStocks()) {
-									if(s.getStockID().equals(stockID)){
+									if(s.getStockName().equals(stockName)){
 										currStock = s;
 										currAccount = acc;
 										break;
@@ -755,18 +755,19 @@ public class CustomerView extends JFrame implements Observer {
 							JOptionPane.showMessageDialog(null,
 									"You have withdrawn $" + amount + ". You can select an account to deposit.", "Sell Stock",
 									JOptionPane.OK_OPTION);
-
+							
+							break;
 						} catch (Exception e1) {
 							JOptionPane.showMessageDialog(null, "Error",
 									"Error", JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
-						break;
 					}
 					else{
 						return;
 					}
 				}
+				return;
 			}
 		}
 	}
