@@ -16,12 +16,12 @@ public class BankBranch extends Observable {
 	private ArrayList<BankStock> allStocks;
 	private double moneyEarned;
 	private double accountOperationFee;
-	private double checkingTransactionFee;
+	private double transactionFee;
 	private double withdrawalFee;
 	private double loanInterestRate;
 	private double highBalance;
 	private double savingsInterestRate;
-	private double buyStockFee;
+	private double stockFee;
 	private ArrayList<Currency> currencies;
 	private double tradeThreshold;
 	private int stockID;
@@ -36,11 +36,11 @@ public class BankBranch extends Observable {
 		this.loanInterestRate = 0.1;
 		this.moneyEarned = 0;
 		this.accountOperationFee = 5;
-		this.checkingTransactionFee = 2;
+		this.transactionFee = 2;
 		this.withdrawalFee = 2;
 		this.highBalance = 100;
 		this.savingsInterestRate = 0.02;
-		this.buyStockFee = 2;
+		this.stockFee = 2;
 		this.stockID = 0;
 
 		this.currencies = new ArrayList<Currency>();
@@ -75,7 +75,7 @@ public class BankBranch extends Observable {
 
 	public void addAccount(BankCustomer customer, String accountName, String accountType) {
 		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType,
-				loanInterestRate, withdrawalFee, checkingTransactionFee, accountOperationFee, tradeThreshold, buyStockFee));
+				loanInterestRate, withdrawalFee, transactionFee, accountOperationFee, tradeThreshold, stockFee));
 		setChanged();
 		notifyObservers();
 	}
@@ -114,7 +114,8 @@ public class BankBranch extends Observable {
 				modifyAllStocks(i, Double.parseDouble(stock.getCurrentValue()), allStocks.get(i).getNumStocks() + Integer.parseInt(stock.getNumStocks()));
 			}
 		}
-
+		double amount = Double.parseDouble(stock.getCurrentValue()) * Integer.parseInt(stock.getNumStocks());
+		acc.setBalance(acc.getBalance()+amount-stockFee);
 		setChanged();
 		notifyObservers();
 	}
@@ -295,7 +296,7 @@ public class BankBranch extends Observable {
 		} else if (type.equals("Withdrawal")) {
 			this.setWithdrawalFee(newFees);
 		} else if (type.equals("BuyStock")) {
-			this.setBuyStockFee(newFees);
+			this.setStockFee(newFees);
 		}
 
 		this.setSavingsInterestRate(newFees);
@@ -452,20 +453,20 @@ public class BankBranch extends Observable {
 		this.accountOperationFee = accountOperationFee;
 	}
 
-	public double getBuyStockFee() {
-		return buyStockFee;
+	public double getStockFee() {
+		return stockFee;
 	}
 
-	public void setBuyStockFee(double buyStockFee) {
-		this.buyStockFee = buyStockFee;
+	public void setStockFee(double stockFee) {
+		this.stockFee = stockFee;
 	}
 
 	public double getCheckingTransactionFee() {
-		return checkingTransactionFee;
+		return transactionFee;
 	}
 
-	public void setCheckingTransactionFee(double checkingTransactionFee) {
-		this.checkingTransactionFee = checkingTransactionFee;
+	public void setCheckingTransactionFee(double transactionFee) {
+		this.transactionFee = transactionFee;
 	}
 
 	public double getWithdrawalFee() {

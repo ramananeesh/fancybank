@@ -668,7 +668,7 @@ public class CustomerView extends JFrame implements Observer {
 										JOptionPane.ERROR_MESSAGE);
 								return;
 							}
-							double balance = currAccount.getBalance() - Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()) - bank.getBuyStockFee();
+							double balance = currAccount.getBalance() - Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()) - bank.getStockFee();
 							//why do we need this?
 //							if(balance < 500){
 //								JOptionPane.showMessageDialog(null,
@@ -678,11 +678,11 @@ public class CustomerView extends JFrame implements Observer {
 //							}
 							bank.addStock(customer, currAccount.getAccountName(), bank.getStockID(), stock.getStockName(), Double.valueOf(stock.getValue()), Integer.parseInt(numStocksField.getText()), balance);
 							bank.setStockID(bank.getStockID()+1);
-							bank.addMoneyEarned(bank.getBuyStockFee());
+							bank.addMoneyEarned(bank.getStockFee());
 							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Buy Stock",
 									Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()), "Savings", "Secure");
 							bank.addTransactionForCustomer(customer, transaction);
-							double fees = bank.getBuyStockFee();
+							double fees = bank.getStockFee();
 							if (fees != 0) {
 								transaction = bank.addTransaction(customer.getName(), "Bank", "Buy Stock Fees", fees,
 										currAccount.getAccountName(), "My Fancy Bank");
@@ -748,14 +748,20 @@ public class CustomerView extends JFrame implements Observer {
 								}
 							}
 							bank.sellStock(customer, currAccount.getAccountName(), currStock);
-							double amount = Double.parseDouble(currStock.getCurrentValue())*Integer.parseInt(currStock.getNumStocks());
+							double amount = Double.parseDouble(currStock.getCurrentValue())*Integer.parseInt(currStock.getNumStocks())-bank.getStockFee();
 							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Sell Stock",
-									 amount, "Secure", "Withdraw");
+									 amount, "Secure", "Savings");
 							bank.addTransactionForCustomer(customer, transaction);
 							JOptionPane.showMessageDialog(null,
-									"You have withdrawn $" + amount + ". You can select an account to deposit.", "Sell Stock",
+									"You have selled your stock", "Sell Stock",
 									JOptionPane.OK_OPTION);
-							
+							double fees = bank.getStockFee();
+							if (fees != 0) {
+								transaction = bank.addTransaction(customer.getName(), "Bank", "Sell Stock Fees", fees,
+										currAccount.getAccountName(), "My Fancy Bank");
+								bank.addTransactionForCustomer(customer, transaction);
+							}
+							bank.addMoneyEarned(bank.getStockFee());
 							break;
 						} catch (Exception e1) {
 							JOptionPane.showMessageDialog(null, "Error",
