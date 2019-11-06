@@ -669,12 +669,13 @@ public class CustomerView extends JFrame implements Observer {
 								return;
 							}
 							double balance = currAccount.getBalance() - Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()) - bank.getBuyStockFee();
-							if(balance < 500){
-								JOptionPane.showMessageDialog(null,
-										"Account too low", "Error",
-										JOptionPane.ERROR_MESSAGE);
-								return;
-							}
+							//why do we need this?
+//							if(balance < 500){
+//								JOptionPane.showMessageDialog(null,
+//										"Account too low", "Error",
+//										JOptionPane.ERROR_MESSAGE);
+//								return;
+//							}
 							bank.addStock(customer, currAccount.getAccountName(), bank.getStockID(), stock.getStockName(), Double.valueOf(stock.getValue()), Integer.parseInt(numStocksField.getText()), balance);
 							bank.setStockID(bank.getStockID()+1);
 							bank.addMoneyEarned(bank.getBuyStockFee());
@@ -1199,6 +1200,8 @@ public class CustomerView extends JFrame implements Observer {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<BankAccount> accounts = customer.getAccounts();
 		for(BankAccount acc : accounts){
+			if(!acc.isTradable())
+				continue;
 			ArrayList<CustomerStock> stocks = acc.getStocks();
 			for(CustomerStock s : stocks) {
 				model.addRow(s.getShortStockDisplayForCustomer());

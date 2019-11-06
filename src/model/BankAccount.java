@@ -31,6 +31,7 @@ public class BankAccount {
 		this.isTradable = false;
 		this.tradeThreshold = tradeThreshold;
 		this.tradingFee = tradingFee;
+		this.stocks = new ArrayList<CustomerStock>();
 	}
 
 	public BankAccount(String name, String type, double balance, double rate, double withdrawalFee, double transactionFee,
@@ -47,6 +48,7 @@ public class BankAccount {
 		this.isTradable = determineTradability();
 		this.tradeThreshold = tradeThreshold;
 		this.tradingFee = tradingFee;
+		this.stocks = new ArrayList<CustomerStock>();
 	}
 
 	public BankAccount(String name, String type, double balance, double rate, double withdrawalFee, double transactionFee,
@@ -214,6 +216,7 @@ public class BankAccount {
 	
 	public void addStock(CustomerStock newStock) {
 		this.stocks.add(newStock);
+		this.isTradable = determineTradability();
 	}
 
 	public void sellStock(CustomerStock stock) {
