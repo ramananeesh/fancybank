@@ -726,7 +726,7 @@ public class CustomerView extends JFrame implements Observer {
 				JComboBox<String> stockCombo = new JComboBox<String>();
 				for(BankAccount acc : accounts){
 					for(CustomerStock s : acc.getStocks()){
-						stockCombo.addItem(s.getStockID());
+						stockCombo.addItem(s.getStockName());
 					}
 				}
 
