@@ -34,8 +34,7 @@ public class Insert {
 				System.out.println("Insert successful");
 				conn.close();
 				return true;
-			}
-			else {
+			} else {
 				System.out.println("Insert unsuccessful");
 			}
 
@@ -52,9 +51,19 @@ public class Insert {
 		String sql = "insert into customer values('" + customer.getCustomerId() + "','" + customer.getName() + "','"
 				+ customer.getPhoneNumber() + "','" + customer.getSsn() + "','" + customer.getEmail() + "','"
 				+ customer.getPassword() + "')";
-		
+
 		return performInsert(sql);
 
+	}
+
+	public static boolean insertNewAccount(BankAccount account) {
+		String sql = "Insert into account values('" + account.getAccountName() + "','" + account.getType() + "','"
+				+ account.getBalance() + "','" + account.getRate() + "','" + account.getWithdrawalFee() + "','"
+				+ account.getAccountOperationFee() + "','" + account.getTransactionFee() + "','"
+				+ account.isNewAccount() + "','" + account.isTradable() + "','" + account.getTradeThreshold() + "','"
+				+ account.getTradingFee();
+
+		return performInsert(sql);
 	}
 
 	public static boolean insertNewTransaction(Transaction t, String customerId) {
@@ -65,11 +74,12 @@ public class Insert {
 	}
 
 	public static boolean insertNewLoan(Loan l) {
-		
-		String sql = "Insert into loan values('"+l.getLoanId()+ "','" +l.getCustomerId()+ "','" +l.getCustomerName()+ "','" +l.getLoanAmount()
-		+ "','" +l.getInterestRate()+ "','" +l.getTenure()+ "','" +l.isActive()+ "','" +l.isApproved()+ "','" +l.getLoanStartDate()
-		+ "','" +l.getCollateral()+ "','" +l.getCollateralAmount()+"')";
-		
+
+		String sql = "Insert into loan values('" + l.getLoanId() + "','" + l.getCustomerId() + "','"
+				+ l.getCustomerName() + "','" + l.getLoanAmount() + "','" + l.getInterestRate() + "','" + l.getTenure()
+				+ "','" + l.isActive() + "','" + l.isApproved() + "','" + l.getLoanStartDate() + "','"
+				+ l.getCollateral() + "','" + l.getCollateralAmount() + "')";
+
 		return performInsert(sql);
 	}
 

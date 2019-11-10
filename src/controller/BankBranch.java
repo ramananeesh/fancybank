@@ -2,6 +2,7 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.Observable;
+import DB.*;
 
 import javax.swing.DefaultListModel;
 
@@ -57,65 +58,72 @@ public class BankBranch extends Observable {
 	}
 
 	public Transaction addTransaction(String fromCustomer, String toCustomer, String type, double amount,
-									  String fromAccount, String toAccount) {
+			String fromAccount, String toAccount) {
 		Transaction newTransaction = new Transaction(fromCustomer, toCustomer, type, amount, fromAccount, toAccount);
 		transactions.add(newTransaction);
 		return newTransaction;
 	}
 
 	public BankCustomer addCustomer(String name, Address address, String phoneNumber, String ssn, String email,
-									String password) {
+			String password) {
 
 		int customerId = BankCustomer.generateCustomerId(customers);
 		BankCustomer newCustomer = new BankCustomer(name, Integer.toString(customerId), address, phoneNumber, ssn,
 				email, password);
+		Insert.insertNewCustomer(newCustomer);
 		this.customers.add(newCustomer);
 		return newCustomer;
 	}
 
 	public void addAccount(BankCustomer customer, String accountName, String accountType) {
-		this.getCustomerByEmail(customer.getEmail()).addAccount(new BankAccount(accountName, accountType,
-				loanInterestRate, withdrawalFee, transactionFee, accountOperationFee, tradeThreshold, stockFee));
+		BankAccount newAccount = new BankAccount(accountName, accountType, loanInterestRate, withdrawalFee,
+				transactionFee, accountOperationFee, tradeThreshold, stockFee);
+		this.getCustomerByEmail(customer.getEmail()).addAccount(newAccount);
+		Insert.insertNewAccount(newAccount);
 		setChanged();
 		notifyObservers();
 	}
 
 	public void addLoan(BankCustomer customer, double loanAmount, double interestRate, int tenure, String collateral,
-						double collateralAmount) {
+			double collateralAmount) {
 		Loan loan = new Loan(customer.getName(), customer.getCustomerId(),
 				Integer.toString(BankCustomer.generateLoanId(customer.getLoans())), loanAmount, interestRate, tenure,
 				collateral, collateralAmount);
 		this.loans.add(loan);
 		this.getCustomerByEmail(customer.getEmail()).addLoan(loan);
+		Insert.insertNewLoan(loan);
 		setChanged();
 		notifyObservers();
 	}
 
-	public void addStock(BankCustomer customer, String accountName, int stockID, String stockName, double value, int numStocks, double balance){
+	public void addStock(BankCustomer customer, String accountName, int stockID, String stockName, double value,
+			int numStocks, double balance) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		acc.setBalance(balance);
 		BankStock currStock = null;
-		for(int i = 0; i < allStocks.size(); i++){
-			if(allStocks.get(i).getStockName().equals(stockName)){
+		for (int i = 0; i < allStocks.size(); i++) {
+			if (allStocks.get(i).getStockName().equals(stockName)) {
 				currStock = allStocks.get(i);
 				currStock.setNumStocks(currStock.getNumStocks() - numStocks);
 			}
 		}
-		acc.addStock(new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks, acc.getAccountName()));
+		acc.addStock(
+				new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks, acc.getAccountName()));
 		setChanged();
 		notifyObservers();
 	}
 
-	public void sellStock(BankCustomer customer, String accountName, CustomerStock stock){
+	public void sellStock(BankCustomer customer, String accountName, CustomerStock stock) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		acc.sellStock(stock);
-		for(int i = 0; i < allStocks.size(); i++){
-			if(allStocks.get(i).getStockName().equals(stock.getStockName())){
-				modifyAllStocks(i, Double.parseDouble(stock.getCurrentValue()), allStocks.get(i).getNumStocks() + Integer.parseInt(stock.getNumStocks()));
+		for (int i = 0; i < allStocks.size(); i++) {
+			if (allStocks.get(i).getStockName().equals(stock.getStockName())) {
+				modifyAllStocks(i, Double.parseDouble(stock.getCurrentValue()),
+						allStocks.get(i).getNumStocks() + Integer.parseInt(stock.getNumStocks()));
 			}
 		}
 		double amount = Double.parseDouble(stock.getCurrentValue()) * Integer.parseInt(stock.getNumStocks());
-		acc.setBalance(acc.getBalance()+amount-stockFee);
+		acc.setBalance(acc.getBalance() + amount - stockFee);
 		setChanged();
 		notifyObservers();
 	}
@@ -132,9 +140,9 @@ public class BankBranch extends Observable {
 		stock.setValue(value);
 		stock.setNumStocks(numStocks);
 
-		for(BankCustomer c: customers){
+		for (BankCustomer c : customers) {
 			ArrayList<BankAccount> accounts = c.getAccounts();
-			for(BankAccount acc: accounts) {
+			for (BankAccount acc : accounts) {
 				acc.modifyStock(stock);
 			}
 		}
@@ -195,13 +203,14 @@ public class BankBranch extends Observable {
 	}
 
 	public boolean transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName,
-													  String toAccountName, double amount) {
+			String toAccountName, double amount) {
 		return this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName,
 				amount);
 	}
 
 	public void addTransactionForCustomer(BankCustomer customer, Transaction transaction) {
 		this.getCustomerByEmail(customer.getEmail()).addTransaction(transaction);
+		Insert.insertNewTransaction(transaction, customer.getCustomerId());
 		setChanged();
 		notifyObservers();
 	}
@@ -516,6 +525,5 @@ public class BankBranch extends Observable {
 	public void setStockID(int id) {
 		this.stockID = id;
 	}
-
 
 }
