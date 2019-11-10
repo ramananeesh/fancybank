@@ -294,7 +294,7 @@ public class BankBranch extends Observable {
 		this.addMoneyEarned(fees);
 		
 		//update loan in db 
-		
+		Update.updateLoanForSettle(loanId, customer.getCustomerId());
 		setChanged();
 		notifyObservers();
 		return true;
@@ -316,7 +316,8 @@ public class BankBranch extends Observable {
 								interestAmount, "My Fancy Bank", acc.getAccountName());
 						this.addTransactionForCustomer(customer, t);
 						// update balance for customer account in db 
-						
+						double modifiedBalance = acc.getBalance();
+						Update.updateDepositOrWithdrawal(customer.getCustomerId(), acc.getAccountName(), modifiedBalance);
 					}
 				}
 			}

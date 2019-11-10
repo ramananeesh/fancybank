@@ -54,10 +54,15 @@ public class Update {
 
 	public static boolean updateDepositOrWithdrawal(String customerId, String accountName, double balance) {
 		String sql = "Update bankaccount set balance=" + balance + " where customerId='" + customerId
-				+ "' and accountName='"+accountName+"'";
+				+ "' and accountName='" + accountName + "'";
 
 		return performUpdate(sql);
 	}
-	
-	
+
+	public static boolean updateLoanForSettle(String loanId, String customerId) {
+		String sql = "Update loan set isActive=false where loanId='" + loanId + "' and customerId='"+customerId+"'";
+
+		return performUpdate(sql);
+	}
+
 }
