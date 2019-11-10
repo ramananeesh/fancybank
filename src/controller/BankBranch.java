@@ -255,6 +255,9 @@ public class BankBranch extends Observable {
 				fees + accountOperationFee, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, transaction);
 		this.addMoneyEarned(fees);
+		
+		//remove account from db 
+		
 		setChanged();
 		notifyObservers();
 	}
@@ -274,6 +277,9 @@ public class BankBranch extends Observable {
 		t = this.addTransaction(customer.getName(), "Bank", "Transaction fees", fees, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, t);
 		this.addMoneyEarned(fees);
+		
+		//update loan in db 
+		
 		setChanged();
 		notifyObservers();
 		return true;
@@ -294,6 +300,8 @@ public class BankBranch extends Observable {
 						Transaction t = this.addTransaction("Bank", customer.getName(), "Interest Settlement",
 								interestAmount, "My Fancy Bank", acc.getAccountName());
 						this.addTransactionForCustomer(customer, t);
+						// update balance for customer account in db 
+						
 					}
 				}
 			}
@@ -313,6 +321,8 @@ public class BankBranch extends Observable {
 					acc.setRate(newInterestRate);
 			}
 		}
+		
+		//update fees table in db
 	}
 
 	public void modifyLoanInterestRate(double newInterestRate) {
@@ -327,6 +337,8 @@ public class BankBranch extends Observable {
 				acc.setInterestRate(newInterestRate);
 			}
 		}
+		
+		//update fees table in db 
 	}
 
 	public void modifyFees(String type, double newFees) {
@@ -400,6 +412,8 @@ public class BankBranch extends Observable {
 	public void approveLoanForCustomer(BankCustomer customer, String loanId) {
 		this.getCustomerByEmail(customer.getEmail()).approveLoan(loanId);
 		this.approveLoan(loanId);
+		//update loan table in db 
+		
 		setChanged();
 		notifyObservers();
 	}
