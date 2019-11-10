@@ -82,6 +82,13 @@ public class Insert {
 
 		return performInsert(sql);
 	}
+	
+	public static boolean insertNewCustomerStock(CustomerStock stock, String customerId) {
+		String sql = "Insert into customerStock values('"+stock.getStockID()+"','"+stock.getStockName()
+		+"','"+customerId+"','"+stock.getBuyingValue()+"','"+stock.getCurrentValue()+"','"+stock.getNumStocks();
+		
+		return performInsert(sql);
+	}
 
 	public static void main(String[] args) {
 		insertNewCustomer(new BankCustomer("Aneesh", "1234", new Address("", "", "", "", ""), "1234567891", "12345678",

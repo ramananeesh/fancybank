@@ -49,7 +49,7 @@ public class BankBranch extends Observable {
 		currencies.add(new Currency("Indian Rupees", "INR", 0.014, 72.14));
 		currencies.add(new Currency("British Pounds", "GBP", 1.30, 0.77));
 		currencies.add(new Currency("Euros", "EUR", 1.12, 0.9));
-		
+
 		initialize();
 	}
 
@@ -63,7 +63,7 @@ public class BankBranch extends Observable {
 //			this.loans.addAll(Read.getLoans(c.getCustomerId()));
 //		}
 	}
-	
+
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
 		BankManager newManager = new BankManager(name, id, email, securityCode, password);
 		managers.add(newManager);
@@ -121,8 +121,15 @@ public class BankBranch extends Observable {
 				currStock.setNumStocks(currStock.getNumStocks() - numStocks);
 			}
 		}
-		acc.addStock(
-				new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks, acc.getAccountName()));
+
+		CustomerStock newStock = new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks,
+				acc.getAccountName());
+		acc.addStock(newStock);
+		
+		//add stock to db
+		Insert.insertNewCustomerStock(newStock, customer.getCustomerId());
+		
+		//update bank stock in db
 		setChanged();
 		notifyObservers();
 	}
