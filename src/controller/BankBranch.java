@@ -57,6 +57,7 @@ public class BankBranch extends Observable {
 		this.customers.addAll(Read.getAllCustomers());
 		this.transactions.addAll(Read.getTransactions(""));
 		this.loans.addAll(Read.getLoans(""));
+		this.allStocks.addAll(Read.getBankStocks());
 //		for(BankCustomer c: this.customers) {
 //			this.transactions.addAll(Read.getTransactions(c.getCustomerId()));
 //			this.loans.addAll(Read.getLoans(c.getCustomerId()));
