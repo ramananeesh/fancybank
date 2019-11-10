@@ -49,8 +49,20 @@ public class BankBranch extends Observable {
 		currencies.add(new Currency("Indian Rupees", "INR", 0.014, 72.14));
 		currencies.add(new Currency("British Pounds", "GBP", 1.30, 0.77));
 		currencies.add(new Currency("Euros", "EUR", 1.12, 0.9));
+		
+		initialize();
 	}
 
+	public void initialize() {
+		this.customers.addAll(Read.getAllCustomers());
+		this.transactions.addAll(Read.getTransactions(""));
+		this.loans.addAll(Read.getLoans(""));
+//		for(BankCustomer c: this.customers) {
+//			this.transactions.addAll(Read.getTransactions(c.getCustomerId()));
+//			this.loans.addAll(Read.getLoans(c.getCustomerId()));
+//		}
+	}
+	
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
 		BankManager newManager = new BankManager(name, id, email, securityCode, password);
 		managers.add(newManager);
