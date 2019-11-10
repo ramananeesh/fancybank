@@ -125,11 +125,13 @@ public class BankBranch extends Observable {
 		CustomerStock newStock = new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks,
 				acc.getAccountName());
 		acc.addStock(newStock);
-		
-		//add stock to db
+
+		// add stock to db
 		Insert.insertNewCustomerStock(newStock, customer.getCustomerId());
-		
-		//update bank stock in db
+
+		// update bank stock in db
+		Update.updateBankStocksForBuyOrSell(newStock.getStockName(), currStock.getNumStocks());
+
 		setChanged();
 		notifyObservers();
 	}
@@ -137,14 +139,18 @@ public class BankBranch extends Observable {
 	public void sellStock(BankCustomer customer, String accountName, CustomerStock stock) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		acc.sellStock(stock);
+		int num = -1;
 		for (int i = 0; i < allStocks.size(); i++) {
+			num = allStocks.get(i).getNumStocks() + Integer.parseInt(stock.getNumStocks());
 			if (allStocks.get(i).getStockName().equals(stock.getStockName())) {
-				modifyAllStocks(i, Double.parseDouble(stock.getCurrentValue()),
-						allStocks.get(i).getNumStocks() + Integer.parseInt(stock.getNumStocks()));
+				modifyAllStocks(i, Double.parseDouble(stock.getCurrentValue()), num);
 			}
 		}
 		double amount = Double.parseDouble(stock.getCurrentValue()) * Integer.parseInt(stock.getNumStocks());
 		acc.setBalance(acc.getBalance() + amount - stockFee);
+
+		// remove or update customerStock in db
+
 		setChanged();
 		notifyObservers();
 	}
@@ -167,6 +173,11 @@ public class BankBranch extends Observable {
 				acc.modifyStock(stock);
 			}
 		}
+
+		// update bankStock in db
+		if (numStocks != -1)
+			Update.updateBankStocksForBuyOrSell(stock.getStockName(), numStocks);
+
 		setChanged();
 		notifyObservers();
 	}
