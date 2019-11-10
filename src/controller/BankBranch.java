@@ -215,29 +215,44 @@ public class BankBranch extends Observable {
 	public boolean depositForCustomer(BankCustomer customer, String accountName, double amount) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		boolean t = acc.isNewAccount();
-
+		
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
-
+		acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
+		double balance = acc.getBalance();
 		if (t) {
 			Transaction transaction = this.addTransaction(customer.getName(), "Bank",
 					"Transaction fees - Account Opening", accountOperationFee, accountName, "My Fancy Bank");
 			this.addTransactionForCustomer(customer, transaction);
 			this.addMoneyEarned(accountOperationFee);
+			//update fees table in db for moneyEarned
+			
 			customer.getAccounts().get(customer.getAccountIndexByName(accountName)).setNewAccount(false);
 		}
+		//update account of customer in db for balance
+		Update.updateDepositOrWithdrawal(customer.getCustomerId(), accountName, balance);
 
 		return flag;
 	}
 
 	public boolean withdrawForCustomer(BankCustomer customer, String accountName, double amount) {
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
+		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
+		//update account of customer in db for balance
+				Update.updateDepositOrWithdrawal(customer.getCustomerId(), accountName, acc.getBalance());
 		return flag;
 	}
 
 	public boolean transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName,
 			String toAccountName, double amount) {
-		return this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName,
+		boolean flag = this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName,
 				amount);
+		BankAccount withdrawalAcc = customer.getAccounts().get(customer.getAccountIndexByName(fromAccountName));
+		BankAccount depositAcc = customer.getAccounts().get(customer.getAccountIndexByName(toAccountName));
+		
+		Update.updateDepositOrWithdrawal(customer.getCustomerId(), fromAccountName, withdrawalAcc.getBalance());
+		Update.updateDepositOrWithdrawal(customer.getCustomerId(), toAccountName, depositAcc.getBalance());
+		
+		return flag;
 	}
 
 	public void addTransactionForCustomer(BankCustomer customer, Transaction transaction) {

@@ -45,13 +45,19 @@ public class Update {
 
 		return false;
 	}
-	
+
 	public static boolean updateBankStocksForBuyOrSell(String stockName, int quantity) {
-		String sql="Update bankStock set numberOfStocks="+quantity+" where "
-				+ "stockName='"+stockName+"'";
-		
+		String sql = "Update bankStock set numberOfStocks=" + quantity + " where " + "stockName='" + stockName + "'";
+
 		return performUpdate(sql);
 	}
 
+	public static boolean updateDepositOrWithdrawal(String customerId, String accountName, double balance) {
+		String sql = "Update bankaccount set balance=" + balance + " where customerId='" + customerId
+				+ "' and accountName='"+accountName+"'";
+
+		return performUpdate(sql);
+	}
+	
 	
 }
