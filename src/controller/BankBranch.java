@@ -58,6 +58,7 @@ public class BankBranch extends Observable {
 
 	public void initialize() {
 		this.customers.addAll(Read.getAllCustomers());
+		this.managers.addAll(Read.getAllManagers());
 		this.transactions.addAll(Read.getTransactions("manager"));
 		this.loans.addAll(Read.getLoans("manager"));
 		this.allStocks.addAll(Read.getBankStocks());
@@ -83,6 +84,8 @@ public class BankBranch extends Observable {
 			String fromAccount, String toAccount) {
 		Transaction newTransaction = new Transaction(fromCustomer, toCustomer, type, amount, fromAccount, toAccount);
 		transactions.add(newTransaction);
+		setChanged();
+		notifyObservers();
 		return newTransaction;
 	}
 
@@ -123,6 +126,7 @@ public class BankBranch extends Observable {
 			int numStocks, double balance) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		acc.setBalance(balance);
+		customer.modifyAccountBalanceByAccountName(accountName, balance);
 		BankStock currStock = null;
 		for (int i = 0; i < allStocks.size(); i++) {
 			if (allStocks.get(i).getStockName().equals(stockName)) {
@@ -130,38 +134,68 @@ public class BankBranch extends Observable {
 				currStock.setNumStocks(currStock.getNumStocks() - numStocks);
 			}
 		}
+		int i = 0;
+		boolean flag = false;
+		for (CustomerStock s : acc.getStocks()) {
+			if (s.getStockName().equals(stockName)) {
+				int num = s.getNumberOfStocks() + numStocks;
+				acc.modifyStockByStockIndex(i, num);
+				Update.updateCustomerStockNumber(stockName, customer.getCustomerId(), num);
+				flag = true;
+			}
+			i++;
+		}
+		if (!flag) {
+			CustomerStock newStock = new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks,
+					acc.getAccountName());
+			acc.addStock(newStock);
 
-		CustomerStock newStock = new CustomerStock(Integer.toString(stockID), stockName, value, value, numStocks,
-				acc.getAccountName());
-		acc.addStock(newStock);
+			// add stock to db
+			Create.insertNewCustomerStock(newStock, customer.getCustomerId(), accountName);
 
-		// add stock to db
-		Create.insertNewCustomerStock(newStock, customer.getCustomerId());
+		}
 
 		// update bank stock in db
-		Update.updateBankStocksForBuyOrSell(newStock.getStockName(), currStock.getNumStocks());
+		Update.updateBankStocksForBuyOrSell(stockName, currStock.getNumStocks(), currStock.getValue());
 
 		setChanged();
 		notifyObservers();
 	}
 
-	public void sellStock(BankCustomer customer, String accountName, CustomerStock stock) {
+	public void sellStock(BankCustomer customer, String accountName, CustomerStock stock, int number) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
-		acc.sellStock(stock);
+		acc.sellStock(stock, number);
+		//customer.getAccounts().get(customer.getAccountIndexByName(accountName)).sellStock(stock, number);
 		int num = -1;
 		for (int i = 0; i < allStocks.size(); i++) {
-			num = allStocks.get(i).getNumStocks() + Integer.parseInt(stock.getNumStocks());
+			num = allStocks.get(i).getNumStocks() + number;
 			if (allStocks.get(i).getStockName().equals(stock.getStockName())) {
 				modifyAllStocks(i, Double.parseDouble(stock.getCurrentValue()), num);
 			}
 		}
-		double amount = Double.parseDouble(stock.getCurrentValue()) * Integer.parseInt(stock.getNumStocks());
-		// acc.setBalance(acc.getBalance() + amount - stockFee);
-		this.depositForCustomer(customer, accountName, acc.getBalance() + amount - stockFee);
+		double amount = Double.parseDouble(stock.getCurrentValue()) * number;
+		acc.setBalance(acc.getBalance() + amount - stockFee);
+//		this.depositForCustomer(customer, accountName, acc.getBalance() + amount - stockFee);
 		// remove or update customerStock in db
-		Delete.removeStockForCustomer(stock.getStockID(), customer.getCustomerId(), accountName);
+		CustomerStock s = acc.getStocks().get(acc.getStockIndexByName(stock.getStockName()));
+		if(s.getNumberOfStocks()==0) {
+			allStocks.remove(getStockIndex(stock.getStockName()));
+			Delete.removeStockForCustomer(stock.getStockID(), customer.getCustomerId(), accountName);
+		}
+		else {
+			Update.updateCustomerStockNumber(stock.getStockName(), customer.getCustomerId(), s.getNumberOfStocks());
+		}
+		
 		setChanged();
 		notifyObservers();
+	}
+	
+	public int getStockIndex(String stockName) {
+		for(int i=0;i<allStocks.size();i++) {
+			if(stockName.equals(allStocks.get(i).getStockName()))
+					return i;
+		}
+		return -1;
 	}
 
 	public void addAllStocks(String stockName, double value, int numStocks) {
@@ -175,8 +209,13 @@ public class BankBranch extends Observable {
 
 	public void modifyAllStocks(int stockIndex, double value, int numStocks) {
 		BankStock stock = this.allStocks.get(stockIndex);
-		stock.setValue(value);
-		stock.setNumStocks(numStocks);
+//		stock.setValue(value);
+//		stock.setNumStocks(numStocks);
+		boolean flag=false;
+		if(this.allStocks.get(stockIndex).getValue()!=value)
+			flag=true;
+		this.allStocks.get(stockIndex).setValue(value);
+		this.allStocks.get(stockIndex).setNumStocks(numStocks);
 
 		for (BankCustomer c : customers) {
 			ArrayList<BankAccount> accounts = c.getAccounts();
@@ -184,10 +223,13 @@ public class BankBranch extends Observable {
 				acc.modifyStock(stock);
 			}
 		}
+		if(flag) {
+			Update.updateCustomerStockValue(stock.getStockName(), value);
+		}
 
 		// update bankStock in db
 		if (numStocks != -1)
-			Update.updateBankStocksForBuyOrSell(stock.getStockName(), numStocks);
+			Update.updateBankStocksForBuyOrSell(stock.getStockName(), numStocks, value);
 
 		setChanged();
 		notifyObservers();
@@ -230,14 +272,18 @@ public class BankBranch extends Observable {
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
 		acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		double balance = acc.getBalance();
+		Transaction tr = addTransaction(customer.getName(), "Bank", "Transaction Fees - deposit", transactionFee,
+				accountName, "My Fancy Bank");
+		this.addMoneyEarned(transactionFee);
+		this.addTransactionForCustomer(customer, tr);
 		if (t) {
 			Transaction transaction = this.addTransaction(customer.getName(), "Bank",
 					"Transaction fees - Account Opening", accountOperationFee, accountName, "My Fancy Bank");
-			this.addTransactionForCustomer(customer, transaction);
+
 			this.addMoneyEarned(accountOperationFee);
-			// update fees table in db for moneyEarned
 
 			customer.getAccounts().get(customer.getAccountIndexByName(accountName)).setNewAccount(false);
+			this.addTransactionForCustomer(customer, transaction);
 		}
 		// update account of customer in db for balance
 		Update.updateDepositOrWithdrawal(customer.getCustomerId(), accountName, balance);
@@ -248,6 +294,13 @@ public class BankBranch extends Observable {
 	public boolean withdrawForCustomer(BankCustomer customer, String accountName, double amount) {
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
+		if (acc.getType().equals("checking")) {
+			Transaction tr = addTransaction(customer.getName(), "Bank", "Transaction Fees - withdrawal", transactionFee,
+					accountName, "My Fancy Bank");
+			this.addMoneyEarned(transactionFee);
+			this.addTransactionForCustomer(customer, tr);
+		}
+
 		// update account of customer in db for balance
 		Update.updateDepositOrWithdrawal(customer.getCustomerId(), accountName, acc.getBalance());
 		return flag;

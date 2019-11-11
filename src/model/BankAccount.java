@@ -219,8 +219,20 @@ public class BankAccount {
 		this.isTradable = determineTradability();
 	}
 
-	public void sellStock(CustomerStock stock) {
-		this.stocks.remove(stock);
+	public void sellStock(CustomerStock stock, int num) {
+		int existing = this.stocks.get(getStockIndexByName(stock.getStockName())).getNumberOfStocks();
+		this.stocks.get(getStockIndexByName(stock.getStockName())).setNumStocks(existing-num);
+	}
+	
+	public int getStockIndexByName(String name) {
+		int i=0;
+		for(CustomerStock s: stocks) {
+			if(s.getStockName().equals(name)) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
 	}
 	
 	public void modifyStock(BankStock newStock) {
@@ -251,4 +263,7 @@ public class BankAccount {
 		this.tradingFee = tradingFee;
 	}
 	
+	public void modifyStockByStockIndex(int index, int value) {
+		this.stocks.get(index).setNumStocks(value);
+	}
 }

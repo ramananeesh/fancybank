@@ -39,7 +39,7 @@ public class SQLHelper {
 
 		return rs;
 	}
-	
+
 	public static boolean performQuery(String sql) {
 		Connection conn = getConnection();
 
@@ -48,11 +48,11 @@ public class SQLHelper {
 			int m = st.executeUpdate(sql);
 
 			if (m == 1) {
-				System.out.println("Insert successful");
+
 				conn.close();
 				return true;
 			} else {
-				System.out.println("Insert unsuccessful");
+
 			}
 
 			conn.close();

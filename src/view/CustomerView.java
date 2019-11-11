@@ -227,12 +227,17 @@ public class CustomerView extends JFrame implements Observer {
 
 		String loansData[][] = new String[][] {};
 		String loansHeader[] = new String[] { "ID", "Amount", "Status", "Active" };
-		loansModel = new DefaultTableModel(loansData, loansHeader);
+		loansModel = new DefaultTableModel(loansData, loansHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
 		loansModel = addLoansToTable(customer, loansModel);
 		loansTable = new JTable(loansModel);
 		loansTable.getSelectionModel().addListSelectionListener(new LoanListListener());
 		loansTable.setDefaultRenderer(String.class, centerRenderer);
 		loansTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 18));
+		loansTable.setRowHeight(25);
 		JScrollPane loansScrollPane = new JScrollPane(loansTable);
 		loansScrollPane.setPreferredSize(new Dimension(580, 200));
 		loansTable.setPreferredSize(new Dimension(580, 140));
@@ -421,8 +426,12 @@ public class CustomerView extends JFrame implements Observer {
 //		moreOptionsPanel.add(stocksDisplayPanel, BorderLayout.CENTER);
 
 		String stockData[][] = new String[][] {};
-		String stockHeader[] = new String[] {"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks" };
-		stocksModel = new DefaultTableModel(stockData, stockHeader);
+		String stockHeader[] = new String[] { "Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks" };
+		stocksModel = new DefaultTableModel(stockData, stockHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
 		stocksModel = addStocksToTable(customer, stocksModel);
 		stocksTable = new JTable(stocksModel);
 		stocksTable.getSelectionModel().addListSelectionListener(new StockListListener());
@@ -436,7 +445,7 @@ public class CustomerView extends JFrame implements Observer {
 		stocksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		stocksTable.setBorder(new EmptyBorder(5, 5, 5, 5));
 		stocksTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
-		stocksTable.setRowHeight(20);
+		stocksTable.setRowHeight(25);
 
 		JScrollPane jsStock = new JScrollPane(stocksTable);
 		jsStock.setVisible(true);
@@ -585,7 +594,7 @@ public class CustomerView extends JFrame implements Observer {
 			UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
 
 			String allStockData[][] = new String[][] {};
-			String allStockHeader[] = new String[] {"Stock Name", "Value", "Total Available"};
+			String allStockHeader[] = new String[] { "Stock Name", "Value", "Total Available" };
 			allStocksModel = new DefaultTableModel(allStockData, allStockHeader);
 			allStocksModel = addAllStocksToTable(allStocksModel);
 			allStocksTable = new JTable(allStocksModel);
@@ -603,7 +612,7 @@ public class CustomerView extends JFrame implements Observer {
 			allStocksTable.setFont(new Font("Tahoma", Font.PLAIN, 26));
 			allStocksTable.setRowHeight(20);
 			int reply = JOptionPane.showConfirmDialog(null, allStocksScrollPane, "All Stocks", JOptionPane.OK_OPTION);
-			if(reply == JOptionPane.OK_OPTION) {
+			if (reply == JOptionPane.OK_OPTION) {
 				return;
 			}
 		}
@@ -620,67 +629,74 @@ public class CustomerView extends JFrame implements Observer {
 			ArrayList<BankAccount> accounts = customer.getAccounts();
 			boolean satisfySecure = false;
 			for (int i = 0; i < accounts.size(); i++) {
-				if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > 500) {
+				if (accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > 500) {
 					satisfySecure = true;
 				}
 			}
-			if(satisfySecure == false){
+			if (satisfySecure == false) {
 				JOptionPane.showMessageDialog(null, "Do not satisfy a secure account", "Error",
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 			centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-			while(true){
+			while (true) {
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
 				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
 
 				try {
 					JComboBox<String> accountCombo = new JComboBox<String>();
-					for(int i = 0; i < accounts.size(); i++){
-						if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > bank.getHighBalance()){
+					for (int i = 0; i < accounts.size(); i++) {
+						if (accounts.get(i).getType().equals("Savings")
+								&& accounts.get(i).getBalance() > bank.getHighBalance()) {
 							accountCombo.addItem(accounts.get(i).getAccountName());
 						}
 					}
 					JComboBox<String> stocksCombo = new JComboBox<String>();
 					ArrayList<BankStock> allStocks = bank.getAllStocks();
-					for(int i = 0; i < allStocks.size(); i++) {
+					for (int i = 0; i < allStocks.size(); i++) {
 						stocksCombo.addItem(allStocks.get(i).getStockName());
 					}
 					JTextField numStocksField = new JTextField();
-					Object[] fields = {"Account Name: ", accountCombo, "Stock Name: ", stocksCombo, "Number of Stocks: ", numStocksField, };
-					while(true) {
+					Object[] fields = { "Account Name: ", accountCombo, "Stock Name: ", stocksCombo,
+							"Number of Stocks: ", numStocksField, };
+					while (true) {
 						BankAccount currAccount = null;
-						int reply = JOptionPane.showConfirmDialog(null, fields, "Buy Stock", JOptionPane.OK_CANCEL_OPTION);
+						int reply = JOptionPane.showConfirmDialog(null, fields, "Buy Stock",
+								JOptionPane.OK_CANCEL_OPTION);
 						if (reply == JOptionPane.OK_OPTION) {
 							String currAccountName = accountCombo.getSelectedItem().toString();
-							for(BankAccount acc : accounts){
-								if(acc.getAccountName().equals(currAccountName)){
+							for (BankAccount acc : accounts) {
+								if (acc.getAccountName().equals(currAccountName)) {
 									currAccount = acc;
 									break;
 								}
 							}
 							int stockIndex = stocksCombo.getSelectedIndex();
 							BankStock stock = allStocks.get(stockIndex);
-							if(stock.getNumStocks() - Integer.valueOf(numStocksField.getText()) <= 0){
-								JOptionPane.showMessageDialog(null,
-										"Stocks not enough", "Error",
+							if (stock.getNumStocks() - Integer.valueOf(numStocksField.getText()) <= 0) {
+								JOptionPane.showMessageDialog(null, "Stocks not enough", "Error",
 										JOptionPane.ERROR_MESSAGE);
 								return;
 							}
-							double balance = currAccount.getBalance() - Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()) - bank.getStockFee();
-							//why do we need this?
-//							if(balance < 500){
-//								JOptionPane.showMessageDialog(null,
-//										"Account too low", "Error",
-//										JOptionPane.ERROR_MESSAGE);
-//								return;
-//							}
-							bank.addStock(customer, currAccount.getAccountName(), bank.getStockID(), stock.getStockName(), Double.valueOf(stock.getValue()), Integer.parseInt(numStocksField.getText()), balance);
-							bank.setStockID(bank.getStockID()+1);
+							double balance = currAccount.getBalance()
+									- Double.valueOf(stock.getValue()) * Integer.parseInt(numStocksField.getText())
+									- bank.getStockFee();
+							// why do we need this?
+							if (balance < 0) {
+								JOptionPane.showMessageDialog(null, "Account too low", "Error",
+										JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							bank.addStock(customer, currAccount.getAccountName(), bank.getStockID(),
+									stock.getStockName(), Double.valueOf(stock.getValue()),
+									Integer.parseInt(numStocksField.getText()), balance);
+							bank.setStockID(bank.getStockID() + 1);
 							bank.addMoneyEarned(bank.getStockFee());
-							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Buy Stock",
-									Double.valueOf(stock.getValue())*Integer.parseInt(numStocksField.getText()), "Savings", "Secure");
+							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(),
+									"Buy Stock",
+									Double.valueOf(stock.getValue()) * Integer.parseInt(numStocksField.getText()),
+									"Savings", "Secure");
 							bank.addTransactionForCustomer(customer, transaction);
 							double fees = bank.getStockFee();
 							if (fees != 0) {
@@ -689,15 +705,12 @@ public class CustomerView extends JFrame implements Observer {
 								bank.addTransactionForCustomer(customer, transaction);
 							}
 							break;
-						}
-						else{
+						} else {
 							return;
 						}
 					}
 				} catch (Exception e1) {
-						JOptionPane.showMessageDialog(null,
-								"Error", "Error",
-								JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 				break;
 			}
@@ -709,51 +722,61 @@ public class CustomerView extends JFrame implements Observer {
 		public void actionPerformed(ActionEvent e) {
 			boolean hasStock = false;
 			ArrayList<BankAccount> accounts = customer.getAccounts();
-			for(BankAccount acc : accounts){
-				if(acc.getStocks().size() != 0){
+			for (BankAccount acc : accounts) {
+				if (acc.getStocks().size() != 0) {
 					hasStock = true;
 					break;
 				}
 			}
-			if(hasStock == false){
-				JOptionPane.showMessageDialog(null, "No Stocks to sell", "Error",
-						JOptionPane.ERROR_MESSAGE);
+			if (hasStock == false) {
+				JOptionPane.showMessageDialog(null, "No Stocks to sell", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			while(true){
+			while (true) {
 				UIManager.put("OptionPane.minimumSize", new Dimension(600, 600));
 				UIManager.put("ComboBox.font", new Font("Tahoma", Font.PLAIN, 30));
 				JComboBox<String> stockCombo = new JComboBox<String>();
-				for(BankAccount acc : accounts){
-					for(CustomerStock s : acc.getStocks()){
-						stockCombo.addItem(s.getStockName());
+				ArrayList<CustomerStock> stocks = new ArrayList<CustomerStock>();
+				for (BankAccount acc : accounts) {
+					for (CustomerStock s : acc.getStocks()) {
+						stockCombo.addItem(s.getStockName() + "-" + acc.getAccountName() + "-" + s.getNumberOfStocks());
+						stocks.add(s);
 					}
 				}
+				JTextField numberOfStocksField = new JTextField();
 
-				Object[] fields = {"Stock Name: ", stockCombo, };
-				while(true) {
+				Object[] fields = { "Stock Name: ", stockCombo, "Number of Stocks: ", numberOfStocksField };
+				while (true) {
 					int reply = JOptionPane.showConfirmDialog(null, fields, "Sell Stock", JOptionPane.OK_CANCEL_OPTION);
 					if (reply == JOptionPane.OK_OPTION) {
-						String stockName = stockCombo.getSelectedItem().toString();
+						String stockName = stocks.get(stockCombo.getSelectedIndex()).getStockName();
+
 						try {
+							int numberOfStocks = Integer.parseInt(numberOfStocksField.getText());
+
 							CustomerStock currStock = null;
 							BankAccount currAccount = null;
-							for(BankAccount acc : accounts) {
+							for (BankAccount acc : accounts) {
 								for (CustomerStock s : acc.getStocks()) {
-									if(s.getStockName().equals(stockName)){
+									if (s.getStockName().equals(stockName)) {
 										currStock = s;
 										currAccount = acc;
 										break;
 									}
 								}
 							}
-							bank.sellStock(customer, currAccount.getAccountName(), currStock);
-							double amount = Double.parseDouble(currStock.getCurrentValue())*Integer.parseInt(currStock.getNumStocks())-bank.getStockFee();
-							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(), "Sell Stock",
-									 amount, "Secure", "Savings");
+							if (numberOfStocks < 0 || numberOfStocks > currStock.getNumberOfStocks()) {
+								JOptionPane.showMessageDialog(null, "Enter a valid number of Stocks", "Error",
+										JOptionPane.ERROR_MESSAGE);
+								continue;
+							}
+							bank.sellStock(customer, currAccount.getAccountName(), currStock, numberOfStocks);
+							double amount = Double.parseDouble(currStock.getCurrentValue()) * numberOfStocks
+									- bank.getStockFee();
+							Transaction transaction = bank.addTransaction(customer.getName(), customer.getName(),
+									"Sell Stock", amount, "Security", "Savings");
 							bank.addTransactionForCustomer(customer, transaction);
-							JOptionPane.showMessageDialog(null,
-									"You have selled your stock", "Sell Stock",
+							JOptionPane.showMessageDialog(null, "You have sold your stock", "Sell Stock",
 									JOptionPane.OK_OPTION);
 							double fees = bank.getStockFee();
 							if (fees != 0) {
@@ -764,12 +787,10 @@ public class CustomerView extends JFrame implements Observer {
 							bank.addMoneyEarned(bank.getStockFee());
 							break;
 						} catch (Exception e1) {
-							JOptionPane.showMessageDialog(null, "Error",
-									"Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
 							continue;
 						}
-					}
-					else{
+					} else {
 						return;
 					}
 				}
@@ -918,9 +939,9 @@ public class CustomerView extends JFrame implements Observer {
 				Object[] fields = { "From Account Name: ", combo1, "To Account Name: ", combo2, "Amount in USD: $",
 						amountField, };
 
-				int reply = JOptionPane.showConfirmDialog(null, fields, "Transfer between Accounts",
-						JOptionPane.OK_CANCEL_OPTION);
 				while (true) {
+					int reply = JOptionPane.showConfirmDialog(null, fields, "Transfer between Accounts",
+							JOptionPane.OK_CANCEL_OPTION);
 					if (reply == JOptionPane.OK_OPTION) {
 
 						int index1 = combo1.getSelectedIndex();
@@ -976,6 +997,7 @@ public class CustomerView extends JFrame implements Observer {
 						}
 						JOptionPane.showMessageDialog(null, "From and to accounts cannot be the same!", "Error",
 								JOptionPane.ERROR_MESSAGE);
+						break;
 					} else {
 						return;
 					}
@@ -1148,26 +1170,28 @@ public class CustomerView extends JFrame implements Observer {
 
 	}
 
-
 	public class StockListListener implements ListSelectionListener {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			if(stocksTable.getSelectedRow() == -1){
+			if (stocksTable.getSelectedRow() == -1) {
 				return;
 			}
 			accountsTable.clearSelection();
 			transactionsTable.clearSelection();
 
 			ArrayList<BankAccount> accounts = customer.getAccounts();
-			for(BankAccount acc : accounts){
-				ArrayList<CustomerStock> stocks = acc.getStocks();
-				CustomerStock stock = stocks.get(stocksTable.getSelectedRow());
-				String info = stock.getDetailedStockDisplayForCustomer();
-				infoDetailsTextArea.setText(info);
+			ArrayList<CustomerStock> stocks = new ArrayList<CustomerStock>();
+			for (BankAccount acc : accounts) {
+				stocks.addAll(acc.getStocks());
 			}
+			if (stocks.size() == 0)
+				return;
+			CustomerStock stock = stocks.get(stocksTable.getSelectedRow());
+			String info = stock.getDetailedStockDisplayForCustomer();
+			infoDetailsTextArea.setText(info);
 		}
-	}
 
+	}
 
 	public DefaultTableModel addAccountsToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
@@ -1189,6 +1213,7 @@ public class CustomerView extends JFrame implements Observer {
 		for (Transaction t : transactions) {
 			model.addRow(t.shortCustomerDisplay());
 		}
+		model.setRowCount(transactions.size());
 		return model;
 	}
 
@@ -1206,11 +1231,11 @@ public class CustomerView extends JFrame implements Observer {
 	public DefaultTableModel addStocksToTable(BankCustomer customer, DefaultTableModel model) {
 		customer = this.bank.getCustomerByEmail(customer.getEmail());
 		ArrayList<BankAccount> accounts = customer.getAccounts();
-		for(BankAccount acc : accounts){
-			if(!acc.isTradable())
+		for (BankAccount acc : accounts) {
+			if (!acc.isTradable())
 				continue;
 			ArrayList<CustomerStock> stocks = acc.getStocks();
-			for(CustomerStock s : stocks) {
+			for (CustomerStock s : stocks) {
 				model.addRow(s.getShortStockDisplayForCustomer());
 			}
 		}
@@ -1249,10 +1274,23 @@ public class CustomerView extends JFrame implements Observer {
 		loansTable.setModel(loansModel);
 
 		String stockData[][] = new String[][] {};
-		String stockHeader[] = new String[] {"Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks"};
-		stocksModel = new DefaultTableModel(stockData, stockHeader);
+		String stockHeader[] = new String[] { "Stock ID", "Stock Name", "Buying Value", "Current Value", "# Stocks" };
+		stocksModel = new DefaultTableModel(stockData, stockHeader) {
+			public boolean isCellEditable(int rowIndex, int mColIndex) {
+				return false;
+			}
+		};
 		stocksModel = addStocksToTable(customer, stocksModel);
 		stocksTable.setModel(stocksModel);
+
+		if (accountsTable.getSelectedRow() != -1) {
+			ArrayList<BankAccount> accounts = customer.getAccounts();
+			BankAccount account = accounts.get(accountsTable.getSelectedRow());
+
+			accountNameLbl.setText("Account Name: " + account.getAccountName());
+			Double balance = account.getBalance();
+			accountBalanceLbl.setText("Account Balance: $" + balance.toString());
+		}
 
 	}
 

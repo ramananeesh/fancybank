@@ -6,8 +6,6 @@ import java.text.SimpleDateFormat;
 
 public class Create {
 
-	
-
 	public static boolean insertNewCustomer(BankCustomer customer) {
 
 		String sql = "insert into customer values('" + customer.getCustomerId() + "','" + customer.getName() + "','"
@@ -45,10 +43,10 @@ public class Create {
 		return SQLHelper.performQuery(sql);
 	}
 
-	public static boolean insertNewCustomerStock(CustomerStock stock, String customerId) {
+	public static boolean insertNewCustomerStock(CustomerStock stock, String customerId, String accountName) {
 		String sql = "Insert into customerStock values('" + stock.getStockID() + "','" + stock.getStockName() + "','"
 				+ customerId + "'," + stock.getBuyingValue() + "," + stock.getCurrentValue() + ","
-				+ stock.getNumStocks() + ")";
+				+ stock.getNumStocks() + ",'" + accountName + "'" + ")";
 
 		return SQLHelper.performQuery(sql);
 	}

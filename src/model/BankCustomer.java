@@ -40,6 +40,7 @@ public class BankCustomer extends Customer {
 		this.loans = loans;
 	}
 	
+	
 	public void addAccount(BankAccount newAccount) {
 		this.accounts.add(newAccount);
 	}
@@ -264,6 +265,15 @@ public class BankCustomer extends Customer {
 			ret += l.getDetailedLoanDisplayForManager();
 		}
 		return ret;
+	}
+	
+	public  void modifyAccountBalanceByAccountName(String accountName, double value) {
+		for(int i=0;i<accounts.size();i++) {
+			if(accounts.get(i).getAccountName().equals(accountName)) {
+				accounts.get(i).setBalance(value);
+				break;
+			}
+		}
 	}
 
 }

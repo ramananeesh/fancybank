@@ -34,6 +34,10 @@ public class CustomerStock {
     public String getNumStocks() {
         return Integer.toString(numStocks);
     }
+    
+    public int getNumberOfStocks() {
+    	return numStocks;
+    }
 
     public void setStockID(String stockID){
         this.stockID = stockID;
@@ -69,6 +73,7 @@ public class CustomerStock {
         ret += "Buying Value: $" + this.buyingValue + "\n";
         ret += "Current Value: $" + this.currentValue + "\n";
         ret += "Num of Stocks: " + this.numStocks + "\n";
+        ret += "AccountName: " + this.accountName + "\n";
         return ret;
     }
 
@@ -80,6 +85,7 @@ public class CustomerStock {
         ret += "Buying Value: $" + this.buyingValue + "\n";
         ret += "Current Value: $" + this.currentValue + "\n";
         ret += "Num of Stocks: " + this.numStocks + "\n";
+        ret += "AccountName: " + this.accountName + "\n";
         return ret;
     }
 

@@ -5,8 +5,8 @@ import java.sql.*;
 
 public class Update {
 
-	public static boolean updateBankStocksForBuyOrSell(String stockName, int quantity) {
-		String sql = "Update bankStock set numberOfStocks=" + quantity + " where " + "stockName='" + stockName + "'";
+	public static boolean updateBankStocksForBuyOrSell(String stockName, int quantity, double value) {
+		String sql = "Update bankStock set numberOfStocks=" + quantity + ", value="+value+" where " + "stockName='" + stockName + "'";
 
 		return SQLHelper.performQuery(sql);
 	}
@@ -38,11 +38,11 @@ public class Update {
 	}
 
 	public static boolean updateFeeForCustomer(String feeName, double value, String customerId) {
-		if(feeName.equals("savingsInterestRate"))
-			feeName="rate";
-		if(feeName.equals("highBalance"))
-				return true;
-		
+		if (feeName.equals("savingsInterestRate"))
+			feeName = "rate";
+		if (feeName.equals("highBalance"))
+			return true;
+
 		String sql = "Update bankAccount set " + feeName + "=" + value + " where ";
 
 		if (customerId.equals(""))
@@ -60,6 +60,18 @@ public class Update {
 			sql += "1";
 		else
 			sql += " customerId='" + customerId + "'";
+
+		return SQLHelper.performQuery(sql);
+	}
+
+	public static boolean updateCustomerStockNumber(String stockName, String customerId, int value) {
+		String sql = "Update customerStock set numStocks=" + value + " where customerId='" + customerId
+				+ "' and stockName='" + stockName + "'";
+
+		return SQLHelper.performQuery(sql);
+	}
+	public static boolean updateCustomerStockValue(String stockName, double value) {
+		String sql = "Update customerStock set currentValue=" + value + " where stockName='" + stockName + "'";
 
 		return SQLHelper.performQuery(sql);
 	}

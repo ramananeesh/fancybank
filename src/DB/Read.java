@@ -194,7 +194,7 @@ public class Read {
 	public static ArrayList<CustomerStock> getCustomerStocks(String customerId) {
 		ArrayList<CustomerStock> stocks = new ArrayList<CustomerStock>();
 		String query = "Select stockId, stockName, buyingValue, currentValue,"
-				+ "numstocks from customerStock where customerId='" + customerId + "'";
+				+ "numstocks, accountName from customerStock where customerId='" + customerId + "'";
 		ResultSet rs = SQLHelper.performRead(query);
 
 		try {
@@ -291,6 +291,28 @@ public class Read {
 		String[] x = date.split("/");
 
 		return new Date(Integer.parseInt(x[0]), Integer.parseInt(x[1]), Integer.parseInt(x[2]));
+	}
+	
+	public static ArrayList<BankManager> getAllManagers(){
+		ArrayList<BankManager> m=new ArrayList<BankManager>();
+		
+		String query="select * from manager";
+		ResultSet rs = SQLHelper.performRead(query);
+		
+		try {
+			while(rs.next()) {
+				String name=rs.getString("name");
+				String id=rs.getString("id");
+				String email=rs.getString("email");
+				String securityCode=rs.getString("securityCode");
+				String password=rs.getString("password");
+				m.add(new BankManager(name, id, email, securityCode, password));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return m;
 	}
 
 }
