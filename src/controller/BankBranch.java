@@ -75,7 +75,7 @@ public class BankBranch extends Observable {
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
 		BankManager newManager = new BankManager(name, id, email, securityCode, password);
 		managers.add(newManager);
-		Insert.insertNewManager(newManager);
+		Create.insertNewManager(newManager);
 		return newManager;
 	}
 
@@ -94,7 +94,7 @@ public class BankBranch extends Observable {
 		int customerId = BankCustomer.generateCustomerId(customers);
 		BankCustomer newCustomer = new BankCustomer(name, Integer.toString(customerId), address, phoneNumber, ssn,
 				email, password);
-		Insert.insertNewCustomer(newCustomer);
+		Create.insertNewCustomer(newCustomer);
 		this.customers.add(newCustomer);
 		return newCustomer;
 	}
@@ -103,7 +103,7 @@ public class BankBranch extends Observable {
 		BankAccount newAccount = new BankAccount(accountName, accountType, loanInterestRate, withdrawalFee,
 				transactionFee, accountOperationFee, tradeThreshold, stockFee);
 		this.getCustomerByEmail(customer.getEmail()).addAccount(newAccount);
-		Insert.insertNewAccount(newAccount, customer.getCustomerId());
+		Create.insertNewAccount(newAccount, customer.getCustomerId());
 		setChanged();
 		notifyObservers();
 	}
@@ -116,7 +116,7 @@ public class BankBranch extends Observable {
 				collateral, collateralAmount);
 		this.loans.add(loan);
 		this.getCustomerByEmail(customer.getEmail()).addLoan(loan);
-		Insert.insertNewLoan(loan);
+		Create.insertNewLoan(loan);
 		setChanged();
 		notifyObservers();
 	}
@@ -138,7 +138,7 @@ public class BankBranch extends Observable {
 		acc.addStock(newStock);
 
 		// add stock to db
-		Insert.insertNewCustomerStock(newStock, customer.getCustomerId());
+		Create.insertNewCustomerStock(newStock, customer.getCustomerId());
 
 		// update bank stock in db
 		Update.updateBankStocksForBuyOrSell(newStock.getStockName(), currStock.getNumStocks());
@@ -170,7 +170,7 @@ public class BankBranch extends Observable {
 		BankStock bankStock = new BankStock(stockName, value, numStocks);
 		this.allStocks.add(bankStock);
 		// insert to db
-		Insert.insertNewBankStock(bankStock);
+		Create.insertNewBankStock(bankStock);
 		setChanged();
 		notifyObservers();
 	}
@@ -270,7 +270,7 @@ public class BankBranch extends Observable {
 
 	public void addTransactionForCustomer(BankCustomer customer, Transaction transaction) {
 		this.getCustomerByEmail(customer.getEmail()).addTransaction(transaction);
-		Insert.insertNewTransaction(transaction, customer.getCustomerId());
+		Create.insertNewTransaction(transaction, customer.getCustomerId());
 		setChanged();
 		notifyObservers();
 	}
