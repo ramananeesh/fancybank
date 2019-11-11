@@ -2,6 +2,7 @@ package DB;
 
 import model.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 public class Insert {
 
@@ -56,37 +57,52 @@ public class Insert {
 
 	}
 
-	public static boolean insertNewAccount(BankAccount account) {
-		String sql = "Insert into account values('" + account.getAccountName() + "','" + account.getType() + "','"
-				+ account.getBalance() + "','" + account.getRate() + "','" + account.getWithdrawalFee() + "','"
-				+ account.getAccountOperationFee() + "','" + account.getTransactionFee() + "','"
-				+ account.isNewAccount() + "','" + account.isTradable() + "','" + account.getTradeThreshold() + "','"
-				+ account.getTradingFee();
+	public static boolean insertNewAccount(BankAccount account, String customerId) {
+		String sql = "Insert into bankAccount values('" + account.getAccountName() + "','" + account.getType() + "',"
+				+ account.getBalance() + "," + account.getRate() + "," + account.getWithdrawalFee() + ","
+				+ account.getAccountOperationFee() + "," + account.getTransactionFee() + "," + account.isNewAccount()
+				+ ",'" + customerId + "'," + account.isTradable() + "," + account.getTradeThreshold() + ","
+				+ account.getTradingFee() + ")";
 
 		return performInsert(sql);
 	}
 
 	public static boolean insertNewTransaction(Transaction t, String customerId) {
-		String sql = "Insert into transaction values('" + t.getFromAccount() + "','" + t.getToAccount() + "','"
-				+ customerId + "','" + t.getType() + "','" + t.getFromCustomer() + "','" + t.getToCustomer()
-				+ t.getAmount() + "')";
+		String sql = "Insert into transaction (fromAccount, toAccount, customerId, type, fromCustomer, toCustomer, amount) values('"
+				+ t.getFromAccount() + "','" + t.getToAccount() + "','" + customerId + "','" + t.getType() + "','"
+				+ t.getFromCustomer() + "','" + t.getToCustomer() + "'," + t.getAmount() + ")";
 		return performInsert(sql);
 	}
 
 	public static boolean insertNewLoan(Loan l) {
 
 		String sql = "Insert into loan values('" + l.getLoanId() + "','" + l.getCustomerId() + "','"
-				+ l.getCustomerName() + "','" + l.getLoanAmount() + "','" + l.getInterestRate() + "','" + l.getTenure()
-				+ "','" + l.isActive() + "','" + l.isApproved() + "','" + l.getLoanStartDate() + "','"
-				+ l.getCollateral() + "','" + l.getCollateralAmount() + "')";
+				+ l.getCustomerName() + "'," + l.getLoanAmount() + "," + l.getInterestRate() + "," + l.getTenure() + ","
+				+ l.isActive() + "," + l.isApproved() + ",'" + l.getLoanStartDate() + "','" + l.getCollateral() + "',"
+				+ l.getCollateralAmount() + ")";
 
 		return performInsert(sql);
 	}
-	
+
 	public static boolean insertNewCustomerStock(CustomerStock stock, String customerId) {
-		String sql = "Insert into customerStock values('"+stock.getStockID()+"','"+stock.getStockName()
-		+"','"+customerId+"','"+stock.getBuyingValue()+"','"+stock.getCurrentValue()+"','"+stock.getNumStocks();
-		
+		String sql = "Insert into customerStock values('" + stock.getStockID() + "','" + stock.getStockName() + "','"
+				+ customerId + "'," + stock.getBuyingValue() + "," + stock.getCurrentValue() + ","
+				+ stock.getNumStocks() + ")";
+
+		return performInsert(sql);
+	}
+
+	public static boolean insertNewBankStock(BankStock stock) {
+		String sql = "Insert into bankStock values('" + stock.getStockName() + "'," + stock.getValue() + ","
+				+ stock.getNumStocks() + ")";
+
+		return performInsert(sql);
+	}
+
+	public static boolean insertNewManager(BankManager manager) {
+		String sql = "Insert into manager values('" + manager.getName() + "','" + manager.getId() + "','"
+				+ manager.getEmail() + "','" + manager.getSecurityCode() + "','" + manager.getPassword() + "')";
+
 		return performInsert(sql);
 	}
 

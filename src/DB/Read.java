@@ -129,7 +129,7 @@ public class Read {
 		ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
 		String query = "select accountName, accountType, balance, rate, "
 				+ "withdrawalFee, accountOperationFee, transactionFee,"
-				+ "isNewAccount from bankaccount where customerId='" + customerId + "'";
+				+ "isNewAccount, tradeThreshold, tradingFee from bankaccount where customerId='" + customerId + "'";
 		ResultSet rs = performRead(query);
 		try {
 			while (rs.next()) {
@@ -141,7 +141,7 @@ public class Read {
 				double accountOperationFee = Double.parseDouble(rs.getString("accountOperationFee"));
 				double transactionFee = Double.parseDouble(rs.getString("transactionFee"));
 				boolean isNewAccount = Boolean.parseBoolean(rs.getString("isNewAccount"));
-				double tradingThreshold = Double.parseDouble(rs.getString("tradingThreshold"));
+				double tradingThreshold = Double.parseDouble(rs.getString("tradeThreshold"));
 				double tradingFee = Double.parseDouble(rs.getString("tradingFee"));
 				accounts.add(new BankAccount(name, accountType, balance, rate, withdrawalFee, transactionFee,
 						accountOperationFee, isNewAccount, tradingThreshold, tradingFee));
@@ -186,9 +186,12 @@ public class Read {
 	public static ArrayList<Loan> getLoans(String customerId) {
 		ArrayList<Loan> loans = new ArrayList<Loan>();
 
-		String query = "Select 'loanId', 'customerId', 'customerName', "
-				+ "'loanAmount', 'interestRate', 'tenure', 'isActive',"
-				+ "'isApproved', 'startDate', 'collateral', 'collateralAmount'" + "from loan";
+//		String query = "Select 'loanId', 'customerId', 'customerName', "
+//				+ "'loanAmount', 'interestRate', 'tenure', 'isActive',"
+//				+ "'isApproved', 'startDate', 'collateral', 'collateralAmount'" + "from loan";
+
+		String query = "Select loanId, customerId, customerName, loanAmount, interestRate, tenure, isActive, isApproved, startDate, collateral, collateralAmount from loan"
+				+ "";
 
 		// customerId = manager when manager is querying
 		if (!customerId.equals("manager")) {
@@ -201,14 +204,17 @@ public class Read {
 			while (rs.next()) {
 				String loanId = rs.getString("loanId");
 				String customerName = rs.getString("customerName");
-				double loanAmount = Double.parseDouble(rs.getString("loanAmount"));
-				double interestRate = Double.parseDouble(rs.getString("interestRate"));
-				int tenure = Integer.parseInt(rs.getString("tenure"));
-				boolean isActive = Boolean.parseBoolean(rs.getString("isActive"));
-				boolean isApproved = Boolean.parseBoolean(rs.getString("isApproved"));
-				Date startDate = getDateFromString(rs.getString("startDate"));
+
+//				double loanAmount = Double.parseDouble(rs.getString("loanAmount"));
+//				double interestRate = Double.parseDouble(rs.getString("interestRate"));
+				double loanAmount = rs.getDouble("loanAmount");
+				double interestRate = rs.getDouble("interestRate");
+				int tenure = rs.getInt("tenure");
+				boolean isActive = rs.getBoolean("isActive");
+				boolean isApproved = rs.getBoolean("isApproved");
+				Date startDate = rs.getDate("startDate");
 				String collateral = rs.getString("collateral");
-				double collateralAmount = Double.parseDouble(rs.getString("collateralAmount"));
+				double collateralAmount = rs.getDouble("collateralAmount");
 				loans.add(new Loan(loanId, customerName, customerId, loanAmount, interestRate, tenure, isActive,
 						isApproved, startDate, collateral, collateralAmount));
 			}
@@ -229,9 +235,9 @@ public class Read {
 			while (rs.next()) {
 				String stockId = rs.getString("stockId");
 				String stockName = rs.getString("stockName");
-				double buyingValue = Double.parseDouble(rs.getString("buyingValue"));
-				double currentValue = Double.parseDouble(rs.getString("currentValue"));
-				int numStocks = Integer.parseInt(rs.getString("numStocks"));
+				double buyingValue = rs.getDouble("buyingValue");
+				double currentValue = rs.getDouble("currentValue");
+				int numStocks = rs.getInt("numStocks");
 				String accountName = rs.getString("accountName");
 				stocks.add(new CustomerStock(stockId, stockName, buyingValue, currentValue, numStocks, accountName));
 			}
@@ -263,8 +269,8 @@ public class Read {
 		try {
 			while (rs.next()) {
 				String stockName = rs.getString("stockName");
-				double value = Double.parseDouble(rs.getString("value"));
-				int numberOfStocks = Integer.parseInt(rs.getString("numberOfStocks"));
+				double value = rs.getDouble("value");
+				int numberOfStocks = rs.getInt("numberOfStocks");
 
 				stocks.add(new BankStock(stockName, value, numberOfStocks));
 			}
@@ -273,6 +279,22 @@ public class Read {
 			e.printStackTrace();
 		}
 		return stocks;
+	}
+	
+	public static HashMap<String,Double> getAllFees(){
+		HashMap<String,Double> map=new HashMap<String, Double>();
+		String query = "Select * from fees";
+		ResultSet rs = performRead(query);
+		
+		try {
+			while (rs.next()) {
+				map.put(rs.getString("name"),rs.getDouble("value"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return map;
 	}
 
 	public static ArrayList<BankCustomer> getAllCustomers() {
@@ -291,11 +313,11 @@ public class Read {
 			e.printStackTrace();
 		}
 
-		//loop through emails and get customers
-		for(String email: emails) {
+		// loop through emails and get customers
+		for (String email : emails) {
 			customers.add(getCustomer(email));
 		}
-		
+
 		return customers;
 	}
 

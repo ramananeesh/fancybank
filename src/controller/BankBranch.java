@@ -2,6 +2,9 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Date;
+import java.util.HashMap;
+
 import DB.*;
 
 import javax.swing.DefaultListModel;
@@ -55,25 +58,32 @@ public class BankBranch extends Observable {
 
 	public void initialize() {
 		this.customers.addAll(Read.getAllCustomers());
-		this.transactions.addAll(Read.getTransactions(""));
-		this.loans.addAll(Read.getLoans(""));
+		this.transactions.addAll(Read.getTransactions("manager"));
+		this.loans.addAll(Read.getLoans("manager"));
 		this.allStocks.addAll(Read.getBankStocks());
-//		for(BankCustomer c: this.customers) {
-//			this.transactions.addAll(Read.getTransactions(c.getCustomerId()));
-//			this.loans.addAll(Read.getLoans(c.getCustomerId()));
-//		}
+		HashMap<String, Double> feeMap = Read.getAllFees();
+		this.loanInterestRate = feeMap.get("loanInterestRate");
+		this.accountOperationFee = feeMap.get("accountOperationFee");
+		this.highBalance = feeMap.get("highBalance");
+		this.moneyEarned = feeMap.get("moneyEarned");
+		this.savingsInterestRate = feeMap.get("savingsInterestRate");
+		this.stockFee = feeMap.get("stockFee");
+		this.transactionFee = feeMap.get("transactionFee");
+		this.withdrawalFee = feeMap.get("withdrawalFee");
 	}
 
 	public BankManager addManager(String name, String id, String email, String securityCode, String password) {
 		BankManager newManager = new BankManager(name, id, email, securityCode, password);
 		managers.add(newManager);
+		Insert.insertNewManager(newManager);
 		return newManager;
 	}
 
 	public Transaction addTransaction(String fromCustomer, String toCustomer, String type, double amount,
 			String fromAccount, String toAccount) {
 		Transaction newTransaction = new Transaction(fromCustomer, toCustomer, type, amount, fromAccount, toAccount);
-		Insert.insertNewTransaction(newTransaction, customers.get(getCustomerIndex(fromCustomer)).getCustomerId());
+		// Insert.insertNewTransaction(newTransaction,
+		// customers.get(getCustomerIndex(fromCustomer)).getCustomerId());
 		transactions.add(newTransaction);
 		return newTransaction;
 	}
@@ -93,13 +103,14 @@ public class BankBranch extends Observable {
 		BankAccount newAccount = new BankAccount(accountName, accountType, loanInterestRate, withdrawalFee,
 				transactionFee, accountOperationFee, tradeThreshold, stockFee);
 		this.getCustomerByEmail(customer.getEmail()).addAccount(newAccount);
-		Insert.insertNewAccount(newAccount);
+		Insert.insertNewAccount(newAccount, customer.getCustomerId());
 		setChanged();
 		notifyObservers();
 	}
 
 	public void addLoan(BankCustomer customer, double loanAmount, double interestRate, int tenure, String collateral,
 			double collateralAmount) {
+		Date date = new Date();
 		Loan loan = new Loan(customer.getName(), customer.getCustomerId(),
 				Integer.toString(BankCustomer.generateLoanId(customer.getLoans())), loanAmount, interestRate, tenure,
 				collateral, collateralAmount);
@@ -158,6 +169,8 @@ public class BankBranch extends Observable {
 	public void addAllStocks(String stockName, double value, int numStocks) {
 		BankStock bankStock = new BankStock(stockName, value, numStocks);
 		this.allStocks.add(bankStock);
+		// insert to db
+		Insert.insertNewBankStock(bankStock);
 		setChanged();
 		notifyObservers();
 	}
@@ -215,7 +228,7 @@ public class BankBranch extends Observable {
 	public boolean depositForCustomer(BankCustomer customer, String accountName, double amount) {
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		boolean t = acc.isNewAccount();
-		
+
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).depositIntoAccount(accountName, amount);
 		acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
 		double balance = acc.getBalance();
@@ -224,11 +237,11 @@ public class BankBranch extends Observable {
 					"Transaction fees - Account Opening", accountOperationFee, accountName, "My Fancy Bank");
 			this.addTransactionForCustomer(customer, transaction);
 			this.addMoneyEarned(accountOperationFee);
-			//update fees table in db for moneyEarned
-			
+			// update fees table in db for moneyEarned
+
 			customer.getAccounts().get(customer.getAccountIndexByName(accountName)).setNewAccount(false);
 		}
-		//update account of customer in db for balance
+		// update account of customer in db for balance
 		Update.updateDepositOrWithdrawal(customer.getCustomerId(), accountName, balance);
 
 		return flag;
@@ -237,21 +250,21 @@ public class BankBranch extends Observable {
 	public boolean withdrawForCustomer(BankCustomer customer, String accountName, double amount) {
 		boolean flag = this.getCustomerByEmail(customer.getEmail()).withdrawFromAccount(accountName, amount);
 		BankAccount acc = customer.getAccounts().get(customer.getAccountIndexByName(accountName));
-		//update account of customer in db for balance
-				Update.updateDepositOrWithdrawal(customer.getCustomerId(), accountName, acc.getBalance());
+		// update account of customer in db for balance
+		Update.updateDepositOrWithdrawal(customer.getCustomerId(), accountName, acc.getBalance());
 		return flag;
 	}
 
 	public boolean transferBetweenAccountsForCustomer(BankCustomer customer, String fromAccountName,
 			String toAccountName, double amount) {
-		boolean flag = this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName, toAccountName,
-				amount);
+		boolean flag = this.getCustomerByEmail(customer.getEmail()).transferBetweenAccounts(fromAccountName,
+				toAccountName, amount);
 		BankAccount withdrawalAcc = customer.getAccounts().get(customer.getAccountIndexByName(fromAccountName));
 		BankAccount depositAcc = customer.getAccounts().get(customer.getAccountIndexByName(toAccountName));
-		
+
 		Update.updateDepositOrWithdrawal(customer.getCustomerId(), fromAccountName, withdrawalAcc.getBalance());
 		Update.updateDepositOrWithdrawal(customer.getCustomerId(), toAccountName, depositAcc.getBalance());
-		
+
 		return flag;
 	}
 
@@ -270,9 +283,9 @@ public class BankBranch extends Observable {
 				fees + accountOperationFee, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, transaction);
 		this.addMoneyEarned(fees);
-		
-		//remove account from db 
-		
+
+		// remove account from db
+
 		setChanged();
 		notifyObservers();
 	}
@@ -292,8 +305,8 @@ public class BankBranch extends Observable {
 		t = this.addTransaction(customer.getName(), "Bank", "Transaction fees", fees, accountName, "My Fancy Bank");
 		this.addTransactionForCustomer(customer, t);
 		this.addMoneyEarned(fees);
-		
-		//update loan in db 
+
+		// update loan in db
 		Update.updateLoanForSettle(loanId, customer.getCustomerId());
 		setChanged();
 		notifyObservers();
@@ -315,9 +328,10 @@ public class BankBranch extends Observable {
 						Transaction t = this.addTransaction("Bank", customer.getName(), "Interest Settlement",
 								interestAmount, "My Fancy Bank", acc.getAccountName());
 						this.addTransactionForCustomer(customer, t);
-						// update balance for customer account in db 
+						// update balance for customer account in db
 						double modifiedBalance = acc.getBalance();
-						Update.updateDepositOrWithdrawal(customer.getCustomerId(), acc.getAccountName(), modifiedBalance);
+						Update.updateDepositOrWithdrawal(customer.getCustomerId(), acc.getAccountName(),
+								modifiedBalance);
 					}
 				}
 			}
@@ -326,6 +340,7 @@ public class BankBranch extends Observable {
 
 	public void modifySavingsInterestRate(double newInterestRate) {
 		this.setSavingsInterestRate(newInterestRate);
+		Update.updateFees("savingsInterestRate", newInterestRate);
 		if (customers.size() == 0)
 			return;
 		for (BankCustomer customer : customers) {
@@ -337,12 +352,12 @@ public class BankBranch extends Observable {
 					acc.setRate(newInterestRate);
 			}
 		}
-		
-		//update fees table in db
+		Update.updateFeeForCustomer("savingsInterestRate", newInterestRate, "");
 	}
 
 	public void modifyLoanInterestRate(double newInterestRate) {
 		this.setLoanInterestRate(newInterestRate);
+		Update.updateFees("loanInterestRate", newInterestRate);
 		if (customers.size() == 0)
 			return;
 		for (BankCustomer customer : customers) {
@@ -353,22 +368,29 @@ public class BankBranch extends Observable {
 				acc.setInterestRate(newInterestRate);
 			}
 		}
-		
-		//update fees table in db 
+		Update.updateLoanInterestRateForCustomer("", newInterestRate);
+
 	}
 
 	public void modifyFees(String type, double newFees) {
+		String name = "";
 		if (type.equals("Account Operation")) {
 			this.setAccountOperationFee(newFees);
+			name = "accountOperationFee";
 		} else if (type.equals("Checking")) {
+			name = "transactionFee";
 			this.setCheckingTransactionFee(newFees);
 		} else if (type.equals("Withdrawal")) {
+			name = "withdrawalFee";
 			this.setWithdrawalFee(newFees);
 		} else if (type.equals("BuyStock")) {
+			name = "stockFee";
 			this.setStockFee(newFees);
 		}
 
-		this.setSavingsInterestRate(newFees);
+		// update fees in db
+		Update.updateFees(name, newFees);
+
 		if (customers.size() == 0)
 			return;
 		for (BankCustomer customer : customers) {
@@ -382,9 +404,13 @@ public class BankBranch extends Observable {
 					acc.setTransactionFee(newFees);
 				} else if (type.equals("Withdrawal")) {
 					acc.setWithdrawalFee(newFees);
+				} else if (type.equals("BuyStock")) {
+					name = "tradingFee";
+					acc.setTradingFee(newFees);
 				}
 			}
 		}
+		Update.updateFeeForCustomer(name, newFees, "");
 	}
 
 	public Loan getLoanById(String loanId) {
@@ -423,13 +449,15 @@ public class BankBranch extends Observable {
 
 	public void addMoneyEarned(double moneyEarned) {
 		this.moneyEarned += moneyEarned;
+		Update.updateFees("moneyEarned", this.moneyEarned);
 	}
 
 	public void approveLoanForCustomer(BankCustomer customer, String loanId) {
 		this.getCustomerByEmail(customer.getEmail()).approveLoan(loanId);
 		this.approveLoan(loanId);
-		//update loan table in db 
-		
+		// update loan table in db
+		Update.updateLoanForApproval(loanId, customer.getCustomerId());
+
 		setChanged();
 		notifyObservers();
 	}
@@ -554,6 +582,7 @@ public class BankBranch extends Observable {
 
 	public void setHighBalance(double highBalance) {
 		this.highBalance = highBalance;
+		Update.updateFees("highBalance", highBalance);
 	}
 
 	public double getSavingsInterestRate() {

@@ -638,7 +638,7 @@ public class CustomerView extends JFrame implements Observer {
 				try {
 					JComboBox<String> accountCombo = new JComboBox<String>();
 					for(int i = 0; i < accounts.size(); i++){
-						if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > 500){
+						if(accounts.get(i).getType().equals("Savings") && accounts.get(i).getBalance() > bank.getHighBalance()){
 							accountCombo.addItem(accounts.get(i).getAccountName());
 						}
 					}

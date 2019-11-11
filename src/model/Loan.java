@@ -1,6 +1,14 @@
 package model;
 
-import java.util.Date;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Locale;
+
 
 public class Loan {
 
@@ -32,7 +40,9 @@ public class Loan {
 		this.isActive = false;
 		this.isApproved = false;
 		this.loanApprovedStatus = "Pending";
-		this.loanStartDate = new Date();
+		
+	
+		this.loanStartDate = new Date(System.currentTimeMillis());
 	}
 
 	public Loan(String loanId, String customerName, String customerId, double loanAmount, double interestRate,

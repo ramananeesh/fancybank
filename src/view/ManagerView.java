@@ -287,7 +287,7 @@ public class ManagerView extends JFrame implements Observer {
 		amountEarnedLbl.setFont(new Font("Tahoma", Font.PLAIN, 40));
 		amountEarnedLbl.setHorizontalAlignment(SwingConstants.CENTER);
 
-		moneyLbl = new JLabel("$"+bank.getMoneyEarned());
+		moneyLbl = new JLabel("$" + bank.getMoneyEarned());
 		moneyLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		moneyLbl.setFont(new Font("Tahoma", Font.PLAIN, 34));
 		panel_1.add(moneyLbl, BorderLayout.CENTER);
@@ -340,7 +340,7 @@ public class ManagerView extends JFrame implements Observer {
 		stocksDisplayPanel.add(lblStocks, BorderLayout.NORTH);
 
 		String stocksData[][] = new String[][] {};
-		String stocksHeader[] = new String[] {"Stock Name", "Value", "# Stocks"};
+		String stocksHeader[] = new String[] { "Stock Name", "Value", "# Stocks" };
 		stocksModel = new DefaultTableModel(stocksData, stocksHeader) {
 			public boolean isCellEditable(int rowIndex, int mColIndex) {
 				return false;
@@ -455,10 +455,10 @@ public class ManagerView extends JFrame implements Observer {
 
 	public DefaultTableModel addStocksToTable(DefaultTableModel model) {
 		ArrayList<BankStock> stocks = bank.getAllStocks();
-		if(stocks.size() == 0) {
+		if (stocks.size() == 0) {
 			return model;
 		}
-		for(BankStock s : stocks) {
+		for (BankStock s : stocks) {
 			model.addRow(s.getShortAllStockDisplayForManager());
 		}
 		return model;
@@ -474,20 +474,24 @@ public class ManagerView extends JFrame implements Observer {
 			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Set High Balance Minimum Limit",
 						JOptionPane.OK_CANCEL_OPTION);
-				try {
-					double newBalance = Double.parseDouble(field.getText());
+				if (reply == JOptionPane.OK_OPTION) {
+					try {
+						double newBalance = Double.parseDouble(field.getText());
 
-					if (newBalance <= 0) {
-						JOptionPane.showMessageDialog(null, "New Limit has to be more than 0", "Error",
+						if (newBalance <= 0) {
+							JOptionPane.showMessageDialog(null, "New Limit has to be more than 0", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						bank.setHighBalance(newBalance);
+						break;
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Enter a valid value more than 0", "Error",
 								JOptionPane.ERROR_MESSAGE);
 						continue;
 					}
-					bank.setHighBalance(newBalance);
+				} else {
 					break;
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, "Enter a valid value more than 0", "Error",
-							JOptionPane.ERROR_MESSAGE);
-					continue;
 				}
 			}
 
@@ -511,25 +515,28 @@ public class ManagerView extends JFrame implements Observer {
 			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Set" + this.type + " Interest Rate Percentage",
 						JOptionPane.OK_CANCEL_OPTION);
-				try {
-					double newRate = Double.parseDouble(field.getText());
+				if (reply == JOptionPane.OK_OPTION)
+					try {
+						double newRate = Double.parseDouble(field.getText());
 
-					if (newRate <= 0 || newRate >= 100) {
-						JOptionPane.showMessageDialog(null, "Interest has to be more than 0 and less than 100", "Error",
+						if (newRate <= 0 || newRate >= 100) {
+							JOptionPane.showMessageDialog(null, "Interest has to be more than 0 and less than 100",
+									"Error", JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						if (type.equals("Loan"))
+							bank.modifyLoanInterestRate(newRate / 100.0);
+						else if (type.equals("Savings"))
+							bank.modifySavingsInterestRate(newRate / 100.0);
+
+						break;
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Enter a valid value between 0 and 100", "Error",
 								JOptionPane.ERROR_MESSAGE);
 						continue;
 					}
-					if (type.equals("Loan"))
-						bank.modifyLoanInterestRate(newRate / 100.0);
-					else if (type.equals("Savings"))
-						bank.modifySavingsInterestRate(newRate / 100.0);
-
+				else
 					break;
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, "Enter a valid value between 0 and 100", "Error",
-							JOptionPane.ERROR_MESSAGE);
-					continue;
-				}
 			}
 		}
 	}
@@ -551,22 +558,26 @@ public class ManagerView extends JFrame implements Observer {
 			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Set" + this.type + " Fee",
 						JOptionPane.OK_CANCEL_OPTION);
-				try {
-					double newFee = Double.parseDouble(field.getText());
+				if (reply == JOptionPane.OK_OPTION)
+					try {
+						double newFee = Double.parseDouble(field.getText());
 
-					if (newFee <= 0) {
-						JOptionPane.showMessageDialog(null, "Fee has to be more than 0", "Error",
+						if (newFee <= 0) {
+							JOptionPane.showMessageDialog(null, "Fee has to be more than 0", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						bank.modifyFees(type, newFee);
+						break;
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Enter a valid value more than 0", "Error",
 								JOptionPane.ERROR_MESSAGE);
 						continue;
 					}
-					bank.modifyFees(type, newFee);
+				else
 					break;
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, "Enter a valid value more than 0", "Error",
-							JOptionPane.ERROR_MESSAGE);
-					continue;
-				}
 			}
+
 		}
 	}
 
@@ -577,34 +588,36 @@ public class ManagerView extends JFrame implements Observer {
 			JTextField valueField = new JTextField();
 			JTextField numStocksField = new JTextField();
 
-			Object[] fields = new Object[] {"Stock Name: ", stockNameField, "Value: ", valueField,
+			Object[] fields = new Object[] { "Stock Name: ", stockNameField, "Value: ", valueField,
 					"Number of Stocks: ", numStocksField, };
 
-			while(true) {
-				int reply = JOptionPane.showConfirmDialog(null, fields, "Add Stock",
-						JOptionPane.OK_CANCEL_OPTION);
-				try{
-					String stockName = stockNameField.getText();
-					double value = Double.parseDouble(valueField.getText());
-					int numStocks = Integer.parseInt(numStocksField.getText());
+			while (true) {
+				int reply = JOptionPane.showConfirmDialog(null, fields, "Add Stock", JOptionPane.OK_CANCEL_OPTION);
+				if (reply == JOptionPane.OK_OPTION)
+					try {
+						String stockName = stockNameField.getText();
+						double value = Double.parseDouble(valueField.getText());
+						int numStocks = Integer.parseInt(numStocksField.getText());
 
-					if(numStocks <= 0){
-						JOptionPane.showMessageDialog(null, "Number of Stocks has to be more than 0", "Error",
+						if (numStocks <= 0) {
+							JOptionPane.showMessageDialog(null, "Number of Stocks has to be more than 0", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						if (value <= 0) {
+							JOptionPane.showMessageDialog(null, "Stocks value has to be more than 0", "Error",
+									JOptionPane.ERROR_MESSAGE);
+							continue;
+						}
+						bank.addAllStocks(stockName, value, numStocks);
+						break;
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Please enter a valid value", "Error",
 								JOptionPane.ERROR_MESSAGE);
 						continue;
 					}
-					if(value <= 0) {
-						JOptionPane.showMessageDialog(null, "Stocks value has to be more than 0", "Error",
-								JOptionPane.ERROR_MESSAGE);
-						continue;
-					}
-					bank.addAllStocks(stockName, value, numStocks);
+				else
 					break;
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(null, "Please enter a valid value", "Error",
-							JOptionPane.ERROR_MESSAGE);
-					continue;
-				}
 			}
 		}
 	}
@@ -612,9 +625,8 @@ public class ManagerView extends JFrame implements Observer {
 	public class ModifyStocks implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(bank.getAllStocks().size() == 0){
-				JOptionPane.showMessageDialog(null, "No Stocks", "Error",
-						JOptionPane.ERROR_MESSAGE);
+			if (bank.getAllStocks().size() == 0) {
+				JOptionPane.showMessageDialog(null, "No Stocks", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			JComboBox<String> stockNameCombo = new JComboBox<String>();
@@ -625,12 +637,13 @@ public class ManagerView extends JFrame implements Observer {
 			JTextField valueField = new JTextField();
 			JTextField numStocksField = new JTextField();
 
-			Object[] fields = {"Stock Name: ", stockNameCombo, "Value: ", valueField, "Number of Stocks: ", numStocksField};
-			while(true) {
+			Object[] fields = { "Stock Name: ", stockNameCombo, "Value: ", valueField, "Number of Stocks: ",
+					numStocksField };
+			while (true) {
 				int reply = JOptionPane.showConfirmDialog(null, fields, "Modify Stocks", JOptionPane.OK_CANCEL_OPTION);
 
 				if (reply == JOptionPane.OK_OPTION) {
-					try{
+					try {
 						int stockIndex = stockNameCombo.getSelectedIndex();
 						double value = Double.parseDouble(valueField.getText());
 						int numStocks = Integer.parseInt(numStocksField.getText());
@@ -638,12 +651,10 @@ public class ManagerView extends JFrame implements Observer {
 
 						break;
 					} catch (Exception e1) {
-						JOptionPane.showMessageDialog(null, "Error",
-								"Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
 						continue;
 					}
-				}
-				else{
+				} else {
 					return;
 				}
 			}
@@ -719,7 +730,7 @@ public class ManagerView extends JFrame implements Observer {
 	public class StockListListener implements ListSelectionListener {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			if(stocksTable.getSelectedRow() == -1) {
+			if (stocksTable.getSelectedRow() == -1) {
 				return;
 			}
 
@@ -770,7 +781,7 @@ public class ManagerView extends JFrame implements Observer {
 		loansTable.setModel(loansModel);
 
 		String stocksData[][] = new String[][] {};
-		String stocksHeader[] = new String[] {"Stock Name", "Value", "# Stocks"};
+		String stocksHeader[] = new String[] { "Stock Name", "Value", "# Stocks" };
 		stocksModel = new DefaultTableModel(stocksData, stocksHeader) {
 			public boolean isCellEditable(int rowIndex, int mColIndex) {
 				return false;
@@ -779,7 +790,7 @@ public class ManagerView extends JFrame implements Observer {
 		stocksModel = addStocksToTable(stocksModel);
 		stocksTable.setModel(stocksModel);
 
-		moneyLbl.setText("$"+bank.getMoneyEarned());
+		moneyLbl.setText("$" + bank.getMoneyEarned());
 
 	}
 
