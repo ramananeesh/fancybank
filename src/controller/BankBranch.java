@@ -158,10 +158,10 @@ public class BankBranch extends Observable {
 			}
 		}
 		double amount = Double.parseDouble(stock.getCurrentValue()) * Integer.parseInt(stock.getNumStocks());
-		acc.setBalance(acc.getBalance() + amount - stockFee);
-
+		// acc.setBalance(acc.getBalance() + amount - stockFee);
+		this.depositForCustomer(customer, accountName, acc.getBalance() + amount - stockFee);
 		// remove or update customerStock in db
-
+		Delete.removeStockForCustomer(stock.getStockID(), customer.getCustomerId(), accountName);
 		setChanged();
 		notifyObservers();
 	}
@@ -285,6 +285,7 @@ public class BankBranch extends Observable {
 		this.addMoneyEarned(fees);
 
 		// remove account from db
+		Delete.removeAccountForCustomer(accountName, customer.getCustomerId());
 
 		setChanged();
 		notifyObservers();

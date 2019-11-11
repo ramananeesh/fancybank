@@ -7,43 +7,9 @@ import java.util.HashMap;
 
 public class Read {
 
-	public static Connection getConnection() {
-		Connection conn = null;
-
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bankdb?" + "user=root");
-
-			// Do something with the Connection
-
-		} catch (Exception ex) {
-			// handle any errors
-			System.out.println("Exception: " + ex.getMessage());
-
-		}
-
-		return conn;
-	}
-
-	public static ResultSet performRead(String query) {
-		ResultSet rs = null;
-
-		try {
-			Connection conn = getConnection();
-
-			Statement stmt = conn.createStatement();
-
-			rs = stmt.executeQuery(query);
-		} catch (Exception e) {
-			System.out.println("Exception: " + e.getMessage());
-		}
-
-		return rs;
-	}
-
 	public static boolean checkCredentials(String email, String password) {
 		String query = "Select password from customer where email='" + email + "'";
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 
 		try {
 			while (rs.next()) {
@@ -92,7 +58,7 @@ public class Read {
 		map.put("email", email);
 		String query = "Select customerId, name, phoneNumber, " + "ssn, password from customer where " + "email='"
 				+ email + "'";
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 		try {
 			while (rs.next()) {
 				map.put("customerId", rs.getString("customerId"));
@@ -112,7 +78,7 @@ public class Read {
 		Address address = new Address("", "", "", "", "");
 		String query = "Select houseNumber, street, city, state, zipcode " + "from address where customerId='"
 				+ customerId + "'";
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 		try {
 			while (rs.next()) {
 				address = new Address(rs.getString("houseNumber"), rs.getString("street"), rs.getString("city"),
@@ -130,7 +96,7 @@ public class Read {
 		String query = "select accountName, accountType, balance, rate, "
 				+ "withdrawalFee, accountOperationFee, transactionFee,"
 				+ "isNewAccount, tradeThreshold, tradingFee from bankaccount where customerId='" + customerId + "'";
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 		try {
 			while (rs.next()) {
 				String name = rs.getString("accountName");
@@ -163,7 +129,7 @@ public class Read {
 			query += " where customerId='" + customerId + "'";
 		}
 
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 		try {
 			while (rs.next()) {
 				String id = rs.getString("id");
@@ -198,7 +164,7 @@ public class Read {
 			query += " where customerId='" + customerId + "'";
 		}
 
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 
 		try {
 			while (rs.next()) {
@@ -229,7 +195,7 @@ public class Read {
 		ArrayList<CustomerStock> stocks = new ArrayList<CustomerStock>();
 		String query = "Select stockId, stockName, buyingValue, currentValue,"
 				+ "numstocks from customerStock where customerId='" + customerId + "'";
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 
 		try {
 			while (rs.next()) {
@@ -264,7 +230,7 @@ public class Read {
 	public static ArrayList<BankStock> getBankStocks() {
 		ArrayList<BankStock> stocks = new ArrayList<BankStock>();
 		String query = "Select stockName, value, numberOfStocks from bankStock";
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 
 		try {
 			while (rs.next()) {
@@ -284,7 +250,7 @@ public class Read {
 	public static HashMap<String,Double> getAllFees(){
 		HashMap<String,Double> map=new HashMap<String, Double>();
 		String query = "Select * from fees";
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 		
 		try {
 			while (rs.next()) {
@@ -302,7 +268,7 @@ public class Read {
 		ArrayList<String> emails = new ArrayList<String>();
 		String query = "Select email from customer";
 
-		ResultSet rs = performRead(query);
+		ResultSet rs = SQLHelper.performRead(query);
 
 		try {
 			while (rs.next()) {
@@ -325,11 +291,6 @@ public class Read {
 		String[] x = date.split("/");
 
 		return new Date(Integer.parseInt(x[0]), Integer.parseInt(x[1]), Integer.parseInt(x[2]));
-	}
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		getCustomer("test");
 	}
 
 }
