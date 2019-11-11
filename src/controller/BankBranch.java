@@ -82,8 +82,6 @@ public class BankBranch extends Observable {
 	public Transaction addTransaction(String fromCustomer, String toCustomer, String type, double amount,
 			String fromAccount, String toAccount) {
 		Transaction newTransaction = new Transaction(fromCustomer, toCustomer, type, amount, fromAccount, toAccount);
-		// Insert.insertNewTransaction(newTransaction,
-		// customers.get(getCustomerIndex(fromCustomer)).getCustomerId());
 		transactions.add(newTransaction);
 		return newTransaction;
 	}
